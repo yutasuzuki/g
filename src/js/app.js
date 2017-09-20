@@ -1,13 +1,3 @@
-class Animal {
-  constructor(name = 'test') {
-    this.name = name
-  }
+import Battle from './battle/battle';
 
-  say() {
-    alert(this.name )
-  }
-}
-
-const a = new Animal('dog');
-
-a.say();
+const battle = new Battle();
