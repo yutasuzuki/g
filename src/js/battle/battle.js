@@ -51,7 +51,7 @@ class Battle {
     const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
     this.state.enemy.charactors = await ayncGetChara(ENEMY_CHARACTOR);
     const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
-    queue.loadManifest(commandManifest, true, '/assets/images/battle/');
+    queue.loadManifest(commandManifest, true, '/assets/images/battle/command/');
     queue.loadManifest(magicManifest, true, '/assets/images/battle/effect/magic/');
     queue.loadManifest(fieldManifest, true, '/assets/images/field/');
     queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
@@ -177,6 +177,14 @@ class Battle {
   attackTween(mainCharactor, targetCharactor) {
     const x = mainCharactor.x;
     const y = mainCharactor.y;
+    let rotate = 20;
+    let offsetY = -10;
+    let offsetX = 10;
+    if (mainCharactor.type === 'enemy') {
+      rotate = -20;
+      offsetY = 0;
+      offsetX = -10;
+    }
 
     createjs.Tween.get(mainCharactor)
       .to({
@@ -190,18 +198,25 @@ class Battle {
     
     createjs.Tween.get(targetCharactor)
       .to({
+        y: targetCharactor.y + offsetY,
+        x: targetCharactor.x + offsetX,
+        rotation: rotate,
         alpha: .25
-      }, 100)
+      }, 200)
       .to({
+        y: targetCharactor.y,
+        x: targetCharactor.x,
+        rotation: 0,
         alpha: 1
-      }, 100);
-    
-    if (targetCharactor.status.HP <= 0) {
-      createjs.Tween.get(targetCharactor)
-        .to({
-          alpha: .05
-        }, 800);
-    }
+      }, 200)
+      .call(() => {
+        if (targetCharactor.status.HP <= 0) {
+          createjs.Tween.get(targetCharactor)
+            .to({
+              alpha: 0
+            }, 800);
+        }
+      });;
   }
 
   magicTween(mainCharactor, targetCharactor) {
@@ -256,7 +271,8 @@ class Battle {
         y: targetCharactor.y,
         x: targetCharactor.x,
         rotation: 0
-      }, 100).call(() => {
+      }, 100)
+      .call(() => {
         if (targetCharactor.status.HP <= 0) {
           createjs.Tween.get(targetCharactor)
             .to({
@@ -287,7 +303,6 @@ class Battle {
   magicHandler() {
     const mainCharactor = this.state.order.current;
     const targetCharactors = this.orderedEnemyChara;
-    console.log(mainCharactor);
     // ダメージの計算
     targetCharactors.forEach((charactor) => {
       const coefficient = random(85, 115);
@@ -307,6 +322,7 @@ class Battle {
   defenseHandler() {
     const mainCharactor = this.state.order.current;
     const targetCharactor = this.state.self.current;
+    if (targetCharactor.status.HP <= 0) return;
 
     // ダメージの計算
     const coefficient = random(85, 115);
@@ -400,14 +416,14 @@ class Battle {
   setCharactors(charactors, type = 'self') {
     return charactors.map((charactor, index) => {
       const chara = new createjs.Bitmap(this.loaders[`chara_${charactor.id}`]);
-      chara.status = charactor;
       const x = chara.getBounds().width / 2;
       const y = chara.getBounds().height / 2;
+      chara.status = charactor;
+      chara.type = type;
       chara.scaleX = .5;
       chara.scaleY = .5;
       chara.regX = x;
       chara.regY = y;
-      chara.type = type;
       if (type === 'enemy') {
         chara.scaleX = -.5;
         chara.regX = x + 80;
