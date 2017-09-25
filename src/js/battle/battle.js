@@ -124,7 +124,7 @@ class Battle {
     ];
     attcker.cache(0, 0, 200, 200);
     defenser.filters = [
-      new createjs.ColorFilter(0.7, 0.3, 0.3, 1, 90, 90, 90, 0)
+      new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 60, 60, 0, 0)
     ];
     defenser.cache(0, 0, 200, 200);
     Stage.addChild(attcker, defenser);
@@ -188,16 +188,64 @@ class Battle {
     }
   }
 
+  magicTween(mainCharactor, targetCharactor) {
+    const x = mainCharactor.x;
+    const y = mainCharactor.y;
+
+    createjs.Tween.get(mainCharactor)
+      .to({
+        x: mainCharactor.x + 40
+      }, 100)
+      .to({
+        x,
+      }, 100);
+    
+    createjs.Tween.get(targetCharactor)
+      .to({
+        alpha: .25
+      }, 100)
+      .to({
+        alpha: 1
+      }, 100);
+    
+    if (targetCharactor.status.HP <= 0) {
+      createjs.Tween.get(targetCharactor)
+        .to({
+          alpha: .05
+        }, 800);
+    }
+  }
+
   attackHandler() {
     const mainCharactor = this.state.order.current;
     const targetCharactor = this.state.enemy.current;
     // ダメージの計算
     const coefficient = random(85, 115);
-    const damage = Math.floor(targetCharactor.status.ATK * coefficient / 100);
+    const damage = Math.floor(mainCharactor.status.ATK * coefficient / 100);
     targetCharactor.damage(damage);
 
     this.attackTween(mainCharactor, targetCharactor);
 
+    if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
+      console.log('敵を倒した')
+    } else {
+      this.turnController();
+    }    
+  }
+
+  magicHandler() {
+    const mainCharactor = this.state.order.current;
+    const targetCharactors = this.orderedEnemyChara;
+    console.log(mainCharactor);
+    // ダメージの計算
+    targetCharactors.forEach((charactor) => {
+      const coefficient = random(85, 115);
+      const damage = Math.floor(mainCharactor.status.ATK * coefficient / 100);
+      console.log(charactor);
+      charactor.damage(damage);
+      this.magicTween(mainCharactor, charactor);
+    })
+    console.log(targetCharactors);
     if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
       console.log('敵を倒した')
     } else {
@@ -248,6 +296,7 @@ class Battle {
     magic.y = 0;
     magic.scaleX = .5;
     magic.scaleY = .5;
+    magic.addEventListener('click', this.magicHandler.bind(this));
     const skill = new createjs.Bitmap(this.loaders['skill']);
     skill.x = 0;
     skill.y = 100;
