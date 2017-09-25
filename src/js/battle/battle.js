@@ -103,22 +103,22 @@ class Battle {
         this.state.enemy.current = this.getRandomChara(this.orderedEnemyChara);
         this.commands.attack.y = window.innerHeight - 200;
         this.commands.defense.y = window.innerHeight;
-        this.setEnrtyMark(this.state.self.current, this.state.enemy.current);
+        this.setEntryMark(this.state.self.current, this.state.enemy.current);
       } else {
         this.state.enemy.current = this.state.order.current;
         this.state.self.current = this.getRandomChara(this.orderedMyChara);
         this.commands.attack.y = window.innerHeight;
         this.commands.defense.y = window.innerHeight - 200;
-        this.setEnrtyMark(this.state.enemy.current, this.state.self.current);
+        this.setEntryMark(this.state.enemy.current, this.state.self.current);
       }
     } else {
-      this.resetEnrtyMark();
+      this.resetEntryMark();
       this.turnController();
     }
   }
 
-  setEnrtyMark(attcker, defenser) {
-    this.resetEnrtyMark();
+  setEntryMark(attcker, defenser) {
+    this.resetEntryMark();
     attcker.filters = [
       new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 90, 90, 90, 0)
     ];
@@ -131,7 +131,7 @@ class Battle {
     Stage.update();
   }
 
-  resetEnrtyMark() {
+  resetEntryMark() {
     const resetAllChara =  this.orderAllChara.map((charactor) => {
       charactor.filters = [];
       charactor.cache(0, 0, 200, 200);
