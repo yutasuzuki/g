@@ -44,11 +44,15 @@ class Battle {
       {src: 'command_counter.png', id: 'counter'},
       {src: 'command_recovery.png', id: 'recovery'},
     ];
+    const magicManifest = [
+      {src: 'air.png', id: 'air'},
+    ];
     this.state.self.charactors = await ayncGetChara(MY_CHARACTOR);
     const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
     this.state.enemy.charactors = await ayncGetChara(ENEMY_CHARACTOR);
     const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
     queue.loadManifest(commandManifest, true, '/assets/images/battle/');
+    queue.loadManifest(magicManifest, true, '/assets/images/battle/effect/magic/');
     queue.loadManifest(fieldManifest, true, '/assets/images/field/');
     queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
     queue.loadManifest(enemyCharaManifest, true, '/assets/images/chara/');
@@ -103,22 +107,22 @@ class Battle {
         this.state.enemy.current = this.getRandomChara(this.orderedEnemyChara);
         this.commands.attack.y = window.innerHeight - 200;
         this.commands.defense.y = window.innerHeight;
-        this.setEntryMark(this.state.self.current, this.state.enemy.current);
+        this.setCurrentMark(this.state.self.current, this.state.enemy.current);
       } else {
         this.state.enemy.current = this.state.order.current;
         this.state.self.current = this.getRandomChara(this.orderedMyChara);
         this.commands.attack.y = window.innerHeight;
         this.commands.defense.y = window.innerHeight - 200;
-        this.setEntryMark(this.state.enemy.current, this.state.self.current);
+        this.setCurrentMark(this.state.enemy.current, this.state.self.current);
       }
     } else {
-      this.resetEntryMark();
+      this.resetCurrentMark();
       this.turnController();
     }
   }
 
-  setEntryMark(attcker, defenser) {
-    this.resetEntryMark();
+  setCurrentMark(attcker, defenser) {
+    this.resetCurrentMark();
     attcker.filters = [
       new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 90, 90, 90, 0)
     ];
@@ -131,7 +135,7 @@ class Battle {
     Stage.update();
   }
 
-  resetEntryMark() {
+  resetCurrentMark() {
     const resetAllChara =  this.orderAllChara.map((charactor) => {
       charactor.filters = [];
       charactor.cache(0, 0, 200, 200);
@@ -146,6 +150,18 @@ class Battle {
         id: `chara_${charactor.id}`,
       }
     })
+  }
+
+  setMagicEffect() {
+    const air = new createjs.Bitmap(this.loaders['air']);
+    air.skewX = air.width / 2;
+    air.skewY = air.height / 2;
+    air.scaleX = 0.5;
+    air.scaleY = 0.5;
+    air.x = -10;
+    air.y = 60;
+    air.alpha = 0;
+    return air;
   }
 
   setField() {
@@ -191,6 +207,9 @@ class Battle {
   magicTween(mainCharactor, targetCharactor) {
     const x = mainCharactor.x;
     const y = mainCharactor.y;
+    const magic = this.setMagicEffect();
+    Stage.addChild(magic);
+    Stage.update();
 
     createjs.Tween.get(mainCharactor)
       .to({
@@ -199,21 +218,53 @@ class Battle {
       .to({
         x,
       }, 100);
-    
+      
+    createjs.Tween.get(magic)
+      .to({
+        alpha: 0.15,
+        x: magic.x + 10
+      }, 200)
+      .to({
+        alpha: 0.25,
+        x: magic.x
+      }, 1000)
+      .to({
+        alpha: 0,
+        x: magic.x + 15
+      }, 200);
+      
     createjs.Tween.get(targetCharactor)
       .to({
-        alpha: .25
+        alpha: .5,
       }, 100)
       .to({
-        alpha: 1
-      }, 100);
+        y: targetCharactor.y - 10,
+        x: targetCharactor.x + 10,
+        rotation: 20,
+        alpha: .5
+      }, 100)
+      .to({
+        alpha: .5
+      }, 500)
+      .to({
+        alpha: .5
+      }, 500)
+      .to({
+        alpha: 1,
+      }, 300)
+      .to({
+        y: targetCharactor.y,
+        x: targetCharactor.x,
+        rotation: 0
+      }, 100).call(() => {
+        if (targetCharactor.status.HP <= 0) {
+          createjs.Tween.get(targetCharactor)
+            .to({
+              alpha: 0
+            }, 800);
+        }
+      });;
     
-    if (targetCharactor.status.HP <= 0) {
-      createjs.Tween.get(targetCharactor)
-        .to({
-          alpha: .05
-        }, 800);
-    }
   }
 
   attackHandler() {
