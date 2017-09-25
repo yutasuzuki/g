@@ -4,19 +4,33 @@ import constants from './constants';
 class Battle {
   constructor() {
     this.loaders = {};
-    this.preload();
-    this.status = {
-      own: {
-        chara: {}
+    this.commands = {
+      attack: {},
+      defense: {}
+    };
+    this.state = {
+      self: {
+        charactors: {},
+        current: {},
       },
       enemy: {
-        chara: {}
-      }
+        charactors: {},
+        current: {},
+      },
+      order: {
+        current: {},
+        self: 0,
+        enemy: 0,
+        total: 0
+      },
+      turn: {
+        count: 0
+      },
     }
   }
 
-  async preload() {
-    const preload = new createjs.LoadQueue();
+  async start() {
+    const queue = new createjs.LoadQueue();
     const fieldManifest = [
       {src: 'forest1.jpg', id: 'field'},
     ];
@@ -25,36 +39,104 @@ class Battle {
       {src: 'command_magic.png', id: 'magic'},
       {src: 'command_skill.png', id: 'skill'},
       {src: 'command_skip.png', id: 'skip'},
+      {src: 'command_defense.png', id: 'defense'},
+      {src: 'command_magic_defense.png', id: 'magic_defense'},
+      {src: 'command_counter.png', id: 'counter'},
+      {src: 'command_recovery.png', id: 'recovery'},
     ];
-    this.myCharactors = await ayncGetChara(MY_CHARACTOR);
-    const myCharaManifest = this.createCharaManifest(this.myCharactors);
-    this.enemyCharactors = await ayncGetChara(ENEMY_CHARACTOR);
-    const enemyCharaManifest = this.createCharaManifest(this.enemyCharactors);
-    preload.loadManifest(commandManifest, true, '/assets/images/battle/');
-    preload.loadManifest(fieldManifest, true, '/assets/images/field/');
-    preload.loadManifest(myCharaManifest, true, '/assets/images/chara/');
-    preload.loadManifest(enemyCharaManifest, true, '/assets/images/chara/');
-    preload.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
-    preload.addEventListener('complete', () => this.init());
+    this.state.self.charactors = await ayncGetChara(MY_CHARACTOR);
+    const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
+    this.state.enemy.charactors = await ayncGetChara(ENEMY_CHARACTOR);
+    const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
+    queue.loadManifest(commandManifest, true, '/assets/images/battle/');
+    queue.loadManifest(fieldManifest, true, '/assets/images/field/');
+    queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
+    queue.loadManifest(enemyCharaManifest, true, '/assets/images/chara/');
+    queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
+    queue.addEventListener('complete', () => this.init());
   }
 
   init() {
-    const bg = this.setBackground();
-    const command = this.setCommands();
-    this.myTroops = this.setCharactors(this.myCharactors);
-    this.enemyTroops = this.setCharactors(this.enemyCharactors, 'enemy');
-    this.Flow = new Flow(this.myTroops, this.enemyTroops);
-    this.turn();
+    const field = this.setField();
+    this.commands = this.setCommands();
+    this.myCharactors = this.setCharactors(this.state.self.charactors);
+    this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
+    this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.addEventListener("tick", Stage);
-    Stage.addChild(bg, command, ...this.myTroops, ...this.enemyTroops);
+    Stage.addChild(field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
     Stage.update();
+    this.turn();
   }
 
   turn() {
-    const { orderedMyChara, orderedEnemyChara } = this.Flow.turn();
-    this.orderedMyChara = orderedMyChara;
-    this.orderedEnemyChara = orderedEnemyChara;
+    const { orderedMyChara, orderedEnemyChara, orderedAllChara} = this.Flow.turn();
+    this.orderedMyChara = this.getLivingCharas(orderedMyChara);
+    this.orderedEnemyChara = this.getLivingCharas(orderedEnemyChara);
+    this.orderAllChara = this.getLivingCharas(orderedAllChara);
+    this.switchCommand();
+  }
+  
+  turnController() {
+    if (this.state.order.total < this.orderAllChara.length - 1) {
+      if (this.state.order.current.type === 'self') {
+        this.state.order.self++;
+      } else {
+        this.state.order.enemy++;
+      }
+      this.state.order.total++;
+      this.switchCommand();
+    } else {
+      this.state.order.self = 0;
+      this.state.order.enemy = 0;
+      this.state.order.total = 0;
+      this.state.turn.count++;
+      this.turn();
+    }
+  }
+
+  switchCommand() {
+    this.state.order.current = this.orderAllChara[this.state.order.total];
+    if (0 < this.state.order.current.status.HP) {
+      if (this.state.order.current.type === 'self') {
+        this.state.self.current = this.state.order.current;
+        this.state.enemy.current = this.getRandomChara(this.orderedEnemyChara);
+        this.commands.attack.y = window.innerHeight - 200;
+        this.commands.defense.y = window.innerHeight;
+        this.setEnrtyMark(this.state.self.current, this.state.enemy.current);
+      } else {
+        this.state.enemy.current = this.state.order.current;
+        this.state.self.current = this.getRandomChara(this.orderedMyChara);
+        this.commands.attack.y = window.innerHeight;
+        this.commands.defense.y = window.innerHeight - 200;
+        this.setEnrtyMark(this.state.enemy.current, this.state.self.current);
+      }
+    } else {
+      this.resetEnrtyMark();
+      this.turnController();
+    }
+  }
+
+  setEnrtyMark(attcker, defenser) {
+    this.resetEnrtyMark();
+    attcker.filters = [
+      new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 90, 90, 90, 0)
+    ];
+    attcker.cache(0, 0, 200, 200);
+    defenser.filters = [
+      new createjs.ColorFilter(0.7, 0.3, 0.3, 1, 90, 90, 90, 0)
+    ];
+    defenser.cache(0, 0, 200, 200);
+    Stage.addChild(attcker, defenser);
+    Stage.update();
+  }
+
+  resetEnrtyMark() {
+    const resetAllChara =  this.orderAllChara.map((charactor) => {
+      charactor.filters = [];
+      charactor.cache(0, 0, 200, 200);
+      return charactor;
+    })
   }
 
   createCharaManifest(charactors) {
@@ -66,7 +148,7 @@ class Battle {
     })
   }
 
-  setBackground() {
+  setField() {
     const field = new createjs.Bitmap(this.loaders['field']);
     field.skewX = field.width / 2;
     field.skewY = field.height / 2;
@@ -76,58 +158,91 @@ class Battle {
     return field;
   }
 
+  attackTween(mainCharactor, targetCharactor) {
+    const x = mainCharactor.x;
+    const y = mainCharactor.y;
+
+    createjs.Tween.get(mainCharactor)
+      .to({
+        x: targetCharactor.x,
+        y: targetCharactor.y
+      }, 150)
+      .to({
+        x,
+        y,
+      }, 150);
+    
+    createjs.Tween.get(targetCharactor)
+      .to({
+        alpha: .25
+      }, 100)
+      .to({
+        alpha: 1
+      }, 100);
+    
+    if (targetCharactor.status.HP <= 0) {
+      createjs.Tween.get(targetCharactor)
+        .to({
+          alpha: .05
+        }, 800);
+    }
+  }
+
+  attackHandler() {
+    const mainCharactor = this.state.order.current;
+    const targetCharactor = this.state.enemy.current;
+    // ダメージの計算
+    const coefficient = random(85, 115);
+    const damage = Math.floor(targetCharactor.status.ATK * coefficient / 100);
+    targetCharactor.damage(damage);
+
+    this.attackTween(mainCharactor, targetCharactor);
+
+    if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
+      console.log('敵を倒した')
+    } else {
+      this.turnController();
+    }    
+  }
+
+  defenseHandler() {
+    const mainCharactor = this.state.order.current;
+    const targetCharactor = this.state.self.current;
+
+    // ダメージの計算
+    const coefficient = random(85, 115);
+    const damage = Math.floor(targetCharactor.status.ATK * coefficient / 100);
+    targetCharactor.damage(damage);
+    
+    this.attackTween(mainCharactor, targetCharactor);
+
+    if (this.getLivingCharas(this.orderedMyChara).length === 0) {
+      console.log('全滅した')
+    } else {
+      this.turnController();
+    }
+  }
+
+  getRandomChara(charactors) {
+    const charas = this.getLivingCharas(charactors);
+    const cnt = random(0, charas.length - 1);
+    return charas[cnt];
+  }
+
+  getLivingCharas(charas) {
+    return charas.filter((chara) =>  0 < chara.status.HP);
+  }
+
   setCommands() {
-    const command = new createjs.Container();
+    const attackCommand = new createjs.Container();
     const attack = new createjs.Bitmap(this.loaders['attack']);
     attack.x = 0;
     attack.y = 0;
     attack.scaleX = .5;
     attack.scaleY = .5;
-    let cnt = 0;
-    attack.addEventListener('click', (e) => {
-      const myCurrentChara = this.orderedMyChara[cnt];
-      const enemyTargetChara = this.orderedEnemyChara[cnt];
-      const x = myCurrentChara.x;
-      const y = myCurrentChara.y;
-
-      createjs.Tween.get(myCurrentChara)
-        .to({
-          x: enemyTargetChara.x,
-          y: enemyTargetChara.y
-        }, 150)
-        .to({
-          x,
-          y,
-        }, 150);
-
-      const coefficient = getRandomCoefficient(85, 115);
-      const damage = Math.floor(myCurrentChara.status.ATK * coefficient / 100);
-      enemyTargetChara.damage(damage);
-
-      createjs.Tween.get(enemyTargetChara)
-        .to({
-          alpha: .25
-        }, 200)
-        .to({
-          alpha: 1
-        }, 50);
-
-      console.log(enemyTargetChara.status.HP);
-      
-      if (enemyTargetChara.status.HP <= 0) {
-        createjs.Tween.get(enemyTargetChara)
-          .to({
-            alpha: .05
-          }, 800)
-      }
-      
-      if (cnt < 4) {
-        cnt++;
-      } else {
-        cnt = 0;
-      }
-    });
     attack.alpha = 1;
+    attack.cursor = "pointer";
+    attack.addEventListener('click', this.attackHandler.bind(this));
     const magic = new createjs.Bitmap(this.loaders['magic']);
     magic.x = window.innerWidth / 2;
     magic.y = 0;
@@ -144,13 +259,45 @@ class Battle {
     skip.scaleX = .5;
     skip.scaleY = .5;
      
-    command.addChild(attack, magic, skill, skip);
-    command.y = window.innerHeight - 200;
+    attackCommand.addChild(attack, magic, skill, skip);
+    attackCommand.y = window.innerHeight - 200;
 
-    return command;
+
+    const defenseCommand = new createjs.Container();
+    const defense = new createjs.Bitmap(this.loaders['defense']);
+    defense.x = 0;
+    defense.y = 0;
+    defense.scaleX = .5;
+    defense.scaleY = .5;
+    defense.alpha = 1;
+    defense.cursor = "pointer";
+    defense.addEventListener('click', this.defenseHandler.bind(this));
+    const magicDefense = new createjs.Bitmap(this.loaders['magic_defense']);
+    magicDefense.x = window.innerWidth / 2;
+    magicDefense.y = 0;
+    magicDefense.scaleX = .5;
+    magicDefense.scaleY = .5;
+    const counter = new createjs.Bitmap(this.loaders['counter']);
+    counter.x = 0;
+    counter.y = 100;
+    counter.scaleX = .5;
+    counter.scaleY = .5;
+    const recovery = new createjs.Bitmap(this.loaders['recovery']);
+    recovery.x = window.innerWidth / 2;
+    recovery.y = 100;
+    recovery.scaleX = .5;
+    recovery.scaleY = .5;
+     
+    defenseCommand.addChild(defense, magicDefense, counter, recovery);
+    defenseCommand.y = window.innerHeight - 100;
+
+    return {
+      attack: attackCommand,
+      defense: defenseCommand
+    };
   }
 
-  setCharactors(charactors, type = 'own') {
+  setCharactors(charactors, type = 'self') {
     return charactors.map((charactor, index) => {
       const chara = new createjs.Bitmap(this.loaders[`chara_${charactor.id}`]);
       chara.status = charactor;
@@ -160,6 +307,7 @@ class Battle {
       chara.scaleY = .5;
       chara.regX = x;
       chara.regY = y;
+      chara.type = type;
       if (type === 'enemy') {
         chara.scaleX = -.5;
         chara.regX = x + 80;
@@ -176,10 +324,10 @@ class Battle {
 
 
 class Flow {
-  constructor(own, enemy) {
+  constructor(self, enemy) {
     this.current = 0;
     this.chara = {
-      own,
+      self,
       enemy
     }
   }
@@ -189,16 +337,17 @@ class Flow {
   }
 
   turn () {
-    const orderedMyChara = this.setAttackOrder(_.clone(this.chara.own))
+    const orderedMyChara = this.setAttackOrder(_.clone(this.chara.self));
     const orderedEnemyChara = this.setAttackOrder(_.clone(this.chara.enemy));
     return {
       orderedMyChara,
-      orderedEnemyChara
+      orderedEnemyChara,
+      orderedAllChara: _.sortBy([...orderedMyChara, ...orderedEnemyChara], c => c.status.SP).reverse()
     }
   }
 
   next() {
-    this.chara.own.map()
+    this.chara.self.map()
     this.current++;
   }
   
@@ -208,16 +357,16 @@ class Flow {
     const max = 115;
     
     const charas = charactors.map((charactor) => {
-      const coefficient = getRandomCoefficient(min, max);
+      const coefficient = random(min, max);
       charactor.status.SP = (charactor.status.SP * coefficient) / 100;
       return charactor;
     });
   
-    return  _.sortBy(charas, c => c.SP).reverse();
+    return  _.sortBy(charas, c => c.status.SP).reverse();
   }
 }
 
-function getRandomCoefficient(min = 0, max = 100) {
+function random(min = 0, max = 100) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 

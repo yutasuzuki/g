@@ -1,5 +1,5 @@
 const constants = {
-  own: {
+  self: {
     pos: [
       {
         x: 35,
