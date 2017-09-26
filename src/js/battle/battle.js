@@ -279,7 +279,8 @@ class Battle {
               alpha: 0
             }, 800);
         }
-      });;
+        Stage.removeChild(magic);
+      });
     
   }
 
@@ -289,7 +290,30 @@ class Battle {
     // ダメージの計算
     const coefficient = random(85, 115);
     const damage = Math.floor(mainCharactor.status.ATK * coefficient / 100);
+    const damageText = new createjs.Text(damage, "18px serif", "white");
     targetCharactor.damage(damage);
+    damageText.x = targetCharactor.x + 22;
+    damageText.y = targetCharactor.y + 22;
+    Stage.setChildIndex(damageText, 1);
+    Stage.addChild(damageText);
+    Stage.update();
+    createjs.Tween.get(damageText)
+      .to({
+        y: damageText.y - 10,
+        alpha: 1
+      }, 400)
+      .to({
+        y: damageText.y,
+        alpha: 1
+      }, 400)
+      .to({
+        y: damageText.y,
+        alpha: 0
+      }, 200)
+      .call(() => {
+        Stage.removeChild(damageText);
+        Stage.update();
+      });
 
     this.attackTween(mainCharactor, targetCharactor);
 
