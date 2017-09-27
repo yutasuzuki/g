@@ -1,5 +1,8 @@
 import _ from 'lodash';
 import constants from './constants';
+import Attack from './tween/attack';
+
+const attack = new Attack();
 
 class Battle {
   constructor() {
@@ -131,6 +134,8 @@ class Battle {
       new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 60, 60, 0, 0)
     ];
     defenser.cache(0, 0, 200, 200);
+    Stage.setChildIndex(attcker, 1);
+    Stage.setChildIndex(defenser, 1);
     Stage.addChild(attcker, defenser);
     Stage.update();
   }
@@ -172,51 +177,6 @@ class Battle {
     field.scaleY = 1.5;
     field.y = -250;
     return field;
-  }
-
-  attackTween(mainCharactor, targetCharactor) {
-    const x = mainCharactor.x;
-    const y = mainCharactor.y;
-    let rotate = 20;
-    let offsetY = -10;
-    let offsetX = 10;
-    if (mainCharactor.type === 'enemy') {
-      rotate = -20;
-      offsetY = 0;
-      offsetX = -10;
-    }
-
-    createjs.Tween.get(mainCharactor)
-      .to({
-        x: targetCharactor.x,
-        y: targetCharactor.y
-      }, 150)
-      .to({
-        x,
-        y,
-      }, 150);
-    
-    createjs.Tween.get(targetCharactor)
-      .to({
-        y: targetCharactor.y + offsetY,
-        x: targetCharactor.x + offsetX,
-        rotation: rotate,
-        alpha: .25
-      }, 200)
-      .to({
-        y: targetCharactor.y,
-        x: targetCharactor.x,
-        rotation: 0,
-        alpha: 1
-      }, 200)
-      .call(() => {
-        if (targetCharactor.status.HP <= 0) {
-          createjs.Tween.get(targetCharactor)
-            .to({
-              alpha: 0
-            }, 800);
-        }
-      });;
   }
 
   magicTween(mainCharactor, targetCharactor) {
@@ -294,7 +254,7 @@ class Battle {
     targetCharactor.damage(damage);
     damageText.x = targetCharactor.x + 22;
     damageText.y = targetCharactor.y + 22;
-    Stage.setChildIndex(damageText, 1);
+    Stage.setChildIndex(damageText, 2);
     Stage.addChild(damageText);
     Stage.update();
     createjs.Tween.get(damageText)
@@ -315,7 +275,7 @@ class Battle {
         Stage.update();
       });
 
-    this.attackTween(mainCharactor, targetCharactor);
+    attack.tween(mainCharactor, targetCharactor);
 
     if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
       console.log('敵を倒した')
@@ -353,7 +313,7 @@ class Battle {
     const damage = Math.floor(targetCharactor.status.ATK * coefficient / 100);
     targetCharactor.damage(damage);
     
-    this.attackTween(mainCharactor, targetCharactor);
+    attack.tween(mainCharactor, targetCharactor);
 
     if (this.getLivingCharas(this.orderedMyChara).length === 0) {
       console.log('全滅した')
