@@ -62,6 +62,15 @@ class Battle {
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.init());
   }
+  
+  createCharaManifest(charactors) {
+    return charactors.map((charactor) => {
+      return {
+        src: `chara_${charactor.id}.png`,
+        id: `chara_${charactor.id}`,
+      }
+    })
+  }
 
   init() {
     const field = this.setField();
@@ -145,15 +154,6 @@ class Battle {
       charactor.filters = [];
       charactor.cache(0, 0, 200, 200);
       return charactor;
-    })
-  }
-
-  createCharaManifest(charactors) {
-    return charactors.map((charactor) => {
-      return {
-        src: `chara_${charactor.id}.png`,
-        id: `chara_${charactor.id}`,
-      }
     })
   }
 
