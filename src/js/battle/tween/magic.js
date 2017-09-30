@@ -104,7 +104,7 @@ class Magic {
                 alpha: 0
               }, 800);
           }
-          Stage.removeChild(magic);
+          stage.removeChild(magic);
         });
     })
   }

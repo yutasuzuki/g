@@ -79,9 +79,9 @@ class Battle {
     this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
     this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
-    createjs.Ticker.addEventListener("tick", Stage);
-    Stage.addChild(field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
-    Stage.update();
+    createjs.Ticker.addEventListener("tick", stage);
+    stage.addChild(field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
+    stage.update();
     this.turn();
   }
 
@@ -143,10 +143,10 @@ class Battle {
       new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 60, 60, 0, 0)
     ];
     defenser.cache(0, 0, 200, 200);
-    Stage.setChildIndex(attcker, 1);
-    Stage.setChildIndex(defenser, 1);
-    Stage.addChild(attcker, defenser);
-    Stage.update();
+    stage.setChildIndex(attcker, 1);
+    stage.setChildIndex(defenser, 1);
+    stage.addChild(attcker, defenser);
+    stage.update();
   }
 
   resetCurrentMark() {
@@ -183,8 +183,8 @@ class Battle {
     const x = mainCharactor.x;
     const y = mainCharactor.y;
     const magic = this.setMagicEffect();
-    Stage.addChild(magic);
-    Stage.update();
+    stage.addChild(magic);
+    stage.update();
 
     createjs.Tween.get(mainCharactor)
       .to({
@@ -239,7 +239,7 @@ class Battle {
               alpha: 0
             }, 800);
         }
-        Stage.removeChild(magic);
+        stage.removeChild(magic);
       });
     
   }
@@ -254,9 +254,9 @@ class Battle {
     targetCharactor.damage(damage);
     damageText.x = targetCharactor.x + 22;
     damageText.y = targetCharactor.y + 22;
-    Stage.setChildIndex(damageText, 2);
-    Stage.addChild(damageText);
-    Stage.update();
+    stage.setChildIndex(damageText, 2);
+    stage.addChild(damageText);
+    stage.update();
     createjs.Tween.get(damageText)
       .to({
         y: damageText.y - 10,
@@ -271,8 +271,8 @@ class Battle {
         alpha: 0
       }, 200)
       .call(() => {
-        Stage.removeChild(damageText);
-        Stage.update();
+        stage.removeChild(damageText);
+        stage.update();
       });
 
     attack.tween(mainCharactor, targetCharactor);
@@ -288,14 +288,15 @@ class Battle {
     const mainCharactor = this.state.order.current;
     const targetCharactors = this.orderedEnemyChara;
     // ダメージの計算
-    targetCharactors.forEach((charactor) => {
-      const coefficient = random(85, 115);
-      const damage = Math.floor(mainCharactor.status.ATK * coefficient / 100);
-      console.log(charactor);
-      charactor.damage(damage);
-      this.magicTween(mainCharactor, charactor);
-    })
-    console.log(targetCharactors);
+    targetCharactors.forEach((targetCharactor) => {
+      if (0 < targetCharactor.status.HP) {
+        const coefficient = random(85, 115);
+        const damage = Math.floor(mainCharactor.status.ATK * coefficient / 100);
+        console.log(targetCharactor);
+        targetCharactor.damage(damage);
+        this.magicTween(mainCharactor, targetCharactor);
+      }
+    });
     if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
       console.log('敵を倒した')
     } else {
