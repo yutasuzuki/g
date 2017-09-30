@@ -17,15 +17,19 @@ class Attack {
       this.defenser.offsetX = -10;
     }
 
-    Promise.all([this._attack(), this._damage()]).then(() => {
-      if (this.defenser.status.HP <= 0) {
-        createjs.Tween.get(this.defenser)
-          .to({
-            alpha: 0
-          }, 800);
-      }
-    });
-    
+    return new Promise((resolve, reject) => {
+      Promise.all([this._attack(), this._damage()]).then(() => {
+        if (this.defenser.status.HP <= 0) {
+          createjs.Tween.get(this.defenser)
+            .to({
+              alpha: 0
+            }, 800);
+        }
+        console.log(123);
+        complete();
+        resolve();
+      });
+    })
   }
   
   _attack() {
@@ -41,9 +45,8 @@ class Attack {
           x,
           y,
         }, 150)
-        .call((a) => {
-          console.log(1, a);
-          resolve(a);
+        .call(() => {
+          resolve();
         });
     })
   }
@@ -63,9 +66,8 @@ class Attack {
           rotation: 0,
           alpha: 1
         }, 200)
-        .call((a) => {
-          console.log(2, a);
-          resolve(a);
+        .call(() => {
+          resolve();
         });
     })
   }

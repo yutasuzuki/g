@@ -1,8 +1,18 @@
 class Magic {
   constructor() {
+    this.queue = new createjs.LoadQueue();
     this.attacker = {};
     this.defenser = {};
     this.effect = {};
+    this.loaders = [];
+    this.magicManifest = [
+      {src: 'air.png', id: 'air'},
+    ];
+    this.queue.loadManifest(this.magicManifest, true, '/assets/images/battle/effect/magic/')
+    this.queue.addEventListener('fileload', (e) => {
+      console.log(e);
+      this.loaders[e.item.id] = e.result
+    });
   }
 
   setMagicEffect() {
@@ -20,16 +30,25 @@ class Magic {
   tween(attacker, defenser, complete = () => {}) {
     this.attacker = attacker;
     this.defenser = defenser;
+    this.effect = this.setMagicEffect();
+    stage.addChild(this.effect);
+    stage.update();
 
-    Promise.all([this._attack(), this._damage()]).then(() => {
-      if (this.defenser.status.HP <= 0) {
-        createjs.Tween.get(this.defenser)
-          .to({
-            alpha: 0
-          }, 800);
-      }
-    });
-    
+    return new Promise((resolve, reject) => {
+      Promise.all([this._start(), this._effect(), this._damage()]).then(() => {
+        if (this.defenser.status.HP <= 0) {
+          createjs.Tween.get(this.defenser)
+            .to({
+              alpha: 0
+            }, 800)
+            .call(() => {
+              resolve(false);
+            });
+        } else {
+          resolve(true);
+        }
+      });
+    })
   }
   
   _start() {
@@ -43,7 +62,6 @@ class Magic {
           x,
         }, 100)
         .call((a) => {
-          console.log(1, a);
           resolve(a);
         });
     })
@@ -51,21 +69,20 @@ class Magic {
 
   _effect() {
     return new Promise((resolve, reject) => {
-      createjs.Tween.get(magic)
+      createjs.Tween.get(this.effect)
         .to({
           alpha: 0.15,
-          x: magic.x + 10
+          x: this.effect.x + 10
         }, 200)
         .to({
           alpha: 0.25,
-          x: magic.x
+          x: this.effect.x
         }, 1000)
         .to({
           alpha: 0,
-          x: magic.x + 15
+          x: this.effect.x + 15
         }, 200)
         .call((a) => {
-          console.log(2, a);
           resolve(a);
         });
     })
@@ -73,13 +90,13 @@ class Magic {
 
   _damage() {
     return new Promise((resolve, reject) => {
-      createjs.Tween.get(targetCharactor)
+      createjs.Tween.get(this.defenser)
         .to({
           alpha: .5,
         }, 100)
         .to({
-          y: targetCharactor.y - 10,
-          x: targetCharactor.x + 10,
+          y: this.defenser.y - 10,
+          x: this.defenser.x + 10,
           rotation: 20,
           alpha: .5
         }, 100)
@@ -93,18 +110,19 @@ class Magic {
           alpha: 1,
         }, 300)
         .to({
-          y: targetCharactor.y,
-          x: targetCharactor.x,
+          y: this.defenser.y,
+          x: this.defenser.x,
           rotation: 0
         }, 100)
         .call(() => {
-          if (targetCharactor.status.HP <= 0) {
-            createjs.Tween.get(targetCharactor)
+          if (this.defenser.status.HP <= 0) {
+            createjs.Tween.get(this.defenser)
               .to({
                 alpha: 0
               }, 800);
           }
-          stage.removeChild(magic);
+          resolve();
+          stage.removeChild(this.effect);
         });
     })
   }

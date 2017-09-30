@@ -1,8 +1,10 @@
 import _ from 'lodash';
 import constants from './constants';
 import Attack from './tween/attack';
+import Magic from './tween/magic';
 
 const attack = new Attack();
+const magic = new Magic();
 
 class Battle {
   constructor() {
@@ -27,8 +29,12 @@ class Battle {
         total: 0
       },
       turn: {
-        count: 0
+        count: 0,
+        finish: true
       },
+      battle: {
+        finish: false
+      }
     }
   }
 
@@ -47,15 +53,11 @@ class Battle {
       {src: 'command_counter.png', id: 'counter'},
       {src: 'command_recovery.png', id: 'recovery'},
     ];
-    const magicManifest = [
-      {src: 'air.png', id: 'air'},
-    ];
     this.state.self.charactors = await ayncGetChara(MY_CHARACTOR);
     const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
     this.state.enemy.charactors = await ayncGetChara(ENEMY_CHARACTOR);
     const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
     queue.loadManifest(commandManifest, true, '/assets/images/battle/command/');
-    queue.loadManifest(magicManifest, true, '/assets/images/battle/effect/magic/');
     queue.loadManifest(fieldManifest, true, '/assets/images/field/');
     queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
     queue.loadManifest(enemyCharaManifest, true, '/assets/images/chara/');
@@ -112,6 +114,7 @@ class Battle {
   }
 
   switchCommand() {
+    this.state.turn.finish = true;
     this.state.order.current = this.orderAllChara[this.state.order.total];
     if (0 < this.state.order.current.status.HP) {
       if (this.state.order.current.type === 'self') {
@@ -143,8 +146,8 @@ class Battle {
       new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 60, 60, 0, 0)
     ];
     defenser.cache(0, 0, 200, 200);
-    stage.setChildIndex(attcker, 1);
-    stage.setChildIndex(defenser, 1);
+    stage.setChildIndex(attcker, 2);
+    stage.setChildIndex(defenser, 2);
     stage.addChild(attcker, defenser);
     stage.update();
   }
@@ -179,72 +182,18 @@ class Battle {
     return field;
   }
 
-  magicTween(mainCharactor, targetCharactor) {
-    const x = mainCharactor.x;
-    const y = mainCharactor.y;
-    const magic = this.setMagicEffect();
-    stage.addChild(magic);
-    stage.update();
-
-    createjs.Tween.get(mainCharactor)
-      .to({
-        x: mainCharactor.x + 40
-      }, 100)
-      .to({
-        x,
-      }, 100);
-      
-    createjs.Tween.get(magic)
-      .to({
-        alpha: 0.15,
-        x: magic.x + 10
-      }, 200)
-      .to({
-        alpha: 0.25,
-        x: magic.x
-      }, 1000)
-      .to({
-        alpha: 0,
-        x: magic.x + 15
-      }, 200);
-      
-    createjs.Tween.get(targetCharactor)
-      .to({
-        alpha: .5,
-      }, 100)
-      .to({
-        y: targetCharactor.y - 10,
-        x: targetCharactor.x + 10,
-        rotation: 20,
-        alpha: .5
-      }, 100)
-      .to({
-        alpha: .5
-      }, 500)
-      .to({
-        alpha: .5
-      }, 500)
-      .to({
-        alpha: 1,
-      }, 300)
-      .to({
-        y: targetCharactor.y,
-        x: targetCharactor.x,
-        rotation: 0
-      }, 100)
-      .call(() => {
-        if (targetCharactor.status.HP <= 0) {
-          createjs.Tween.get(targetCharactor)
-            .to({
-              alpha: 0
-            }, 800);
-        }
-        stage.removeChild(magic);
-      });
-    
+  isCommandDisable() {
+    let bool = false;
+    if (!this.state.turn.finish || this.state.battle.finish) {
+      bool = true;
+    }
+    return bool;
   }
 
   attackHandler() {
+    console.log(this.isCommandDisable());
+    if (this.isCommandDisable()) return;
+    this.state.turn.finish = false;
     const mainCharactor = this.state.order.current;
     const targetCharactor = this.state.enemy.current;
     // ダメージの計算
@@ -254,7 +203,7 @@ class Battle {
     targetCharactor.damage(damage);
     damageText.x = targetCharactor.x + 22;
     damageText.y = targetCharactor.y + 22;
-    stage.setChildIndex(damageText, 2);
+    stage.setChildIndex(damageText, 1);
     stage.addChild(damageText);
     stage.update();
     createjs.Tween.get(damageText)
@@ -275,36 +224,52 @@ class Battle {
         stage.update();
       });
 
-    attack.tween(mainCharactor, targetCharactor);
-
-    if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
-      console.log('敵を倒した')
-    } else {
-      this.turnController();
-    }    
+    attack.tween(mainCharactor, targetCharactor).then(() => {
+      if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
+        this.state.battle.finish = true;
+        this.resetCurrentMark();
+        console.log('敵を倒した');
+      } else {
+        this.turnController();
+      }    
+    });
   }
 
   magicHandler() {
+    console.log(this.isCommandDisable());
+    if (this.isCommandDisable()) return;
+    this.state.turn.finish = false;
     const mainCharactor = this.state.order.current;
     const targetCharactors = this.orderedEnemyChara;
     // ダメージの計算
+    const magicPromises = [];
     targetCharactors.forEach((targetCharactor) => {
       if (0 < targetCharactor.status.HP) {
         const coefficient = random(85, 115);
         const damage = Math.floor(mainCharactor.status.ATK * coefficient / 100);
         console.log(targetCharactor);
         targetCharactor.damage(damage);
-        this.magicTween(mainCharactor, targetCharactor);
+        const magicPromise = magic.tween(mainCharactor, targetCharactor);
+        magicPromises.push(magicPromise);
       }
     });
-    if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
-      console.log('敵を倒した')
-    } else {
-      this.turnController();
-    }    
+    Promise.race(magicPromises).then(() => {
+      if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
+        this.state.battle.finish = true;
+        this.resetCurrentMark();
+        console.log('敵を倒した')
+      } else {
+        this.turnController();
+      }
+    }).catch((e) => {
+      console.log(e);
+    });
   }
 
   defenseHandler() {
+    console.log(this.isCommandDisable());
+    if (this.isCommandDisable()) return;
+    this.state.turn.finish = false;
     const mainCharactor = this.state.order.current;
     const targetCharactor = this.state.self.current;
     if (targetCharactor.status.HP <= 0) return;
@@ -313,14 +278,16 @@ class Battle {
     const coefficient = random(85, 115);
     const damage = Math.floor(targetCharactor.status.ATK * coefficient / 100);
     targetCharactor.damage(damage);
-    
-    attack.tween(mainCharactor, targetCharactor);
 
-    if (this.getLivingCharas(this.orderedMyChara).length === 0) {
-      console.log('全滅した')
-    } else {
-      this.turnController();
-    }
+    attack.tween(mainCharactor, targetCharactor).then(() => {
+      if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
+        this.state.battle.finish = true;
+        this.resetCurrentMark();
+        console.log('敵を倒した');
+      } else {
+        this.turnController();
+      }    
+    });
   }
 
   getRandomChara(charactors) {
@@ -526,7 +493,7 @@ const MY_CHARACTOR = [
     HP: 45,
     ATK: 18,
     DF: 30,
-    SP: 15,
+    SP: 115,
   }
 ]
 
