@@ -479,7 +479,7 @@ class Battle {
     switch (type) {
       case 'ATK':
         df = diffencer.status.DF * 0.1;
-        dmg = Math.floor(damage * 0.75 - df);
+        dmg = Math.floor(damage * 0.5 - df);
         return 0 < dmg ? dmg : 1;
         break;
       case 'MGC':
@@ -489,17 +489,17 @@ class Battle {
         break;
       case 'SP':
         df = diffencer.status.DF * 0.075;
-        dmg = Math.floor(damage * 0.8 - df);
+        dmg = Math.floor(damage * 0.5 - df);
         return 0 < dmg ? dmg : 1;
         break;
       case 'SKIP':
         df = diffencer.status.DF * 0.05;
-        dmg = Math.floor(damage * 0.7 - df);
+        dmg = Math.floor(damage * 0.5 - df);
         return 0 < dmg ? dmg : 1;
         break;
       case 'REFLECT':
         df = diffencer.status.DF * 0.05;
-        dmg = Math.floor(damage - df);
+        dmg = Math.floor(damage * 0.75 - df);
         return 0 < dmg ? dmg : 1;
       default:
         break;
@@ -658,10 +658,10 @@ const MY_CHARACTOR = [
     name: 'ネマーニャ',
     MAX_HP: 42,
     HP: 42,
-    ATK: 18,
-    MGC: 6,
+    ATK: 12,
+    MGC: 25,
     DF: 25,
-    SP: 14,
+    SP: 16,
     choice: {
       rate: {
         ATK: 10,

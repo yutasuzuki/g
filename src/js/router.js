@@ -6,17 +6,17 @@ class Router {
     this.config = {
       battle: {
         name: 'battle',
-        module: battle
+        component: battle
       },
       map: {
         name: 'map',
-        module: map
+        component: map
       }
     }
   }
 
   to(scene) {
-    const route = new this.config[scene].module();
+    const route = new this.config[scene].component();
     route.start();
   }
 }
