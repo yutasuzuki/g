@@ -705,8 +705,8 @@ const ENEMY_CHARACTOR = [
       rate: {
         ATK: 30,
         MGC: 20,
-        SP: 20,
-        OTHER: 30
+        SP: 1,
+        OTHER: 1
       }
     }
   },
@@ -723,8 +723,8 @@ const ENEMY_CHARACTOR = [
       rate: {
         ATK: 30,
         MGC: 20,
-        SP: 20,
-        OTHER: 30
+        SP: 1,
+        OTHER: 1
       }
     }
   },
@@ -741,8 +741,8 @@ const ENEMY_CHARACTOR = [
       rate: {
         ATK: 60,
         MGC: 10,
-        SP: 20,
-        OTHER: 10
+        SP: 1,
+        OTHER: 1
       }
     }
   },
@@ -759,8 +759,8 @@ const ENEMY_CHARACTOR = [
       rate: {
         ATK: 30,
         MGC: 30,
-        SP: 20,
-        OTHER: 20
+        SP: 1,
+        OTHER: 1
       }
     }
   },
@@ -777,8 +777,8 @@ const ENEMY_CHARACTOR = [
       rate: {
         ATK: 70,
         MGC: 10,
-        SP: 10,
-        OTHER: 10
+        SP: 1,
+        OTHER: 1
       }
     }
   }

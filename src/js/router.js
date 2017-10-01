@@ -1,4 +1,5 @@
 import battle from './battle/battle';
+import map from './map/map';
 
 class Router {
   constructor() {
@@ -6,6 +7,10 @@ class Router {
       battle: {
         name: 'battle',
         module: battle
+      },
+      map: {
+        name: 'map',
+        module: map
       }
     }
   }
