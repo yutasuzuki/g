@@ -222,7 +222,6 @@ class Battle {
       diffencers.forEach((diffencer) => {
         if (0 < diffencer.status.HP) {
           const damage = this.calcMagicDamage(commandType, attacker, diffencer);
-          console.log(`${diffencer.status.name}のダメージ`,damage);
           diffencer.damage(damage);
           damege.tween(damage, diffencer);
           const magic = new Magic(this.loaders['air']);
@@ -295,7 +294,6 @@ class Battle {
     console.log(`${this.state.enemy.current.status.name}の選択(防御): `, commandType);
     console.log(' - - - - - - - - - - - -');
 
-    console.log(this.loaders['reflect']);
     const m = new Magic(this.loaders['reflect']);
 
     await m.reflect(attacker);
@@ -343,6 +341,7 @@ class Battle {
     if (this.getLivingCharas(charactors).length === 0) {
       this.state.battle.finish = true;
       console.log(msg);
+      route.to('map');
     } else {
       this.turnController();
     }
@@ -536,6 +535,14 @@ class Battle {
       }
       return chara;
     });
+  }
+
+  win() {
+
+  }
+
+  loose() {
+
   }
 }
 
