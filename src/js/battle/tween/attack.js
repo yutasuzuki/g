@@ -25,7 +25,6 @@ class Attack {
               alpha: 0
             }, 800);
         }
-        console.log(123);
         complete();
         resolve();
       });

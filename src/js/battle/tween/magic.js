@@ -1,28 +1,24 @@
 class Magic {
-  constructor() {
+  constructor(magic) {
     this.queue = new createjs.LoadQueue();
     this.attacker = {};
     this.defenser = {};
     this.effect = {};
-    this.loaders = [];
-    this.magicManifest = [
-      {src: 'air.png', id: 'air'},
-    ];
-    this.queue.loadManifest(this.magicManifest, true, '/assets/images/battle/effect/magic/')
-    this.queue.addEventListener('fileload', (e) => {
-      console.log(e);
-      this.loaders[e.item.id] = e.result
-    });
+    this.magic = magic;
   }
 
-  setMagicEffect() {
-    const air = new createjs.Bitmap(this.loaders['air']);
+  setMagicEffect(type) {
+    const air = new createjs.Bitmap(this.magic);
     air.skewX = air.width / 2;
     air.skewY = air.height / 2;
     air.scaleX = 0.5;
     air.scaleY = 0.5;
-    air.x = -10;
+    air.x = -240;
     air.y = 60;
+    if (type === 'self') {
+      air.x = -10;
+      air.y = 60;
+    }
     air.alpha = 0;
     return air;
   }
@@ -30,7 +26,17 @@ class Magic {
   tween(attacker, defenser, complete = () => {}) {
     this.attacker = attacker;
     this.defenser = defenser;
-    this.effect = this.setMagicEffect();
+    this.defenser.rotate = 20;
+    this.defenser.offsetY = -10;
+    this.defenser.offsetX = 10;
+
+    if (this.attacker.type === 'enemy') {
+      this.defenser.rotate = -20;
+      this.defenser.offsetY = 0;
+      this.defenser.offsetX = -10;
+    }
+
+    this.effect = this.setMagicEffect(attacker.type);
     stage.addChild(this.effect);
     stage.update();
 
@@ -40,13 +46,9 @@ class Magic {
           createjs.Tween.get(this.defenser)
             .to({
               alpha: 0
-            }, 800)
-            .call(() => {
-              resolve(false);
-            });
-        } else {
-          resolve(true);
+            }, 800);
         }
+        resolve();
       });
     })
   }
@@ -61,8 +63,8 @@ class Magic {
         .to({
           x,
         }, 100)
-        .call((a) => {
-          resolve(a);
+        .call(() => {
+          resolve();
         });
     })
   }
@@ -82,22 +84,25 @@ class Magic {
           alpha: 0,
           x: this.effect.x + 15
         }, 200)
-        .call((a) => {
-          resolve(a);
+        .call(() => {
+          resolve();
         });
     })
   }
 
   _damage() {
+    if (this.defenser.type) {
+
+    }
     return new Promise((resolve, reject) => {
       createjs.Tween.get(this.defenser)
         .to({
           alpha: .5,
         }, 100)
         .to({
-          y: this.defenser.y - 10,
-          x: this.defenser.x + 10,
-          rotation: 20,
+          y: this.defenser.y + this.defenser.offsetY,
+          x: this.defenser.x + this.defenser.offsetX,
+          rotation: this.defenser.rotate,
           alpha: .5
         }, 100)
         .to({
@@ -115,14 +120,8 @@ class Magic {
           rotation: 0
         }, 100)
         .call(() => {
-          if (this.defenser.status.HP <= 0) {
-            createjs.Tween.get(this.defenser)
-              .to({
-                alpha: 0
-              }, 800);
-          }
-          resolve();
           stage.removeChild(this.effect);
+          resolve();
         });
     })
   }

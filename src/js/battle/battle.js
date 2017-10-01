@@ -2,9 +2,11 @@ import _ from 'lodash';
 import constants from './constants';
 import Attack from './tween/attack';
 import Magic from './tween/magic';
+import Damage from './tween/damage';
 
 const attack = new Attack();
-const magic = new Magic();
+const magic = {};
+const damege = new Damage();
 
 class Battle {
   constructor() {
@@ -57,10 +59,14 @@ class Battle {
     const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
     this.state.enemy.charactors = await ayncGetChara(ENEMY_CHARACTOR);
     const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
+    const magicManifest = [
+      {src: 'air.png', id: 'air'},
+    ];
     queue.loadManifest(commandManifest, true, '/assets/images/battle/command/');
     queue.loadManifest(fieldManifest, true, '/assets/images/field/');
     queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
     queue.loadManifest(enemyCharaManifest, true, '/assets/images/chara/');
+    queue.loadManifest(magicManifest, true, '/assets/images/battle/effect/magic/')
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.init());
   }
@@ -138,6 +144,7 @@ class Battle {
 
   setCurrentMark(attcker, defenser) {
     this.resetCurrentMark();
+    if (!attcker || !defenser) return
     attcker.filters = [
       new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 90, 90, 90, 0)
     ];
@@ -160,18 +167,6 @@ class Battle {
     })
   }
 
-  setMagicEffect() {
-    const air = new createjs.Bitmap(this.loaders['air']);
-    air.skewX = air.width / 2;
-    air.skewY = air.height / 2;
-    air.scaleX = 0.5;
-    air.scaleY = 0.5;
-    air.x = -10;
-    air.y = 60;
-    air.alpha = 0;
-    return air;
-  }
-
   setField() {
     const field = new createjs.Bitmap(this.loaders['field']);
     field.skewX = field.width / 2;
@@ -191,104 +186,158 @@ class Battle {
   }
 
   attackHandler() {
-    console.log(this.isCommandDisable());
     if (this.isCommandDisable()) return;
     this.state.turn.finish = false;
-    const mainCharactor = this.state.order.current;
-    const targetCharactor = this.state.enemy.current;
-    // ダメージの計算
-    const coefficient = random(85, 115);
-    const damage = Math.floor(mainCharactor.status.ATK * coefficient / 100);
-    const damageText = new createjs.Text(damage, "18px serif", "white");
-    targetCharactor.damage(damage);
-    damageText.x = targetCharactor.x + 22;
-    damageText.y = targetCharactor.y + 22;
-    stage.setChildIndex(damageText, 1);
-    stage.addChild(damageText);
-    stage.update();
-    createjs.Tween.get(damageText)
-      .to({
-        y: damageText.y - 10,
-        alpha: 1
-      }, 400)
-      .to({
-        y: damageText.y,
-        alpha: 1
-      }, 400)
-      .to({
-        y: damageText.y,
-        alpha: 0
-      }, 200)
-      .call(() => {
-        stage.removeChild(damageText);
-        stage.update();
-      });
 
-    attack.tween(mainCharactor, targetCharactor).then(() => {
-      if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
-        this.state.battle.finish = true;
-        this.resetCurrentMark();
-        console.log('敵を倒した');
-      } else {
-        this.turnController();
-      }    
+    const attacker = this.state.order.current;
+    const diffencer = this.state.enemy.current;
+    const commandType = this.choiceEnemyCommandType(diffencer);
+    console.log(' - - - - - - - - - - - -');
+    console.log('自分の選択(攻撃): ', 'ATK');
+    console.log(`${diffencer.status.name}の選択(攻撃): `, commandType);
+    console.log(' - - - - - - - - - - - -');
+    const damagePoint = this.calcAttackDamage(commandType, attacker, diffencer);
+    diffencer.damage(damagePoint);
+    damege.tween(damagePoint, diffencer);
+
+    attack.tween(attacker, diffencer).then(() => {
+      this.decideBattlePhase(this.orderedEnemyChara);
     });
   }
 
   magicHandler() {
-    console.log(this.isCommandDisable());
     if (this.isCommandDisable()) return;
     this.state.turn.finish = false;
-    const mainCharactor = this.state.order.current;
-    const targetCharactors = this.orderedEnemyChara;
+    const attacker = this.state.order.current;
+    const diffencers = this.orderedEnemyChara;
+    const commandType = this.choiceEnemyCommandType(this.state.enemy.current);
+    console.log(' - - - - - - - - - - - -');
+    console.log('自分の選択(攻撃): ', 'MGC');
+    console.log(`${this.state.enemy.current.status.name}の選択(攻撃): `, commandType);
+    console.log(' - - - - - - - - - - - -');
     // ダメージの計算
     const magicPromises = [];
-    targetCharactors.forEach((targetCharactor) => {
-      if (0 < targetCharactor.status.HP) {
-        const coefficient = random(85, 115);
-        const damage = Math.floor(mainCharactor.status.ATK * coefficient / 100);
-        console.log(targetCharactor);
-        targetCharactor.damage(damage);
-        const magicPromise = magic.tween(mainCharactor, targetCharactor);
+    diffencers.forEach((diffencer) => {
+      if (0 < diffencer.status.HP) {
+        const damage = this.calcMagicDamage(commandType, attacker, diffencer);
+        console.log(`${diffencer.status.name}のダメージ`,damage);
+        diffencer.damage(damage);
+        damege.tween(damage, diffencer);
+        const magic = new Magic(this.loaders['air']);
+        const magicPromise = magic.tween(attacker, diffencer);
         magicPromises.push(magicPromise);
       }
     });
     Promise.race(magicPromises).then(() => {
-      if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
-        this.state.battle.finish = true;
-        this.resetCurrentMark();
-        console.log('敵を倒した')
-      } else {
-        this.turnController();
-      }
+      this.decideBattlePhase(diffencers);
     }).catch((e) => {
       console.log(e);
     });
   }
 
+  enemyAttack(diffenceType, attacker) {
+    const commandType = this.choiceEnemyCommandType(attacker);
+    console.log(' - - - - - - - - - - - -');
+    console.log('自分の選択(防御): ', diffenceType);
+    console.log(`${attacker.status.name}の選択(攻撃): `, commandType);
+    console.log(' - - - - - - - - - - - -');
+    if (commandType === 'ATK') {
+      const diffencer = this.state.self.current;
+      const damagePoint = this.calcAttackDamage(diffenceType, attacker, diffencer);
+      diffencer.damage(damagePoint);
+      damege.tween(damagePoint, diffencer);
+
+      attack.tween(attacker, diffencer).then(() => {
+        this.decideBattlePhase(this.orderedMyChara);
+      });
+    } else if (commandType === 'MGC') {
+      const diffencers = this.orderedMyChara;
+      const magicPromises = [];
+      diffencers.forEach((diffencer) => {
+        if (0 < diffencer.status.HP) {
+          const damage = this.calcMagicDamage(diffenceType, attacker, diffencer);
+          diffencer.damage(damage);
+          damege.tween(damage, diffencer);
+          const magic = new Magic(this.loaders['air']);
+          const magicPromise = magic.tween(attacker, diffencer);
+          magicPromises.push(magicPromise);
+        }
+      });
+      Promise.race(magicPromises).then(() => {
+        this.decideBattlePhase(this.orderedMyChara);
+      }).catch((e) => {
+        console.log(e);
+      });
+    } else if (commandType === 'SP') {
+      console.log('SPだけどMGC');
+      
+      const diffencers = this.orderedMyChara;
+      const magicPromises = [];
+      diffencers.forEach((diffencer) => {
+        if (0 < diffencer.status.HP) {
+          const damage = this.calcMagicDamage(diffenceType, attacker, diffencer);
+          diffencer.damage(damage);
+          damege.tween(damage, diffencer);
+          const magic = new Magic(this.loaders['air']);
+          const magicPromise = magic.tween(attacker, diffencer);
+          magicPromises.push(magicPromise);
+        }
+      });
+      Promise.race(magicPromises).then(() => {
+        this.decideBattlePhase(this.orderedMyChara);
+      }).catch((e) => {
+        console.log(e);
+      });
+    } else if (commandType === 'SKIP') {
+      console.log('SKIPだけどMGC');
+      
+      const diffencers = this.orderedMyChara;
+      const magicPromises = [];
+      diffencers.forEach((diffencer) => {
+        if (0 < diffencer.status.HP) {
+          const damage = this.calcMagicDamage(diffenceType, attacker, diffencer);
+          diffencer.damage(damage);
+          damege.tween(damage, diffencer);
+          const magic = new Magic(this.loaders['air']);
+          const magicPromise = magic.tween(attacker, diffencer);
+          magicPromises.push(magicPromise);
+        }
+      });
+      Promise.race(magicPromises).then(() => {
+        this.decideBattlePhase(this.orderedMyChara);
+      }).catch((e) => {
+        console.log(e);
+      });
+    }
+  }
+
   defenseHandler() {
-    console.log(this.isCommandDisable());
     if (this.isCommandDisable()) return;
     this.state.turn.finish = false;
-    const mainCharactor = this.state.order.current;
-    const targetCharactor = this.state.self.current;
-    if (targetCharactor.status.HP <= 0) return;
+    const diffencer = this.state.self.current;
+    const attacker = this.state.order.current;
+    if (diffencer.status.HP <= 0) return;
 
-    // ダメージの計算
-    const coefficient = random(85, 115);
-    const damage = Math.floor(targetCharactor.status.ATK * coefficient / 100);
-    targetCharactor.damage(damage);
-
-    attack.tween(mainCharactor, targetCharactor).then(() => {
-      if (this.getLivingCharas(this.orderedEnemyChara).length === 0) {
-        this.state.battle.finish = true;
-        this.resetCurrentMark();
-        console.log('敵を倒した');
-      } else {
-        this.turnController();
-      }    
-    });
+    this.enemyAttack('ATK', attacker);
   }
+
+  magicDefenseHandler() {
+    if (this.isCommandDisable()) return;
+    this.state.turn.finish = false;
+    const attacker = this.state.enemy.current;
+    const commandType = this.choiceEnemyCommandType(attacker);
+    this.enemyAttack('MGC', attacker);
+  }
+
+  decideBattlePhase(charactors) {
+    const msg = charactors[0].type === 'self'? '全滅した': '敵を倒した';
+    if (this.getLivingCharas(charactors).length === 0) {
+      this.state.battle.finish = true;
+      console.log(msg);
+    } else {
+      this.turnController();
+    }
+  } 
 
   getRandomChara(charactors) {
     const charas = this.getLivingCharas(charactors);
@@ -345,6 +394,7 @@ class Battle {
     magicDefense.y = 0;
     magicDefense.scaleX = .5;
     magicDefense.scaleY = .5;
+    magicDefense.addEventListener('click', this.magicDefenseHandler.bind(this));
     const counter = new createjs.Bitmap(this.loaders['counter']);
     counter.x = 0;
     counter.y = 100;
@@ -363,6 +413,96 @@ class Battle {
       attack: attackCommand,
       defense: defenseCommand
     };
+  }
+
+  choiceEnemyCommandType(chara) {
+    const rates = chara.status.choice.rate;
+    const rateArray = _.map(rates, (value, key) => value);
+    const rateTotal = rateArray.reduce((a, b) => a += b);
+    const choiceKey = random(0, rateTotal);
+
+    if (0 < choiceKey && choiceKey < this.sumLimit(rateArray, 0)) {
+      return 'ATK'
+    } else if(this.sumLimit(rateArray, 0) < choiceKey && choiceKey < this.sumLimit(rateArray, 1)) {
+      return 'MGC'
+    } else if (this.sumLimit(rateArray, 1) < choiceKey && choiceKey < this.sumLimit(rateArray, 2)) {
+      return 'SP'
+    } else if (this.sumLimit(rateArray, 2) < choiceKey && choiceKey < this.sumLimit(rateArray, 3)) {
+      return 'SKIP'
+    } else {
+      return 'SKIP'
+    }
+  }
+  
+  calcAttackDamage(type, attacker, diffencer) {
+    const coefficient = random(85, 115);
+    const damage = Math.floor(attacker.status.ATK * coefficient / 100);
+  
+    let df = 0;
+    switch (type) {
+      case 'ATK':
+        df = diffencer.status.DF * 0.15;
+        return Math.floor(damage * 0.5 - df);
+        break;
+      case 'MGC':
+        df = diffencer.status.DF * 0.20;
+        return Math.floor(damage * 1.25 - df);
+        break;
+      case 'SP':
+        df = diffencer.status.DF * 0.05;
+        return Math.floor(damage - df);
+        break;
+      case 'SKIP':
+        df = diffencer.status.DF * 0.1;
+        return Math.floor(damage - df);
+        break;
+      default:
+        break;
+    }
+  }
+    
+  calcMagicDamage(type, attacker, diffencer) {
+    const coefficient = random(85, 115);
+    const damage = Math.floor(attacker.status.MGC * coefficient / 100);
+
+    let df = 0;
+    let dmg = 0;
+    switch (type) {
+      case 'ATK':
+        df = diffencer.status.DF * 0.1;
+        dmg = Math.floor(damage * 0.75 - df);
+        console.log('ATK', dmg);
+        return 0 < dmg ? dmg : 1;
+        break;
+      case 'MGC':
+        df = diffencer.status.DF * 0.3;
+        dmg = Math.floor(damage * 0.5 - df);
+        console.log('MGC',dmg);
+        return 0 < dmg ? dmg : 1;
+        break;
+      case 'SP':
+        df = diffencer.status.DF * 0.075;
+        dmg = Math.floor(damage * 0.8 - df);
+        console.log('SP', dmg);
+        return 0 < dmg ? dmg : 1;
+        break;
+      case 'SKIP':
+        df = diffencer.status.DF * 0.05;
+        dmg = Math.floor(damage * 0.7 - df);
+        console.log(dmg);
+        return 0 < dmg ? dmg : 1;
+        break;
+      default:
+        break;
+    }
+  }
+
+  sumLimit(array, x) {
+    let value = 0;
+    for (let i = 0; i <= x; i++) {
+      value += array[i];
+    }
+    return value;
   }
 
   setCharactors(charactors, type = 'self') {
@@ -452,96 +592,186 @@ function ayncGetChara(chara) {
 const MY_CHARACTOR = [
   {
     id: 8,
-    name: '女１',
+    name: 'リューリク',
     MAX_HP: 50,
     HP: 50,
     ATK: 20,
-    DF: 20,
-    SP: 12,
+    MGC: 30,
+    DF: 25,
+    SP: 20,
+    choice: {
+      rate: {
+        ATK: 20,
+        MGC: 50,
+        SP: 40,
+        OTHER: 10
+      }
+    }
   },
   {
     id: 13,
-    name: '女１',
+    name: '天穂',
     MAX_HP: 45,
     HP: 45,
     ATK: 18,
-    DF: 30,
-    SP: 11,
+    MGC: 18,
+    DF: 22,
+    SP: 32,
+    choice: {
+      rate: {
+        ATK: 50,
+        MGC: 10,
+        SP: 30,
+        OTHER: 10
+      }
+    }
   },
   {
     id: 17,
-    name: '女１',
-    MAX_HP: 45,
-    HP: 45,
-    ATK: 18,
-    DF: 30,
+    name: 'ベルナドット',
+    MAX_HP: 48,
+    HP: 48,
+    ATK: 14,
+    MGC: 22,
+    DF: 25,
     SP: 12,
+    choice: {
+      rate: {
+        ATK: 30,
+        MGC: 10,
+        SP: 30,
+        OTHER: 30
+      }
+    }
   },
   {
     id: 14,
-    name: '女１',
-    MAX_HP: 45,
-    HP: 45,
+    name: 'ネマーニャ',
+    MAX_HP: 42,
+    HP: 42,
     ATK: 18,
-    DF: 30,
+    MGC: 6,
+    DF: 25,
     SP: 14,
+    choice: {
+      rate: {
+        ATK: 10,
+        MGC: 40,
+        SP: 20,
+        OTHER: 30
+      }
+    }
   },
   {
     id: 1,
-    name: '男１',
-    MAX_HP: 45,
-    HP: 45,
-    ATK: 18,
-    DF: 30,
-    SP: 115,
+    name: 'カフ',
+    MAX_HP: 55,
+    HP: 55,
+    ATK: 16,
+    MGC: 10,
+    DF: 40,
+    SP: 15,
+    choice: {
+      rate: {
+        ATK: 10,
+        MGC: 40,
+        SP: 20,
+        OTHER: 30
+      }
+    }
   }
 ]
 
 const ENEMY_CHARACTOR = [
   {
     id: 2,
-    name: '女１',
+    name: 'enemy_1',
     MAX_HP: 50,
     HP: 50,
     ATK: 20,
+    MGC: 14,
     DF: 20,
     SP: 12,
+    choice: {
+      rate: {
+        ATK: 30,
+        MGC: 20,
+        SP: 20,
+        OTHER: 30
+      }
+    }
   },
   {
     id: 12,
-    name: '女１',
+    name: 'enemy_2',
     MAX_HP: 45,
     HP: 45,
     ATK: 18,
+    MGC: 20,
     DF: 30,
     SP: 11,
+    choice: {
+      rate: {
+        ATK: 30,
+        MGC: 20,
+        SP: 20,
+        OTHER: 30
+      }
+    }
   },
   {
     id: 22,
-    name: '女１',
+    name: 'enemy_3',
     MAX_HP: 45,
     HP: 45,
     ATK: 18,
+    MGC: 19,
     DF: 30,
     SP: 12,
+    choice: {
+      rate: {
+        ATK: 60,
+        MGC: 10,
+        SP: 20,
+        OTHER: 10
+      }
+    }
   },
   {
     id: 19,
-    name: '女１',
+    name: 'enemy_4',
     MAX_HP: 45,
     HP: 45,
     ATK: 18,
+    MGC: 20,
     DF: 30,
     SP: 14,
+    choice: {
+      rate: {
+        ATK: 30,
+        MGC: 30,
+        SP: 20,
+        OTHER: 20
+      }
+    }
   },
   {
     id: 3,
-    name: '男１',
+    name: 'enemy_5',
     MAX_HP: 45,
     HP: 45,
     ATK: 18,
+    MGC: 15,
     DF: 30,
     SP: 15,
+    choice: {
+      rate: {
+        ATK: 70,
+        MGC: 10,
+        SP: 10,
+        OTHER: 10
+      }
+    }
   }
 ]
 
