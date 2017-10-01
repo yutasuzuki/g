@@ -61,6 +61,7 @@ class Battle {
     const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
     const magicManifest = [
       {src: 'air.png', id: 'air'},
+      {src: 'reflect.png', id: 'reflect'},
     ];
     queue.loadManifest(commandManifest, true, '/assets/images/battle/command/');
     queue.loadManifest(fieldManifest, true, '/assets/images/field/');
@@ -87,7 +88,7 @@ class Battle {
     this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
     this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
-    createjs.Ticker.addEventListener("tick", stage);
+    createjs.Ticker.addEventListener('tick', stage);
     stage.addChild(field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
     stage.update();
     this.turn();
@@ -194,7 +195,7 @@ class Battle {
     const commandType = this.choiceEnemyCommandType(diffencer);
     console.log(' - - - - - - - - - - - -');
     console.log('自分の選択(攻撃): ', 'ATK');
-    console.log(`${diffencer.status.name}の選択(攻撃): `, commandType);
+    console.log(`${diffencer.status.name}の選択(防御): `, commandType);
     console.log(' - - - - - - - - - - - -');
     const damagePoint = this.calcAttackDamage(commandType, attacker, diffencer);
     diffencer.damage(damagePoint);
@@ -213,26 +214,30 @@ class Battle {
     const commandType = this.choiceEnemyCommandType(this.state.enemy.current);
     console.log(' - - - - - - - - - - - -');
     console.log('自分の選択(攻撃): ', 'MGC');
-    console.log(`${this.state.enemy.current.status.name}の選択(攻撃): `, commandType);
+    console.log(`${this.state.enemy.current.status.name}の選択(防御): `, commandType);
     console.log(' - - - - - - - - - - - -');
     // ダメージの計算
-    const magicPromises = [];
-    diffencers.forEach((diffencer) => {
-      if (0 < diffencer.status.HP) {
-        const damage = this.calcMagicDamage(commandType, attacker, diffencer);
-        console.log(`${diffencer.status.name}のダメージ`,damage);
-        diffencer.damage(damage);
-        damege.tween(damage, diffencer);
-        const magic = new Magic(this.loaders['air']);
-        const magicPromise = magic.tween(attacker, diffencer);
-        magicPromises.push(magicPromise);
-      }
-    });
-    Promise.race(magicPromises).then(() => {
-      this.decideBattlePhase(diffencers);
-    }).catch((e) => {
-      console.log(e);
-    });
+    if (commandType !== 'MGC') {
+      const magicPromises = [];
+      diffencers.forEach((diffencer) => {
+        if (0 < diffencer.status.HP) {
+          const damage = this.calcMagicDamage(commandType, attacker, diffencer);
+          console.log(`${diffencer.status.name}のダメージ`,damage);
+          diffencer.damage(damage);
+          damege.tween(damage, diffencer);
+          const magic = new Magic(this.loaders['air']);
+          const magicPromise = magic.tween(attacker, diffencer);
+          magicPromises.push(magicPromise);
+        }
+      });
+      Promise.race(magicPromises).then(() => {
+        this.decideBattlePhase(diffencers);
+      }).catch((e) => {
+        console.log(e);
+      });
+    } else {
+      this.reflectMagic(this.state.enemy.current, this.state.self.current, this.orderedMyChara);
+    }
   }
 
   enemyAttack(diffenceType, attacker) {
@@ -251,64 +256,68 @@ class Battle {
         this.decideBattlePhase(this.orderedMyChara);
       });
     } else if (commandType === 'MGC') {
-      const diffencers = this.orderedMyChara;
-      const magicPromises = [];
-      diffencers.forEach((diffencer) => {
-        if (0 < diffencer.status.HP) {
-          const damage = this.calcMagicDamage(diffenceType, attacker, diffencer);
-          diffencer.damage(damage);
-          damege.tween(damage, diffencer);
-          const magic = new Magic(this.loaders['air']);
-          const magicPromise = magic.tween(attacker, diffencer);
-          magicPromises.push(magicPromise);
-        }
-      });
-      Promise.race(magicPromises).then(() => {
-        this.decideBattlePhase(this.orderedMyChara);
-      }).catch((e) => {
-        console.log(e);
-      });
+      if (diffenceType !== commandType) {
+        const diffencers = this.orderedMyChara;
+        const magicPromises = [];
+        diffencers.forEach((diffencer) => {
+          if (0 < diffencer.status.HP) {
+            const damage = this.calcMagicDamage(diffenceType, attacker, diffencer);
+            diffencer.damage(damage);
+            damege.tween(damage, diffencer);
+            const magic = new Magic(this.loaders['air']);
+            const magicPromise = magic.tween(attacker, diffencer);
+            magicPromises.push(magicPromise);
+          }
+        });
+        Promise.race(magicPromises).then(() => {
+          this.decideBattlePhase(this.orderedMyChara);
+        }).catch((e) => {
+          console.log(e);
+        });
+      } else {
+        const attacker = this.state.self.current;
+        const targetDiffencer = this.state.self.current;
+        this.reflectMagic(attacker, targetDiffencer, this.orderedEnemyChara);
+      }
     } else if (commandType === 'SP') {
       console.log('SPだけどMGC');
-      
-      const diffencers = this.orderedMyChara;
-      const magicPromises = [];
-      diffencers.forEach((diffencer) => {
-        if (0 < diffencer.status.HP) {
-          const damage = this.calcMagicDamage(diffenceType, attacker, diffencer);
-          diffencer.damage(damage);
-          damege.tween(damage, diffencer);
-          const magic = new Magic(this.loaders['air']);
-          const magicPromise = magic.tween(attacker, diffencer);
-          magicPromises.push(magicPromise);
-        }
-      });
-      Promise.race(magicPromises).then(() => {
-        this.decideBattlePhase(this.orderedMyChara);
-      }).catch((e) => {
-        console.log(e);
-      });
+      this.decideBattlePhase(this.orderedMyChara);
     } else if (commandType === 'SKIP') {
       console.log('SKIPだけどMGC');
-      
-      const diffencers = this.orderedMyChara;
-      const magicPromises = [];
-      diffencers.forEach((diffencer) => {
-        if (0 < diffencer.status.HP) {
-          const damage = this.calcMagicDamage(diffenceType, attacker, diffencer);
-          diffencer.damage(damage);
-          damege.tween(damage, diffencer);
-          const magic = new Magic(this.loaders['air']);
-          const magicPromise = magic.tween(attacker, diffencer);
-          magicPromises.push(magicPromise);
-        }
-      });
-      Promise.race(magicPromises).then(() => {
-        this.decideBattlePhase(this.orderedMyChara);
-      }).catch((e) => {
-        console.log(e);
-      });
+      this.decideBattlePhase(this.orderedMyChara);
     }
+  }
+  
+  async reflectMagic(attacker, targetDiffencer, diffencers) {
+    const commandType = 'REFLECT';
+    console.log('- - - - 魔法を反射 - - - -');
+    console.log('自分の選択(攻撃): ', 'MGC');
+    console.log(`${this.state.enemy.current.status.name}の選択(防御): `, commandType);
+    console.log(' - - - - - - - - - - - -');
+
+    console.log(this.loaders['reflect']);
+    const m = new Magic(this.loaders['reflect']);
+
+    await m.reflect(attacker);
+
+    // ダメージの計算
+    const magicPromises = [];
+    diffencers.forEach((diffencer) => {
+      if (0 < diffencer.status.HP) {
+        const damage = this.calcMagicDamage(commandType, attacker, diffencer);
+        console.log(`${diffencer.status.name}のダメージ`,damage);
+        diffencer.damage(damage);
+        damege.tween(damage, diffencer);
+        const magic = new Magic(this.loaders['air']);
+        const magicPromise = magic.tween(attacker, diffencer);
+        magicPromises.push(magicPromise);
+      }
+    });
+    Promise.race(magicPromises).then(() => {
+      this.decideBattlePhase(diffencers);
+    }).catch((e) => {
+      console.log(e);
+    });
   }
 
   defenseHandler() {
@@ -471,27 +480,27 @@ class Battle {
       case 'ATK':
         df = diffencer.status.DF * 0.1;
         dmg = Math.floor(damage * 0.75 - df);
-        console.log('ATK', dmg);
         return 0 < dmg ? dmg : 1;
         break;
       case 'MGC':
         df = diffencer.status.DF * 0.3;
         dmg = Math.floor(damage * 0.5 - df);
-        console.log('MGC',dmg);
         return 0 < dmg ? dmg : 1;
         break;
       case 'SP':
         df = diffencer.status.DF * 0.075;
         dmg = Math.floor(damage * 0.8 - df);
-        console.log('SP', dmg);
         return 0 < dmg ? dmg : 1;
         break;
       case 'SKIP':
         df = diffencer.status.DF * 0.05;
         dmg = Math.floor(damage * 0.7 - df);
-        console.log(dmg);
         return 0 < dmg ? dmg : 1;
         break;
+      case 'REFLECT':
+        df = diffencer.status.DF * 0.05;
+        dmg = Math.floor(damage - df);
+        return 0 < dmg ? dmg : 1;
       default:
         break;
     }

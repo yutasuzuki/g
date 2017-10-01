@@ -125,6 +125,42 @@ class Magic {
         });
     })
   }
+
+  reflect(attacker) {
+    console.log('attacker : ', attacker.status.name);
+    const reflect = new createjs.Bitmap(this.magic);
+    reflect.skewX = reflect.width / 2;
+    reflect.skewY = reflect.height / 2;
+    reflect.scaleX = 0.2;
+    reflect.scaleY = 0.2;
+    reflect.x = attacker.x - 50;
+    reflect.y = attacker.y - 50;
+    if (attacker.type === 'enemy') {
+      reflect.x = attacker.x - 20;
+    }
+    reflect.alpha = 0;
+
+    stage.addChild(reflect);
+    stage.update();
+
+    return new Promise((resolve, reject) => {
+      createjs.Tween.get(reflect)
+      .to({
+        alpha: 0.15,
+      }, 200)
+      .to({
+        alpha: 0.75,
+      }, 300)
+      .to({
+        alpha: 0,
+      }, 200)
+      .call(() => {
+        stage.removeChild(reflect);
+        stage.update();
+        resolve();
+      });
+    });
+  }
 }
 
 export default Magic
