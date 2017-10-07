@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 const MapPosition = [
-  [1, 1, 1, 1, 1, 1, 1, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 1, 0, 0, 0, 1, 0, 1],
   [1, 0, 1, 0, 1, 1, 1, 0, 1],
   [1, 0, 1, 0, 1, 0, 1, 0, 1],
@@ -12,12 +12,13 @@ const MapPosition = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
-let dice = 4;
-
 class Map {
   constructor() {
     this.loaders = [];
-    this.dice = null;
+    this.dice = {
+      isRoll: false,
+      count: 0,
+    };
   }
 
   async start() {
@@ -74,7 +75,7 @@ class Map {
       if (window.innerWidth - squares.getBounds().width <= squares.x && squares.x <= 0) {
         squares.x = touch.history.x - diffX;
       }
-      if (window.innerHeight - squares.getBounds().height <= squares.x && squares.x <= 0) {
+      if (window.innerHeight - squares.getBounds().height <= squares.y && squares.y <= 0) {
         squares.y = touch.history.y - diffY;
       }
     });
@@ -84,21 +85,24 @@ class Map {
       } else if (squares.x > 0) {
         squares.x = 0;
       }
-      if (squares.y > 0) {
+      if (squares.y < window.innerHeight - squares.getBounds().height) {
+        squares.y = window.innerHeight - squares.getBounds().height;
+      } else if (squares.y > 0) {
         squares.y = 0;
       }
       touch.history.x = squares.x;
       touch.history.y = squares.y;
     });
-    const diceNumber = new createjs.Text(this.dice, "18px serif", "black");
+    const diceNumber = new createjs.Text(this.dice.count, "18px serif", "black");
     
     diceNumber.x = + 88;
     diceNumber.y = + 22;
     btnDice.addEventListener('click', () => {
-      this.dice = random(1, 6);
-      diceNumber.text = this.dice;
+      this.dice.count = random(1, 6);
+      diceNumber.text = this.dice.count;
       stage.addChild(diceNumber);
       stage.update();
+      this.dice.isRoll = true;
     })
     stage.addChild(field, squares, btnDice);
     stage.update();
@@ -132,20 +136,19 @@ class Map {
           y: i
         };
         if (square.type) {
-          square.addEventListener('click', function(obj) {
-            console.log()
+          square.addEventListener('click', (obj) => {
+            console.log('obj', obj);
             const posDiffX = obj.target.pos.x - state.pos.x;
             const posDiffY = obj.target.pos.y - state.pos.y;
-            console.log(posDiffX)
-            console.log(posDiffY)
-            if ((Math.abs(posDiffX) === 1 || Math.abs(posDiffX) === 0) && (Math.abs(posDiffY) === 1 || Math.abs(posDiffY) === 0)) {
-              if ((Math.abs(posDiffX) === 1 && Math.abs(posDiffY) === 1)) return console.log('そこは進めません');
+            const posDiff = Math.abs(posDiffX) + Math.abs(posDiffY);
+
+            if (posDiff === 1 && this.dice.isRoll) {
               state.pos = obj.target.pos;
               charactor.x = obj.target.x;
               charactor.y = obj.target.y;
-              console.log(dice);
-              dice -= 1;
-              if (!dice) {
+              this.dice.count -= 1;
+              console.log('this.dice.count', this.dice.count);
+              if (!this.dice.count) {
                 route.to('battle');
               }
             } else {

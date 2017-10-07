@@ -13,6 +13,7 @@
   "author": "Yuta Suzuki <bugs_bugs_bunny69@yahoo.co.jp>",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.16.2",
     "createjs": "^1.0.1",
     "lodash": "^4.17.4",
     "redux": "^3.7.2",

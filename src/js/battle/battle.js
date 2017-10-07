@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import axios from 'axios';
 import constants from './constants';
 import Attack from './tween/attack';
 import Magic from './tween/magic';
@@ -38,6 +39,7 @@ class Battle {
         finish: false
       }
     }
+    console.log('battle!!!!!!!!')
   }
 
   async start() {
@@ -55,7 +57,7 @@ class Battle {
       {src: 'command_counter.png', id: 'counter'},
       {src: 'command_recovery.png', id: 'recovery'},
     ];
-    this.state.self.charactors = await ayncGetChara(MY_CHARACTOR);
+    this.state.self.charactors = MY_CHARACTOR;
     const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
     this.state.enemy.charactors = await ayncGetChara(ENEMY_CHARACTOR);
     const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
@@ -82,14 +84,14 @@ class Battle {
   }
 
   init() {
-    const field = this.setField();
+    this.field = this.setField();
     this.commands = this.setCommands();
     this.myCharactors = this.setCharactors(this.state.self.charactors);
     this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
     this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.addEventListener('tick', stage);
-    stage.addChild(field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
+    stage.addChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
     stage.update();
     this.turn();
   }
@@ -97,6 +99,7 @@ class Battle {
   turn() {
     const { orderedMyChara, orderedEnemyChara, orderedAllChara} = this.Flow.turn();
     this.orderedMyChara = this.getLivingCharas(orderedMyChara);
+    console.log(orderedEnemyChara);
     this.orderedEnemyChara = this.getLivingCharas(orderedEnemyChara);
     this.orderAllChara = this.getLivingCharas(orderedAllChara);
     this.switchCommand();
@@ -126,6 +129,7 @@ class Battle {
     if (0 < this.state.order.current.status.HP) {
       if (this.state.order.current.type === 'self') {
         this.state.self.current = this.state.order.current;
+        console.log('this.orderedEnemyChara', this.orderedEnemyChara)
         this.state.enemy.current = this.getRandomChara(this.orderedEnemyChara);
         this.commands.attack.y = window.innerHeight - 200;
         this.commands.defense.y = window.innerHeight;
@@ -194,6 +198,7 @@ class Battle {
 
     const attacker = this.state.order.current;
     const diffencer = this.state.enemy.current;
+    console.log('this.state.enemy.current', this.state.enemy.current);
     const commandType = this.choiceEnemyCommandType(diffencer);
     console.log(' - - - - - - - - - - - -');
     console.log('自分の選択(攻撃): ', 'ATK');
@@ -349,6 +354,7 @@ class Battle {
     if (this.getLivingCharas(charactors).length === 0) {
       this.state.battle.finish = true;
       console.log(msg);
+      stage.removeChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
       route.to('map');
     } else {
       this.turnController();
@@ -610,12 +616,29 @@ function random(min = 0, max = 100) {
 
 
 // 本当はDBから取得するけど、適当
-function ayncGetChara(chara) {
+function ayncGetChara() {
+  let charaIds = [1, 2, 3, 4, 5];
+  // return new Promise((resolve, reject) => {
+  //   chara.forEach((c) => {
+  //     item.push(c);
+  //   });
+  //   setTimeout(() => {
+  //     resolve(item);
+  //   }, 50);
+  // });
+
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(chara);
-    }, 50);
+    let charactors = charaIds.map((value) => {
+      return axios.get(`/assets/data/enemy/${value}.json`);
+    });
+    Promise.all(charactors).then((charas) => {
+      console.log(charas);
+      const c = charas.map(chara => chara.data);
+      console.log('c', c);
+      resolve(c);
+    })
   });
+  console.log(chara);
 }
 
 const MY_CHARACTOR = [
@@ -716,7 +739,7 @@ const ENEMY_CHARACTOR = [
     id: 2,
     name: 'enemy_1',
     MAX_HP: 50,
-    HP: 50,
+    HP: 1,
     ATK: 20,
     MGC: 14,
     DF: 20,
@@ -734,7 +757,7 @@ const ENEMY_CHARACTOR = [
     id: 12,
     name: 'enemy_2',
     MAX_HP: 45,
-    HP: 45,
+    HP: 1,
     ATK: 18,
     MGC: 20,
     DF: 30,
@@ -752,7 +775,7 @@ const ENEMY_CHARACTOR = [
     id: 22,
     name: 'enemy_3',
     MAX_HP: 45,
-    HP: 45,
+    HP: 1,
     ATK: 18,
     MGC: 19,
     DF: 30,
@@ -770,7 +793,7 @@ const ENEMY_CHARACTOR = [
     id: 19,
     name: 'enemy_4',
     MAX_HP: 45,
-    HP: 45,
+    HP: 1,
     ATK: 18,
     MGC: 20,
     DF: 30,
@@ -785,10 +808,10 @@ const ENEMY_CHARACTOR = [
     }
   },
   {
-    id: 3,
+    id: 18,
     name: 'enemy_5',
     MAX_HP: 45,
-    HP: 45,
+    HP: 1,
     ATK: 18,
     MGC: 15,
     DF: 30,
