@@ -55,10 +55,10 @@ class Map {
         const square = new createjs.Bitmap(this.loaders[`square_${item[t]}`]);
         square.skewX = item[t].width / 2;
         square.skewY = item[t].height / 2;
-        square.scaleX = 0.5;
-        square.scaleY = 0.5;
-        square.y = i * 40;
-        square.x = t * 40;
+        // square.scaleX = 0.5;
+        // square.scaleY = 0.5;
+        square.y = i * 80;
+        square.x = t * 80;
         squares.addChild(square);
       }
     }

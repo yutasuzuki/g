@@ -178,6 +178,7 @@ class Battle {
     return field;
   }
 
+  // アニメーション中はコマンドが選択できないようにする判定
   isCommandDisable() {
     let bool = false;
     if (!this.state.turn.finish || this.state.battle.finish) {
@@ -186,6 +187,7 @@ class Battle {
     return bool;
   }
 
+  // 通常攻撃を選択
   attackHandler() {
     if (this.isCommandDisable()) return;
     this.state.turn.finish = false;
@@ -206,6 +208,7 @@ class Battle {
     });
   }
 
+  // 魔法攻撃を選択
   magicHandler() {
     if (this.isCommandDisable()) return;
     this.state.turn.finish = false;
@@ -239,6 +242,7 @@ class Battle {
     }
   }
 
+  // 敵の攻撃
   enemyAttack(diffenceType, attacker) {
     const commandType = this.choiceEnemyCommandType(attacker);
     console.log(' - - - - - - - - - - - -');
@@ -279,14 +283,15 @@ class Battle {
         this.reflectMagic(attacker, targetDiffencer, this.orderedEnemyChara);
       }
     } else if (commandType === 'SP') {
-      console.log('SPだけどMGC');
+      console.log('敵のSP');
       this.decideBattlePhase(this.orderedMyChara);
     } else if (commandType === 'SKIP') {
-      console.log('SKIPだけどMGC');
+      console.log('敵がSKIP');
       this.decideBattlePhase(this.orderedMyChara);
     }
   }
   
+  // 魔法防御が成功した時
   async reflectMagic(attacker, targetDiffencer, diffencers) {
     const commandType = 'REFLECT';
     console.log('- - - - 魔法を反射 - - - -');
@@ -318,6 +323,7 @@ class Battle {
     });
   }
 
+  // 防御
   defenseHandler() {
     if (this.isCommandDisable()) return;
     this.state.turn.finish = false;
@@ -328,6 +334,7 @@ class Battle {
     this.enemyAttack('ATK', attacker);
   }
 
+  // 魔法防御
   magicDefenseHandler() {
     if (this.isCommandDisable()) return;
     this.state.turn.finish = false;
@@ -336,6 +343,7 @@ class Battle {
     this.enemyAttack('MGC', attacker);
   }
 
+  // 敵を倒したか、全滅したかの判定
   decideBattlePhase(charactors) {
     const msg = charactors[0].type === 'self'? '全滅した': '敵を倒した';
     if (this.getLivingCharas(charactors).length === 0) {
@@ -357,6 +365,7 @@ class Battle {
     return charas.filter((chara) =>  0 < chara.status.HP);
   }
 
+  // 攻撃用のコマンドと防御用のコマンドをセット
   setCommands() {
     const attackCommand = new createjs.Container();
     const attack = new createjs.Bitmap(this.loaders['attack']);
@@ -423,6 +432,7 @@ class Battle {
     };
   }
 
+  // 敵が何を選択するのか決める関数
   choiceEnemyCommandType(chara) {
     const rates = chara.status.choice.rate;
     const rateArray = _.map(rates, (value, key) => value);
@@ -442,6 +452,7 @@ class Battle {
     }
   }
   
+  // 攻撃の計算ロジック（適当）
   calcAttackDamage(type, attacker, diffencer) {
     const coefficient = random(85, 115);
     const damage = Math.floor(attacker.status.ATK * coefficient / 100);
@@ -468,7 +479,8 @@ class Battle {
         break;
     }
   }
-    
+  
+  // 魔法攻撃の計算ロジック（適当）
   calcMagicDamage(type, attacker, diffencer) {
     const coefficient = random(85, 115);
     const damage = Math.floor(attacker.status.MGC * coefficient / 100);
@@ -590,13 +602,14 @@ class Flow {
   }
 }
 
+// 幅を指定するランダム関数
 function random(min = 0, max = 100) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
 
 
-
+// 本当はDBから取得するけど、適当
 function ayncGetChara(chara) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
