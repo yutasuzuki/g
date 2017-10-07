@@ -7,7 +7,8 @@
     "type": "git"
   },
   "scripts": {
-    "start": "webpack && webpack-dev-server"
+    "start": "webpack && webpack-dev-server",
+    "script": "webpack --w"
   },
   "author": "Yuta Suzuki <bugs_bugs_bunny69@yahoo.co.jp>",
   "license": "MIT",
