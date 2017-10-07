@@ -25,7 +25,10 @@ class Map {
       {src: 'square_0.png', id: 'square_0'},
       {src: 'square_1.png', id: 'square_1'}
     ];
-    // queue.loadManifest(fieldManifest, true, '/assets/images/field/');
+    const charaManifest = [
+      {src: 'chara_8.png', id: 'chara'},
+    ];
+    queue.loadManifest(charaManifest, true, '/assets/images/chara/');
     queue.loadManifest(squareManifest, true, '/assets/images/map/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.init());
@@ -34,13 +37,51 @@ class Map {
   init() {
     const field = this.setField();
     const squares = this.setSquare();
-    console.log(squares);
+    console.log(squares.getBounds().width);
+    console.log(squares.getBounds().height);
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.addEventListener('tick', stage);
-    // squares.addEventListener('click', function() {
-    //   squares.x += 100;
-    //   squares.y += 100;
-    // });
+    let touch = {
+      start: {
+        x: 0,
+        y: 0
+      },
+      history: {
+        x: 0,
+        y: 0
+      }
+    };
+    window.addEventListener('touchstart', function(e) {
+      const t = e.changedTouches[0];
+      touch.start.x = t.pageX;
+      touch.start.y = t.pageY;
+      squares.x = touch.history.x;
+      squares.y = touch.history.y;
+    });
+    window.addEventListener('touchmove', function(e) {
+      const t = e.changedTouches[0];
+      const diffX = touch.start.x - t.pageX;
+      const diffY = touch.start.y - t.pageY;
+      console.log(window.innerWidth);
+      if (window.innerWidth - squares.getBounds().width <= squares.x && squares.x <= 0) {
+        squares.x = touch.history.x - diffX;
+      }
+      if (window.innerHeight - squares.getBounds().height <= squares.x && squares.x <= 0) {
+        squares.y = touch.history.y - diffY;
+      }
+    });
+    window.addEventListener('touchend', function() {
+      if (squares.x < window.innerWidth - squares.getBounds().width) {
+        squares.x = window.innerWidth - squares.getBounds().width;
+      } else if (squares.x > 0) {
+        squares.x = 0;
+      }
+if (squares.y > 0) {
+        squares.y = 0;
+      }
+      touch.history.x = squares.x;
+      touch.history.y = squares.y;
+    });
     stage.addChild(field, squares);
     stage.update();
   }

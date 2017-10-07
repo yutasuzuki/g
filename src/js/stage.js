@@ -3,6 +3,7 @@ class Stage {
     this.stage = new createjs.Stage(canvas);
     window.addEventListener("resize",() => this.resizeHandler);
     this.resizeHandler();
+    this.getWidth()
     return this.stage;
   }
 
@@ -12,6 +13,14 @@ class Stage {
     this.stage.canvas.width = w;
     this.stage.canvas.height = h;
     this.stage.update();
+  }
+
+  getWidth() {
+    return this.stage.canvas.width;
+  }
+
+  getHeight() {
+    return this.stage.canvas.height;
   }
 }
 
