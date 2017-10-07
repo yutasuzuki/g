@@ -33,19 +33,20 @@ class Router {
     this.loading.y = 0;
     this.loading.alpha = 1;
 
-    stage.addChild(this.loading);
-    stage.update();
+    // stage.addChild(this.loading);
+    // stage.update();
 
     return new Promise((resolve, reject) => {})
   }
 
   to(scene) {
-    this.load();
+    // this.load();
 
-    setTimeout(() => {
-      const route = new this.config[scene].component();
-      route.start();
-    }, 1500);
+    const route = new this.config[scene].component();
+    route.start();
+
+    // setTimeout(() => {
+    // }, 1500);
   }
 }
 
