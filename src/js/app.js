@@ -5,7 +5,14 @@ import Battle from './battle/battle';
 window.stage = new Stage('content');
 window.route = router;
 window.state = {
-  pos: { x: 0, y: 0 }
+  map: {
+    piece: {
+      pos: { x: 0, y: 0 }
+    },
+    squares: {
+      pos: { x: 0, y: 0 }
+    }
+  }
 };
 
 route.to('map');

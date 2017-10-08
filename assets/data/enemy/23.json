@@ -1,0 +1,18 @@
+{
+  "id": 22,
+  "name": "enemy_3",
+  "MAX_HP": 45,
+  "HP": 1,
+  "ATK": 18,
+  "MGC": 19,
+  "DF": 30,
+  "SP": 12,
+  "choice": {
+    "rate": {
+      "ATK": 60,
+      "MGC": 10,
+      "SP": 1,
+      "OTHER": 1
+    }
+  }
+}

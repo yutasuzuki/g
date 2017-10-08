@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { random } from '../util'
 
 const MapPosition = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -41,13 +42,13 @@ class Map {
   }
 
   init() {
-    const field = this.setField();
-    const squares = this.setSquare();
-    const btnDice = this.setBitmap('btn_dice');
-    btnDice.x = window.innerWidth / 2 - btnDice.getBounds().width / 4;
-    btnDice.y = window.innerHeight - btnDice.getBounds().height / 2;
+    this.field = this.setField();
+    this.squares = this.setSquare();
+    this.btnDice = this.setBitmap('btn_dice');
+    this.btnDice.x = window.innerWidth / 2 - this.btnDice.getBounds().width / 4;
+    this.btnDice.y = window.innerHeight - this.btnDice.getBounds().height / 2;
     console.log(window.innerHeight);
-    console.log(btnDice.getBounds().width);
+    console.log(this.btnDice.getBounds().width);
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.addEventListener('tick', stage);
     let touch = {
@@ -56,55 +57,55 @@ class Map {
         y: 0
       },
       history: {
-        x: 0,
-        y: 0
+        x: state.map.squares.pos.x,
+        y: state.map.squares.pos.y
       }
     };
-    window.addEventListener('touchstart', function(e) {
+    window.addEventListener('touchstart', (e) => {
       const t = e.changedTouches[0];
       touch.start.x = t.pageX;
       touch.start.y = t.pageY;
-      squares.x = touch.history.x;
-      squares.y = touch.history.y;
+      this.squares.x = touch.history.x;
+      this.squares.y = touch.history.y;
     });
-    window.addEventListener('touchmove', function(e) {
+    window.addEventListener('touchmove', (e) => {
       const t = e.changedTouches[0];
       const diffX = touch.start.x - t.pageX;
       const diffY = touch.start.y - t.pageY;
       console.log(window.innerWidth);
-      if (window.innerWidth - squares.getBounds().width <= squares.x && squares.x <= 0) {
-        squares.x = touch.history.x - diffX;
+      if (window.innerWidth - this.squares.getBounds().width <= this.squares.x && this.squares.x <= 0) {
+        this.squares.x = touch.history.x - diffX;
       }
-      if (window.innerHeight - squares.getBounds().height <= squares.y && squares.y <= 0) {
-        squares.y = touch.history.y - diffY;
+      if (window.innerHeight - this.squares.getBounds().height <= this.squares.y && this.squares.y <= 0) {
+        this.squares.y = touch.history.y - diffY;
       }
     });
-    window.addEventListener('touchend', function() {
-      if (squares.x < window.innerWidth - squares.getBounds().width) {
-        squares.x = window.innerWidth - squares.getBounds().width;
-      } else if (squares.x > 0) {
-        squares.x = 0;
+    window.addEventListener('touchend', () => {
+      if (this.squares.x < window.innerWidth - this.squares.getBounds().width) {
+        this.squares.x = window.innerWidth - this.squares.getBounds().width;
+      } else if (this.squares.x > 0) {
+        this.squares.x = 0;
       }
-      if (squares.y < window.innerHeight - squares.getBounds().height) {
-        squares.y = window.innerHeight - squares.getBounds().height;
-      } else if (squares.y > 0) {
-        squares.y = 0;
+      if (this.squares.y < window.innerHeight - this.squares.getBounds().height) {
+        this.squares.y = window.innerHeight - this.squares.getBounds().height;
+      } else if (this.squares.y > 0) {
+        this.squares.y = 0;
       }
-      touch.history.x = squares.x;
-      touch.history.y = squares.y;
+      touch.history.x = state.map.squares.pos.x = this.squares.x;
+      touch.history.y = state.map.squares.pos.y = this.squares.y;
     });
-    const diceNumber = new createjs.Text(this.dice.count, "18px serif", "black");
+    this.diceText = new createjs.Text(this.dice.count, "18px serif", "black");
     
-    diceNumber.x = + 88;
-    diceNumber.y = + 22;
-    btnDice.addEventListener('click', () => {
+    this.diceText.x = + 88;
+    this.diceText.y = + 22;
+    this.btnDice.addEventListener('click', () => {
       this.dice.count = random(1, 6);
-      diceNumber.text = this.dice.count;
-      stage.addChild(diceNumber);
+      this.diceText.text = this.dice.count;
+      stage.addChild(this.diceText);
       stage.update();
       this.dice.isRoll = true;
     })
-    stage.addChild(field, squares, btnDice);
+    stage.addChild(this.field, this.squares, this.btnDice);
     stage.update();
   }
     
@@ -138,29 +139,37 @@ class Map {
         if (square.type) {
           square.addEventListener('click', (obj) => {
             console.log('obj', obj);
-            const posDiffX = obj.target.pos.x - state.pos.x;
-            const posDiffY = obj.target.pos.y - state.pos.y;
+            const posDiffX = obj.target.pos.x - state.map.piece.pos.x;
+            const posDiffY = obj.target.pos.y - state.map.piece.pos.y;
             const posDiff = Math.abs(posDiffX) + Math.abs(posDiffY);
 
             if (posDiff === 1 && this.dice.isRoll) {
-              state.pos = obj.target.pos;
+              state.map.piece.pos = obj.target.pos;
               charactor.x = obj.target.x;
               charactor.y = obj.target.y;
               this.dice.count -= 1;
+              this.diceText.text = this.dice.count;
+              stage.update();
               console.log('this.dice.count', this.dice.count);
               if (!this.dice.count) {
                 route.to('battle');
+                setTimeout(function() {
+                  stage.removeChild(this.field, this.squares, this.btnDice, this.diceText);
+                }, 1000);
               }
             } else {
-              console.log('そこは進めません')
+              console.log('そこは進めません');
             }
           });
         }
         squares.addChild(square);
       }
     }
-    charactor.x = state.pos.x * 80;
-    charactor.y = state.pos.y * 80;
+    charactor.x = state.map.piece.pos.x * 80;
+    charactor.y = state.map.piece.pos.y * 80;
+    console.log('state.map.piece.', state.map.piece);
+    squares.x = state.map.squares.pos.x;
+    squares.y = state.map.squares.pos.y;
     squares.addChild(charactor);
     return squares;
   }
@@ -174,13 +183,5 @@ class Map {
     return field;
   }
 }
-
-
-
-// 幅を指定するランダム関数
-function random(min = 0, max = 100) {
-  return Math.floor(Math.random() * (max + 1 - min)) + min;
-}
-
 
 export default Map;

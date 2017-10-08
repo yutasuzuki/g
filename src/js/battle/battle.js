@@ -59,7 +59,7 @@ class Battle {
     ];
     this.state.self.charactors = MY_CHARACTOR;
     const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
-    this.state.enemy.charactors = await ayncGetChara(ENEMY_CHARACTOR);
+    this.state.enemy.charactors = await ayncGetChara();
     const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
     const magicManifest = [
       {src: 'air.png', id: 'air'},
@@ -615,17 +615,9 @@ function random(min = 0, max = 100) {
 
 
 
-// 本当はDBから取得するけど、適当
+// 本当はDBから取得するけど、今はjsonファイルから取得するように
 function ayncGetChara() {
-  let charaIds = [1, 2, 3, 4, 5];
-  // return new Promise((resolve, reject) => {
-  //   chara.forEach((c) => {
-  //     item.push(c);
-  //   });
-  //   setTimeout(() => {
-  //     resolve(item);
-  //   }, 50);
-  // });
+  let charaIds = [1, 2, 3];
 
   return new Promise((resolve, reject) => {
     let charactors = charaIds.map((value) => {
@@ -733,99 +725,5 @@ const MY_CHARACTOR = [
     }
   }
 ]
-
-const ENEMY_CHARACTOR = [
-  {
-    id: 2,
-    name: 'enemy_1',
-    MAX_HP: 50,
-    HP: 1,
-    ATK: 20,
-    MGC: 14,
-    DF: 20,
-    SP: 12,
-    choice: {
-      rate: {
-        ATK: 30,
-        MGC: 20,
-        SP: 1,
-        OTHER: 1
-      }
-    }
-  },
-  {
-    id: 12,
-    name: 'enemy_2',
-    MAX_HP: 45,
-    HP: 1,
-    ATK: 18,
-    MGC: 20,
-    DF: 30,
-    SP: 11,
-    choice: {
-      rate: {
-        ATK: 30,
-        MGC: 20,
-        SP: 1,
-        OTHER: 1
-      }
-    }
-  },
-  {
-    id: 22,
-    name: 'enemy_3',
-    MAX_HP: 45,
-    HP: 1,
-    ATK: 18,
-    MGC: 19,
-    DF: 30,
-    SP: 12,
-    choice: {
-      rate: {
-        ATK: 60,
-        MGC: 10,
-        SP: 1,
-        OTHER: 1
-      }
-    }
-  },
-  {
-    id: 19,
-    name: 'enemy_4',
-    MAX_HP: 45,
-    HP: 1,
-    ATK: 18,
-    MGC: 20,
-    DF: 30,
-    SP: 14,
-    choice: {
-      rate: {
-        ATK: 30,
-        MGC: 30,
-        SP: 1,
-        OTHER: 1
-      }
-    }
-  },
-  {
-    id: 18,
-    name: 'enemy_5',
-    MAX_HP: 45,
-    HP: 1,
-    ATK: 18,
-    MGC: 15,
-    DF: 30,
-    SP: 15,
-    choice: {
-      rate: {
-        ATK: 70,
-        MGC: 10,
-        SP: 1,
-        OTHER: 1
-      }
-    }
-  }
-]
-
 
 export default Battle;
