@@ -4,6 +4,7 @@ import constants from './constants';
 import Attack from './tween/attack';
 import Magic from './tween/magic';
 import Damage from './tween/damage';
+import { random } from '../util';
 
 const attack = new Attack();
 const magic = {};
@@ -59,7 +60,7 @@ class Battle {
     ];
     this.state.self.charactors = MY_CHARACTOR;
     const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
-    this.state.enemy.charactors = await ayncGetChara();
+    this.state.enemy.charactors = await ayncGetChara(this.createEnemiesID());
     const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
     const magicManifest = [
       {src: 'air.png', id: 'air'},
@@ -531,6 +532,15 @@ class Battle {
     return value;
   }
 
+  createEnemiesID() {
+    const len = random(1, 5);
+    let items = []
+    for (let i = 0; i < len; i++) {
+      items.push(random(1, 24));
+    }
+    return items;
+  }
+
   setCharactors(charactors, type = 'self') {
     return charactors.map((charactor, index) => {
       const chara = new createjs.Bitmap(this.loaders[`chara_${charactor.id}`]);
@@ -608,19 +618,12 @@ class Flow {
   }
 }
 
-// 幅を指定するランダム関数
-function random(min = 0, max = 100) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-
 
 // 本当はDBから取得するけど、今はjsonファイルから取得するように
-function ayncGetChara() {
-  let charaIds = [1, 2, 3];
+function ayncGetChara(charactorsID) {
 
   return new Promise((resolve, reject) => {
-    let charactors = charaIds.map((value) => {
+    let charactors = charactorsID.map((value) => {
       return axios.get(`/assets/data/enemy/${value}.json`);
     });
     Promise.all(charactors).then((charas) => {

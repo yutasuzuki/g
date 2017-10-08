@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { random } from '../util'
+import { random } from '../util';
 
 const MapPosition = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -72,7 +72,6 @@ class Map {
       const t = e.changedTouches[0];
       const diffX = touch.start.x - t.pageX;
       const diffY = touch.start.y - t.pageY;
-      console.log(window.innerWidth);
       if (window.innerWidth - this.squares.getBounds().width <= this.squares.x && this.squares.x <= 0) {
         this.squares.x = touch.history.x - diffX;
       }
