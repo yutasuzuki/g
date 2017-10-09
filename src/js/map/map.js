@@ -29,14 +29,19 @@ class Map {
     ];
     const mapManifest = [
       {src: 'btn_dice.png', id: 'btn_dice'},
+      {src: 'dice_bg.png', id: 'dice_bg'},
       {src: 'square_0.png', id: 'square_0'},
       {src: 'square_1.png', id: 'square_1'}
     ];
     const charaManifest = [
       {src: 'chara_8.png', id: 'chara'},
     ];
+    const walkManifest = [
+      {src: 'chara_8.png', id: 'walk'},
+    ];
     queue.loadManifest(charaManifest, true, '/assets/images/chara/');
     queue.loadManifest(mapManifest, true, '/assets/images/map/');
+    queue.loadManifest(walkManifest, true, '/assets/images/map/sprite/walk/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.init());
   }
@@ -44,11 +49,7 @@ class Map {
   init() {
     this.field = this.setField();
     this.squares = this.setSquare();
-    this.btnDice = this.setBitmap('btn_dice');
-    this.btnDice.x = window.innerWidth / 2 - this.btnDice.getBounds().width / 4;
-    this.btnDice.y = window.innerHeight - this.btnDice.getBounds().height / 2;
-    console.log(window.innerHeight);
-    console.log(this.btnDice.getBounds().width);
+    this.footer = this.setFooter();
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.addEventListener('tick', stage);
     let touch = {
@@ -93,18 +94,7 @@ class Map {
       touch.history.x = state.map.squares.pos.x = this.squares.x;
       touch.history.y = state.map.squares.pos.y = this.squares.y;
     });
-    this.diceText = new createjs.Text(this.dice.count, "18px serif", "black");
-    
-    this.diceText.x = + 88;
-    this.diceText.y = + 22;
-    this.btnDice.addEventListener('click', () => {
-      this.dice.count = random(1, 6);
-      this.diceText.text = this.dice.count;
-      stage.addChild(this.diceText);
-      stage.update();
-      this.dice.isRoll = true;
-    })
-    stage.addChild(this.field, this.squares, this.btnDice);
+    stage.addChild(this.field, this.squares, this.footer);
     stage.update();
   }
     
@@ -117,8 +107,65 @@ class Map {
     return chara;
   }
 
+  setCharaSprite() {
+    const data = {
+      images: ['/assets/images/map/sprite/walk/chara_8.png'],
+      frames: {width: 160, height: 160, regX: 0, regY: 0, scaleX: 0.5, scaleY: 0.5},
+      animations: {
+        walk: {
+          frames: [0, 1, 2],
+        }
+      },
+      framerate: 15
+    };
+    
+    const spritesheet = new createjs.SpriteSheet(data);
+    const sprite = new createjs.Sprite(spritesheet, 0);
+    sprite.scaleX = 0.5;
+    sprite.scaleY = 0.5;
+    
+    sprite.stop('walk');
+
+    return sprite;
+  }
+
+  setFooter() {
+    const footer = new createjs.Container();
+    footer.y = window.innerHeight - 60;
+
+    const diceContainer = new createjs.Container();
+    diceContainer.x = 5;
+    diceContainer.y = 2.5;
+
+    const bg = new createjs.Shape();
+    bg.graphics.beginFill("rgba(255, 255, 255, 0.5)");   
+    bg.graphics.rect(0,0, window.innerWidth, 60);
+
+    const diceBg = this.setBitmap('dice_bg');
+
+    this.diceText = new createjs.Text(this.dice.count, "24px Roboto", "#57450d");
+    this.diceText.x = 21;
+    this.diceText.y = 14;
+
+    this.btnDice = this.setBitmap('btn_dice');
+    this.btnDice.x = window.innerWidth / 2 - this.btnDice.getBounds().width / 4;
+    this.btnDice.y = 10;
+    this.btnDice.addEventListener('click', () => {
+      if (this.dice.isRoll) return;
+      this.dice.count = random(1, 6);
+      this.diceText.text = this.dice.count;
+      this.dice.isRoll = true;
+      stage.update();
+    })
+    
+    diceContainer.addChild(diceBg, this.diceText);
+    footer.addChild(bg, diceContainer, this.btnDice);
+    return footer;
+  }
+
   setSquare() {
-    const charactor = this.setBitmap('chara');
+    const charactor = this.setCharaSprite();
+
     const squares = new createjs.Container();
     const length = MapPosition.length;
     for (let i = 0; i < length; i++) {
@@ -137,25 +184,31 @@ class Map {
         };
         if (square.type) {
           square.addEventListener('click', (obj) => {
-            console.log('obj', obj);
+            
             const posDiffX = obj.target.pos.x - state.map.piece.pos.x;
             const posDiffY = obj.target.pos.y - state.map.piece.pos.y;
             const posDiff = Math.abs(posDiffX) + Math.abs(posDiffY);
 
-            if (posDiff === 1 && this.dice.isRoll) {
+            if (this.dice.count && posDiff === 1 && this.dice.isRoll) {
               state.map.piece.pos = obj.target.pos;
-              charactor.x = obj.target.x;
-              charactor.y = obj.target.y;
+              charactor.gotoAndPlay('walk');
+              createjs.Tween.get(charactor)
+                .to({
+                  x: obj.target.x,
+                  y: obj.target.y
+                }, 250)
+                .call(() => {
+                  charactor.stop();
+                  if (!this.dice.count) {
+                    route.to('battle');
+                    setTimeout(() => {
+                      this.destroy();
+                    }, 1000);
+                  }
+                })
               this.dice.count -= 1;
               this.diceText.text = this.dice.count;
               stage.update();
-              console.log('this.dice.count', this.dice.count);
-              if (!this.dice.count) {
-                route.to('battle');
-                setTimeout(function() {
-                  stage.removeChild(this.field, this.squares, this.btnDice, this.diceText);
-                }, 1000);
-              }
             } else {
               console.log('そこは進めません');
             }
@@ -166,10 +219,10 @@ class Map {
     }
     charactor.x = state.map.piece.pos.x * 80;
     charactor.y = state.map.piece.pos.y * 80;
-    console.log('state.map.piece.', state.map.piece);
     squares.x = state.map.squares.pos.x;
     squares.y = state.map.squares.pos.y;
     squares.addChild(charactor);
+
     return squares;
   }
 
@@ -180,6 +233,11 @@ class Map {
     field.scaleX = 2;
     field.scaleY = 2;
     return field;
+  }
+
+  destroy() {
+    stage.removeChild(this.field, this.squares, this.btnDice, this.diceText);
+    stage.update();
   }
 }
 
