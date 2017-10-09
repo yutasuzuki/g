@@ -6,7 +6,7 @@ window.stage = new Stage('content');
 window.route = router;
 window.state = {
   map: {
-    currentType: 0,
+    currentType: 2,
     piece: {
       pos: { x: 0, y: 0 }
     },

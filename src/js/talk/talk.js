@@ -9,8 +9,8 @@ const talkscript = [
   },
   {
     type: 0,
-    name: '男たち',
-    text: 'こんにちは!!'
+    name: '宿屋',
+    text: 'こんにちは'
   },
   {
     type: 1,
@@ -19,13 +19,28 @@ const talkscript = [
   },
   {
     type: 0,
-    name: '男たち',
+    name: '宿屋',
     text: 'ここは宿屋です'
   },
   {
     type: 0,
-    name: '男たち',
-    text: 'ここは宿屋です!!'
+    name: '宿屋',
+    text: 'ここは宿屋です！'
+  },
+  {
+    type: 1,
+    name: 'ルシェ',
+    text: '今日泊まりたいのだけれども・・・'
+  },
+  {
+    type: 0,
+    name: '宿屋',
+    text: 'お好きな部屋をお使いください'
+  },
+  {
+    type: 1,
+    name: 'ルシェ',
+    text: 'ありがとう'
   },
 ]
 
@@ -45,10 +60,11 @@ class Talk {
   async start() {
     const queue = new createjs.LoadQueue();
     const charaManifest = [
+      {src: 'inn.jpg', id: 'inn'},
       {src: 'castle.jpg', id: 'castle'},
       {src: 'chara_8.png', id: 'main_chara'},
       {src: 'king.png', id: 'king'},
-      {src: 'person.png', id: 'person'},
+      {src: 'person_2.png', id: 'person'},
     ];
     queue.loadManifest(charaManifest, true, '/assets/images/talk/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
@@ -56,9 +72,15 @@ class Talk {
   }
 
   init() {
-    this.background = this.setBackground('castle');
     this.mainChara = this.setMainCharactor('main_chara');
-    this.otherChara = this.setOtherCharactor('person');
+
+    if (state.map.currentType === 2) {
+      this.background = this.setBackground('inn');
+      this.otherChara = this.setOtherCharactor('person');
+    } else if (state.map.currentType === 3) {
+      this.background = this.setBackground('castle');
+      this.otherChara = this.setOtherCharactor('king');
+    }
     this.comment = this.setCommentBox();
 
     stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
@@ -67,10 +89,12 @@ class Talk {
 
   setBackground(key) {
     const bg = new createjs.Bitmap(this.loaders[key]);
-    bg.x = - bg.getBounds().width / 2 + 50;
+    console.log(window.innerWidth);
+    console.log(bg.getBounds().width);
+    bg.x = window.innerWidth / 2 - bg.getBounds().width / 2;
     bg.y = 0;
-    bg.scaleX = 1.5;
-    bg.scaleY = 1.5;
+    bg.scaleX = 1;
+    bg.scaleY = 1;
 
     return bg;
   }
@@ -79,9 +103,9 @@ class Talk {
     const container = new createjs.Container();
     const chara = new createjs.Bitmap(this.loaders[key]);
     chara.x = -100;
-    chara.y = 140;
-    chara.scaleX = 0.9;
-    chara.scaleY = 0.9;
+    chara.y = window.innerHeight - chara.getBounds().height * 0.7 - 240;
+    chara.scaleX = 0.8;
+    chara.scaleY = 0.8;
 
     container.addChild(chara);
     return container;
@@ -91,9 +115,9 @@ class Talk {
     const container = new createjs.Container();
     const chara = new createjs.Bitmap(this.loaders[key]);
     chara.x = 100;
-    chara.y = 140;
-    chara.scaleX = 0.9;
-    chara.scaleY = 0.9;
+    chara.y = window.innerHeight - chara.getBounds().height * 0.7 - 240;
+    chara.scaleX = 0.8;
+    chara.scaleY = 0.8;
 
     container.addChild(chara);
     return container;
@@ -123,20 +147,20 @@ class Talk {
           stage.setChildIndex(this.mainChara, stage.getNumChildren() - 1);
           stage.setChildIndex(this.otherChara, stage.getNumChildren() + 1);
           this.mainChara.filters = [];
-          this.mainChara.cache(0, 0, 480, 480);
+          this.mainChara.cache(0, 0, 960, 960);
           this.otherChara.filters = [
             new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
           ];
-          this.otherChara.cache(0, 0, 480, 480);
+          this.otherChara.cache(0, 0, 960, 960);
         }  else {
           stage.setChildIndex(this.mainChara, stage.getNumChildren() + 1);
           stage.setChildIndex(this.otherChara, stage.getNumChildren() - 1);
           this.mainChara.filters = [
             new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
           ];
-          this.mainChara.cache(0, 0, 480, 480);
+          this.mainChara.cache(0, 0, 960, 960);
           this.otherChara.filters = [];
-          this.otherChara.cache(0, 0, 480, 480);
+          this.otherChara.cache(0, 0, 960, 960);
         }
         stage.setChildIndex(this.comment, stage.getNumChildren() - 1);
         this.talk.name.text = item.name;
