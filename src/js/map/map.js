@@ -67,14 +67,14 @@ class Map {
         y: state.map.squares.pos.y
       }
     };
-    window.addEventListener('touchstart', (e) => {
+    this.touchstartHandler = (e) => {
       const t = e.changedTouches[0];
       touch.start.x = t.pageX;
       touch.start.y = t.pageY;
       this.squares.x = touch.history.x;
       this.squares.y = touch.history.y;
-    });
-    window.addEventListener('touchmove', (e) => {
+    }
+    this.touchmoveHandler = (e) => {
       const t = e.changedTouches[0];
       const diffX = touch.start.x - t.pageX;
       const diffY = touch.start.y - t.pageY;
@@ -84,8 +84,8 @@ class Map {
       if (window.innerHeight - this.squares.getBounds().height <= this.squares.y && this.squares.y <= 0) {
         this.squares.y = touch.history.y - diffY;
       }
-    });
-    window.addEventListener('touchend', () => {
+    }
+    this.touchendHandler = () => {
       if (this.squares.x < window.innerWidth - this.squares.getBounds().width) {
         this.squares.x = window.innerWidth - this.squares.getBounds().width;
       } else if (this.squares.x > 0) {
@@ -98,7 +98,10 @@ class Map {
       }
       touch.history.x = state.map.squares.pos.x = this.squares.x;
       touch.history.y = state.map.squares.pos.y = this.squares.y;
-    });
+    }
+    window.addEventListener('touchstart', this.touchstartHandler);
+    window.addEventListener('touchmove', this.touchmoveHandler);
+    window.addEventListener('touchend', this.touchendHandler);
     stage.addChild(this.field, this.squares, this.footer);
     stage.update();
   }
@@ -214,7 +217,7 @@ class Map {
                         route.to('talk');
                         break;
                       case 3:
-                        route.to('battle');
+                        route.to('talk');
                         break;
                     }
                     setTimeout(() => {
@@ -281,6 +284,9 @@ class Map {
 
   destroy() {
     stage.removeChild(this.field, this.squares, this.footer);
+    window.removeEventListener('touchstart', this.touchstartHandler);
+    window.removeEventListener('touchmove', this.touchmoveHandler);
+    window.removeEventListener('touchend', this.touchendHandler);
     stage.update();
   }
 }

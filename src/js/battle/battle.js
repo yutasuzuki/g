@@ -569,7 +569,7 @@ class Battle {
 
   setCharactors(charactors, type = 'self') {
     return charactors.map((charactor, index) => {
-      const charaContainer = new createjs.Container();
+      const container = new createjs.Container();
       const chara = new createjs.Bitmap(this.loaders[`chara_${charactor.id}`]);
       const x = chara.getBounds().width / 2;
       const y = chara.getBounds().height / 2;
@@ -588,6 +588,7 @@ class Battle {
       chara.damage = function(point) {
         chara.status.HP -= point;
       }
+      container.addChild(chara);
       return chara;
     });
   }
