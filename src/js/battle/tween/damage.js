@@ -6,18 +6,20 @@ class Damage {
   tween(point, defenser) {
     this.defenser = defenser;
 
-    const damageText = new createjs.Text(point, "18px Roboto", "white");
+    const damageText = new createjs.Text(point, "16px Roboto", "white");
     
-    damageText.x = defenser.x + 22;
-    damageText.y = defenser.y + 22;
-    stage.setChildIndex(damageText, 2);
+    // damageText.x = defenser.x + defenser.getBounds().width / 4;
+    // damageText.y = defenser.y - defenser.getBounds().width / 4;
+    damageText.x = defenser.x - defenser.getBounds().width / 4;
+    damageText.y = defenser.y - 20;
+    stage.setChildIndex(damageText, -1);
     stage.addChild(damageText);
     stage.update();
     createjs.Tween.get(damageText)
       .to({
         y: damageText.y - 10,
         alpha: 1
-      }, 200)
+      }, 400)
       .to({
         y: damageText.y,
         alpha: 1

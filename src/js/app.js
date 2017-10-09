@@ -8,7 +8,7 @@ window.state = {
   map: {
     currentType: 2,
     piece: {
-      pos: { x: 0, y: 0 }
+      pos: { x: 1, y: 0 }
     },
     squares: {
       pos: { x: 0, y: 0 }
@@ -16,4 +16,4 @@ window.state = {
   }
 };
 
-route.to('map');
+route.to('battle');

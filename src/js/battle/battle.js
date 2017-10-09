@@ -73,7 +73,7 @@ class Battle {
     queue.loadManifest(resultManifest, true, '/assets/images/battle/result/');
     queue.loadManifest(fieldManifest, true, '/assets/images/field/');
     queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
-    queue.loadManifest(enemyCharaManifest, true, '/assets/images/chara/');
+    queue.loadManifest(enemyCharaManifest, true, '/assets/images/enemy/');
     queue.loadManifest(magicManifest, true, '/assets/images/battle/effect/magic/')
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.init());
@@ -569,25 +569,19 @@ class Battle {
     return charactors.map((charactor, index) => {
       const container = new createjs.Container();
       const chara = new createjs.Bitmap(this.loaders[`chara_${charactor.id}`]);
-      const x = chara.getBounds().width / 2;
-      const y = chara.getBounds().height / 2;
-      chara.status = charactor;
-      chara.type = type;
+      container.regX = chara.getBounds().width / 2;
+      container.regY = chara.getBounds().height / 2;
+      container.x = constants[type].pos[index].x + 60;
+      container.y = constants[type].pos[index].y + 40;
       chara.scaleX = 0.5;
       chara.scaleY = 0.5;
-      chara.regX = x;
-      chara.regY = y;
-      if (type === 'enemy') {
-        chara.scaleX = - 0.5;
-        chara.regX = x + 80;
+      container.damage = function(point) {
+        container.status.HP -= point;
       }
-      chara.x = constants[type].pos[index].x;
-      chara.y = constants[type].pos[index].y;
-      chara.damage = function(point) {
-        chara.status.HP -= point;
-      }
+      container.status = charactor;
+      container.type = type;
       container.addChild(chara);
-      return chara;
+      return container;
     });
   }
 
