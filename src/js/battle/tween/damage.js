@@ -6,7 +6,7 @@ class Damage {
   tween(point, defenser) {
     this.defenser = defenser;
 
-    const damageText = new createjs.Text(point, "18px serif", "white");
+    const damageText = new createjs.Text(point, "18px Roboto", "white");
     
     damageText.x = defenser.x + 22;
     damageText.y = defenser.y + 22;
@@ -17,7 +17,7 @@ class Damage {
       .to({
         y: damageText.y - 10,
         alpha: 1
-      }, 400)
+      }, 200)
       .to({
         y: damageText.y,
         alpha: 1

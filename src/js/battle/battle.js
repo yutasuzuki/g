@@ -355,12 +355,29 @@ class Battle {
     if (this.getLivingCharas(charactors).length === 0) {
       this.state.battle.finish = true;
       console.log(msg);
-      stage.removeChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
-      route.to('map');
+      setTimeout(() => {
+        this.showResult();
+      }, 1200);
     } else {
       this.turnController();
     }
   } 
+
+  showResult() {
+    const result = new createjs.Container();
+    const bg = new createjs.Shape();
+    bg.graphics.beginFill('rgba(0, 0, 0, 0.5)');   
+    bg.graphics.rect(0,0, window.innerWidth, window.innerHeight);
+    result.addChild(bg);
+    result.addEventListener('click', () => {
+      route.to('map');
+      setTimeout(() => {
+        this.destroy();
+      }, 1200);
+    })
+    stage.addChild(result);
+    stage.update();
+  }
 
   getRandomChara(charactors) {
     const charas = this.getLivingCharas(charactors);
@@ -543,17 +560,18 @@ class Battle {
 
   setCharactors(charactors, type = 'self') {
     return charactors.map((charactor, index) => {
+      const charaContainer = new createjs.Container();
       const chara = new createjs.Bitmap(this.loaders[`chara_${charactor.id}`]);
       const x = chara.getBounds().width / 2;
       const y = chara.getBounds().height / 2;
       chara.status = charactor;
       chara.type = type;
-      chara.scaleX = .5;
-      chara.scaleY = .5;
+      chara.scaleX = 0.5;
+      chara.scaleY = 0.5;
       chara.regX = x;
       chara.regY = y;
       if (type === 'enemy') {
-        chara.scaleX = -.5;
+        chara.scaleX = - 0.5;
         chara.regX = x + 80;
       }
       chara.x = constants[type].pos[index].x;
@@ -571,6 +589,10 @@ class Battle {
 
   loose() {
 
+  }
+
+  destroy() {
+    stage.removeChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
   }
 }
 

@@ -15,4 +15,4 @@ window.state = {
   }
 };
 
-route.to('map');
+route.to('battle');

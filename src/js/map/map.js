@@ -200,11 +200,22 @@ class Map {
                 .to({
                   x: obj.target.x,
                   y: obj.target.y
-                }, 250)
+                }, 400)
                 .call(() => {
                   charactor.stop();
                   if (!this.dice.count) {
-                    route.to('battle');
+                    console.log(obj.target.type);
+                    switch (obj.target.type) {
+                      case 1:
+                        route.to('battle');
+                        break;
+                      case 2:
+                        route.to('battle');
+                        break;
+                      case 3:
+                        route.to('battle');
+                        break;
+                    }
                     setTimeout(() => {
                       this.destroy();
                     }, 1000);
@@ -268,7 +279,7 @@ class Map {
   }
 
   destroy() {
-    stage.removeChild(this.field, this.squares, this.btnDice, this.diceText);
+    stage.removeChild(this.field, this.squares, this.footer);
     stage.update();
   }
 }
