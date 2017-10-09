@@ -4,12 +4,13 @@ import { random } from '../util';
 const MapPosition = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 1, 0, 0, 0, 1, 0, 1],
-  [1, 0, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 1, 0, 2, 1, 1, 0, 1],
   [1, 0, 1, 0, 1, 0, 1, 0, 1],
   [1, 0, 1, 1, 1, 0, 1, 1, 1],
   [1, 1, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 0, 0, 3, 0, 0, 1],
   [1, 0, 1, 0, 0, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1, 1, 0, 0, 0],
+  [2, 1, 1, 1, 1, 1, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
@@ -20,6 +21,12 @@ class Map {
       isRoll: false,
       count: 0,
     };
+    this.walk = {
+      history: [{
+        x: state.map.piece.pos.x,
+        y: state.map.piece.pos.y
+      }]
+    }
   }
 
   async start() {
@@ -31,15 +38,13 @@ class Map {
       {src: 'btn_dice.png', id: 'btn_dice'},
       {src: 'dice_bg.png', id: 'dice_bg'},
       {src: 'square_0.png', id: 'square_0'},
-      {src: 'square_1.png', id: 'square_1'}
-    ];
-    const charaManifest = [
-      {src: 'chara_8.png', id: 'chara'},
+      {src: 'square_1.png', id: 'square_1'},
+      {src: 'square_2.png', id: 'square_2'},
+      {src: 'square_3.png', id: 'square_3'}
     ];
     const walkManifest = [
       {src: 'chara_8.png', id: 'walk'},
     ];
-    queue.loadManifest(charaManifest, true, '/assets/images/chara/');
     queue.loadManifest(mapManifest, true, '/assets/images/map/');
     queue.loadManifest(walkManifest, true, '/assets/images/map/sprite/walk/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
@@ -138,12 +143,12 @@ class Map {
     diceContainer.y = 2.5;
 
     const bg = new createjs.Shape();
-    bg.graphics.beginFill("rgba(255, 255, 255, 0.5)");   
+    bg.graphics.beginFill('rgba(255, 255, 255, 0.5)');   
     bg.graphics.rect(0,0, window.innerWidth, 60);
 
     const diceBg = this.setBitmap('dice_bg');
 
-    this.diceText = new createjs.Text(this.dice.count, "24px Roboto", "#57450d");
+    this.diceText = new createjs.Text(this.dice.count, '24px Roboto', '#57450d');
     this.diceText.x = 21;
     this.diceText.y = 14;
 
@@ -184,7 +189,6 @@ class Map {
         };
         if (square.type) {
           square.addEventListener('click', (obj) => {
-            
             const posDiffX = obj.target.pos.x - state.map.piece.pos.x;
             const posDiffY = obj.target.pos.y - state.map.piece.pos.y;
             const posDiff = Math.abs(posDiffX) + Math.abs(posDiffY);
@@ -206,7 +210,26 @@ class Map {
                     }, 1000);
                   }
                 })
-              this.dice.count -= 1;
+              
+              if (this.walk.history.length !== 1) {
+                if (this.isRedo(obj.target.pos.x, obj.target.pos.y)) {
+                  this.dice.count += 1;
+                  this.walk.history.pop();
+                } else {
+                  this.dice.count -= 1;
+                  this.walk.history.push({
+                    x: obj.target.pos.x,
+                    y: obj.target.pos.y
+                  })
+                }
+              } else {
+                this.dice.count -= 1;
+                this.walk.history.push({
+                  x: obj.target.pos.x,
+                  y: obj.target.pos.y
+                })
+              }
+
               this.diceText.text = this.dice.count;
               stage.update();
             } else {
@@ -224,6 +247,15 @@ class Map {
     squares.addChild(charactor);
 
     return squares;
+  }
+
+  isRedo(x, y) {
+    const index = this.walk.history.length - 2;
+    let bool = false;
+    if (x === this.walk.history[index].x && y === this.walk.history[index].y) {
+      bool = true;
+    }
+    return bool;
   }
 
   setField() {

@@ -24,23 +24,16 @@ class Router {
   }
 
   load() {
-    this.loading = new createjs.Bitmap(this.loaders['loadingBG']);
-    this.loading.skewX = this.loading.width / 2;
-    this.loading.skewY = this.loading.height / 2;
-    this.loading.scaleX = 1;
-    this.loading.scaleY = 1;
-    this.loading.x = 0;
-    this.loading.y = 0;
-    this.loading.alpha = 1;
+    let shapes = [];
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-    // stage.addChild(this.loading);
-    // stage.update();
+    stage.update();
 
     return new Promise((resolve, reject) => {})
   }
 
   to(scene) {
-    // this.load();
 
     const route = new this.config[scene].component();
     route.start();
