@@ -6,6 +6,7 @@ window.stage = new Stage('content');
 window.route = router;
 window.state = {
   map: {
+    currentType: 0,
     piece: {
       pos: { x: 0, y: 0 }
     },
@@ -15,4 +16,4 @@ window.state = {
   }
 };
 
-route.to('battle');
+route.to('talk');

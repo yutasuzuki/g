@@ -40,7 +40,7 @@ class Battle {
         finish: false
       }
     }
-    console.log('battle!!!!!!!!')
+    console.log('battle!');
   }
 
   async start() {
@@ -58,15 +58,19 @@ class Battle {
       {src: 'command_counter.png', id: 'counter'},
       {src: 'command_recovery.png', id: 'recovery'},
     ];
-    this.state.self.charactors = MY_CHARACTOR;
-    const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
-    this.state.enemy.charactors = await ayncGetChara(this.createEnemiesID());
-    const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
     const magicManifest = [
       {src: 'air.png', id: 'air'},
       {src: 'reflect.png', id: 'reflect'},
     ];
+    const resultManifest = [
+      {src: 'btn_back.png', id: 'btn_back'}
+    ];
+    this.state.self.charactors = MY_CHARACTOR;
+    const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
+    this.state.enemy.charactors = await ayncGetChara(this.createEnemiesID());
+    const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
     queue.loadManifest(commandManifest, true, '/assets/images/battle/command/');
+    queue.loadManifest(resultManifest, true, '/assets/images/battle/result/');
     queue.loadManifest(fieldManifest, true, '/assets/images/field/');
     queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
     queue.loadManifest(enemyCharaManifest, true, '/assets/images/chara/');
@@ -100,7 +104,6 @@ class Battle {
   turn() {
     const { orderedMyChara, orderedEnemyChara, orderedAllChara} = this.Flow.turn();
     this.orderedMyChara = this.getLivingCharas(orderedMyChara);
-    console.log(orderedEnemyChara);
     this.orderedEnemyChara = this.getLivingCharas(orderedEnemyChara);
     this.orderAllChara = this.getLivingCharas(orderedAllChara);
     this.switchCommand();
@@ -130,7 +133,6 @@ class Battle {
     if (0 < this.state.order.current.status.HP) {
       if (this.state.order.current.type === 'self') {
         this.state.self.current = this.state.order.current;
-        console.log('this.orderedEnemyChara', this.orderedEnemyChara)
         this.state.enemy.current = this.getRandomChara(this.orderedEnemyChara);
         this.commands.attack.y = window.innerHeight - 200;
         this.commands.defense.y = window.innerHeight;
@@ -159,8 +161,8 @@ class Battle {
       new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 60, 60, 0, 0)
     ];
     defenser.cache(0, 0, 200, 200);
-    stage.setChildIndex(attcker, 2);
-    stage.setChildIndex(defenser, 2);
+    stage.setChildIndex(attcker, -1);
+    stage.setChildIndex(defenser, -1);
     stage.addChild(attcker, defenser);
     stage.update();
   }
@@ -199,7 +201,6 @@ class Battle {
 
     const attacker = this.state.order.current;
     const diffencer = this.state.enemy.current;
-    console.log('this.state.enemy.current', this.state.enemy.current);
     const commandType = this.choiceEnemyCommandType(diffencer);
     console.log(' - - - - - - - - - - - -');
     console.log('自分の選択(攻撃): ', 'ATK');
@@ -368,13 +369,21 @@ class Battle {
     const bg = new createjs.Shape();
     bg.graphics.beginFill('rgba(0, 0, 0, 0.5)');   
     bg.graphics.rect(0,0, window.innerWidth, window.innerHeight);
-    result.addChild(bg);
-    result.addEventListener('click', () => {
+
+    const btnBack = new createjs.Bitmap(this.loaders['btn_back']);
+    btnBack.x = window.innerWidth / 2 - btnBack.getBounds().width / 4;;
+    btnBack.y = window.innerHeight - btnBack.getBounds().height + 30;
+    btnBack.scaleX = 0.5;
+    btnBack.scaleY = 0.5;
+    btnBack.alpha = 1;
+    btnBack.addEventListener('click', () => {
       route.to('map');
       setTimeout(() => {
         this.destroy();
       }, 1200);
     })
+
+    result.addChild(bg, btnBack);
     stage.addChild(result);
     stage.update();
   }
@@ -649,19 +658,16 @@ function ayncGetChara(charactorsID) {
       return axios.get(`/assets/data/enemy/${value}.json`);
     });
     Promise.all(charactors).then((charas) => {
-      console.log(charas);
       const c = charas.map(chara => chara.data);
-      console.log('c', c);
       resolve(c);
     })
   });
-  console.log(chara);
 }
 
 const MY_CHARACTOR = [
   {
     id: 8,
-    name: 'リューリク',
+    name: 'ルシェ',
     MAX_HP: 50,
     HP: 50,
     ATK: 20,

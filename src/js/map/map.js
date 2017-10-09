@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { random } from '../util';
 
 const MapPosition = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 2],
   [1, 0, 1, 0, 0, 0, 1, 0, 1],
   [1, 0, 1, 0, 2, 1, 1, 0, 1],
   [1, 0, 1, 0, 1, 0, 1, 0, 1],
@@ -205,12 +205,13 @@ class Map {
                   charactor.stop();
                   if (!this.dice.count) {
                     console.log(obj.target.type);
+                    state.map.currentType = obj.target.type;
                     switch (obj.target.type) {
                       case 1:
                         route.to('battle');
                         break;
                       case 2:
-                        route.to('battle');
+                        route.to('talk');
                         break;
                       case 3:
                         route.to('battle');

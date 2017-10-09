@@ -1,5 +1,6 @@
 import battle from './battle/battle';
 import map from './map/map';
+import talk from './talk/talk';
 
 class Router {
   constructor() {
@@ -12,7 +13,11 @@ class Router {
       map: {
         name: 'map',
         component: map
-      }
+      },
+      talk: {
+        name: 'talk',
+        component: talk
+      },
     }
     const queue = new createjs.LoadQueue();
     const fieldManifest = [
