@@ -136,7 +136,7 @@ class Magic {
     reflect.x = attacker.x - 50;
     reflect.y = attacker.y - 50;
     if (attacker.type === 'enemy') {
-      reflect.x = attacker.x - 20;
+      reflect.x = attacker.x - 50;
     }
     reflect.alpha = 0;
 

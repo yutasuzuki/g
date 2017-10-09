@@ -10,8 +10,8 @@ class Damage {
     
     // damageText.x = defenser.x + defenser.getBounds().width / 4;
     // damageText.y = defenser.y - defenser.getBounds().width / 4;
-    damageText.x = defenser.x - defenser.getBounds().width / 4;
-    damageText.y = defenser.y - 20;
+    damageText.x = defenser.x - 5;
+    damageText.y = defenser.y + 30;
     stage.setChildIndex(damageText, -1);
     stage.addChild(damageText);
     stage.update();

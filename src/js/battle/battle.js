@@ -66,9 +66,9 @@ class Battle {
       {src: 'btn_back.png', id: 'btn_back'}
     ];
     this.state.self.charactors = MY_CHARACTOR;
-    const myCharaManifest = this.createCharaManifest(this.state.self.charactors);
+    const myCharaManifest = this.createMainCharaManifest(this.state.self.charactors);
     this.state.enemy.charactors = await ayncGetChara(this.createEnemiesID());
-    const enemyCharaManifest = this.createCharaManifest(this.state.enemy.charactors);
+    const enemyCharaManifest = this.createEnemyCharaManifest(this.state.enemy.charactors);
     queue.loadManifest(commandManifest, true, '/assets/images/battle/command/');
     queue.loadManifest(resultManifest, true, '/assets/images/battle/result/');
     queue.loadManifest(fieldManifest, true, '/assets/images/field/');
@@ -79,11 +79,20 @@ class Battle {
     queue.addEventListener('complete', () => this.init());
   }
   
-  createCharaManifest(charactors) {
+  createMainCharaManifest(charactors) {
     return charactors.map((charactor) => {
       return {
         src: `chara_${charactor.id}.png`,
         id: `chara_${charactor.id}`,
+      }
+    })
+  }
+  
+  createEnemyCharaManifest(charactors) {
+    return charactors.map((charactor) => {
+      return {
+        src: `chara_${charactor.id}.png`,
+        id: `enemy_${charactor.id}`,
       }
     })
   }
@@ -567,12 +576,13 @@ class Battle {
 
   setCharactors(charactors, type = 'self') {
     return charactors.map((charactor, index) => {
+      const key = type === 'self' ? `chara_${charactor.id}` : `enemy_${charactor.id}`;
       const container = new createjs.Container();
-      const chara = new createjs.Bitmap(this.loaders[`chara_${charactor.id}`]);
-      container.regX = chara.getBounds().width / 2;
-      container.regY = chara.getBounds().height / 2;
-      container.x = constants[type].pos[index].x + 60;
-      container.y = constants[type].pos[index].y + 40;
+      const chara = new createjs.Bitmap(this.loaders[key]);
+      container.regX = chara.getBounds().width / 4;
+      container.regY = chara.getBounds().height / 4;
+      container.x = constants[type].pos[index].x + 20;
+      container.y = constants[type].pos[index].y + 20;
       chara.scaleX = 0.5;
       chara.scaleY = 0.5;
       container.damage = function(point) {
