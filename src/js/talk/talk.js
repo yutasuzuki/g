@@ -8,7 +8,7 @@ const talkscript = [
     text: 'こんにちは'
   },
   {
-    type: 0,
+    type: 2,
     name: '宿屋',
     text: 'いらっしゃいませ！'
   },
@@ -18,9 +18,14 @@ const talkscript = [
     text: 'こちらはなんですか？'
   },
   {
-    type: 0,
+    type: 2,
     name: '宿屋',
     text: 'ここは宿屋です！'
+  },
+  {
+    type: 0,
+    name: '',
+    text: '（沈黙）'
   },
   {
     type: 1,
@@ -28,7 +33,7 @@ const talkscript = [
     text: '今日泊まりたいのだけれども・・・'
   },
   {
-    type: 0,
+    type: 2,
     name: '宿屋',
     text: 'お好きな部屋をお使いください！'
   },
@@ -138,7 +143,16 @@ class Talk {
     bg.addEventListener('click', () => {
       const item = talkscript[this.talk.current];
       if (item) {
-        if (item.type) {
+        if (item.type === 0) {
+          this.mainChara.filters = [
+            new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+          ];
+          this.mainChara.cache(0, 0, 960, 960);
+          this.otherChara.filters = [
+            new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+          ];
+          this.otherChara.cache(0, 0, 960, 960);
+        } else if (item.type === 1) {
           stage.setChildIndex(this.mainChara, stage.getNumChildren() - 1);
           stage.setChildIndex(this.otherChara, stage.getNumChildren() + 1);
           this.mainChara.filters = [];
@@ -147,7 +161,7 @@ class Talk {
             new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
           ];
           this.otherChara.cache(0, 0, 960, 960);
-        } else {
+        } else if (item.type === 2) {
           stage.setChildIndex(this.mainChara, stage.getNumChildren() + 1);
           stage.setChildIndex(this.otherChara, stage.getNumChildren() - 1);
           this.mainChara.filters = [
@@ -156,7 +170,7 @@ class Talk {
           this.mainChara.cache(0, 0, 960, 960);
           this.otherChara.filters = [];
           this.otherChara.cache(0, 0, 960, 960);
-        }
+        } 
         stage.setChildIndex(this.comment, stage.getNumChildren() - 1);
         this.talk.name.text = item.name;
         this.talk.text.text = item.text;
