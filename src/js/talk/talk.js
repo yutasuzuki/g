@@ -1,7 +1,41 @@
 import _ from 'lodash';
-import { random } from '../util';
+import { random, wrapText } from '../util';
 
-const talkscript = [
+let talkscript = [];
+const castleTalk = [
+  {
+    type: 2,
+    name: '王様',
+    text: 'よく参られた！'
+  },
+  {
+    type: 1,
+    name: 'ルシェ',
+    text: 'こんにちは'
+  },
+  {
+    type: 2,
+    name: '王様',
+    text: '今回は城の周りをモンスターをよくぞ討伐してくれた'
+  },
+  {
+    type: 2,
+    name: '王様',
+    text: '後ほど褒美を取らせよう！'
+  },
+  {
+    type: 1,
+    name: 'ルシェ',
+    text: 'こちらの口座に振り込んでください'
+  },
+  {
+    type: 0,
+    name: '',
+    text: 'ルシェはカバンから通帳を取り出した'
+  },
+];
+
+const innTalk = [
   {
     type: 1,
     name: 'ルシェ',
@@ -13,14 +47,9 @@ const talkscript = [
     text: 'いらっしゃいませ！'
   },
   {
-    type: 1,
-    name: 'ルシェ',
-    text: 'こちらはなんですか？'
-  },
-  {
     type: 2,
     name: '宿屋',
-    text: 'ここは宿屋です！'
+    text: '宿屋へようこそ！'
   },
   {
     type: 0,
@@ -42,7 +71,7 @@ const talkscript = [
     name: 'ルシェ',
     text: 'ありがとう'
   }
-]
+];
 
 
 class Talk {
@@ -73,15 +102,25 @@ class Talk {
 
   init() {
     this.mainChara = this.setMainCharactor('main_chara');
-
     if (state.map.currentType === 2) {
       this.background = this.setBackground('inn');
       this.otherChara = this.setOtherCharactor('person');
+      talkscript = innTalk;
     } else if (state.map.currentType === 3) {
       this.background = this.setBackground('castle');
       this.otherChara = this.setOtherCharactor('king');
+      talkscript = castleTalk;
     }
     this.comment = this.setCommentBox();
+
+    this.mainChara.filters = [
+      new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+    ];
+    this.mainChara.cache(0, 0, 960, 960);
+    this.otherChara.filters = [
+      new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+    ];
+    this.otherChara.cache(0, 0, 960, 960);
 
     stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
     stage.update();
@@ -89,8 +128,6 @@ class Talk {
 
   setBackground(key) {
     const bg = new createjs.Bitmap(this.loaders[key]);
-    console.log(window.innerWidth);
-    console.log(bg.getBounds().width);
     bg.x = window.innerWidth / 2 - bg.getBounds().width / 2;
     bg.y = 0;
     bg.scaleX = 1;
@@ -137,6 +174,8 @@ class Talk {
     this.talk.name.y = 20;
 
     this.talk.text = new createjs.Text('', '16px Roboto', '#fff');
+    this.talk.text.lineWidth = window.innerWidth - 40;
+    this.talk.text.lineHeight = 24;
     this.talk.text.x = 20;
     this.talk.text.y = 60;
 
@@ -170,10 +209,10 @@ class Talk {
           this.mainChara.cache(0, 0, 960, 960);
           this.otherChara.filters = [];
           this.otherChara.cache(0, 0, 960, 960);
-        } 
+        }
         stage.setChildIndex(this.comment, stage.getNumChildren() - 1);
         this.talk.name.text = item.name;
-        this.talk.text.text = item.text;
+        this.talk.text.text = wrapText(this.talk.text, item.text);
         stage.update();
         this.talk.current++;
       } else {
