@@ -10,17 +10,12 @@ const talkscript = [
   {
     type: 0,
     name: '宿屋',
-    text: 'こんにちは'
+    text: 'いらっしゃいませ！'
   },
   {
     type: 1,
     name: 'ルシェ',
     text: 'こちらはなんですか？'
-  },
-  {
-    type: 0,
-    name: '宿屋',
-    text: 'ここは宿屋です'
   },
   {
     type: 0,
@@ -35,13 +30,13 @@ const talkscript = [
   {
     type: 0,
     name: '宿屋',
-    text: 'お好きな部屋をお使いください'
+    text: 'お好きな部屋をお使いください！'
   },
   {
     type: 1,
     name: 'ルシェ',
     text: 'ありがとう'
-  },
+  }
 ]
 
 
@@ -152,7 +147,7 @@ class Talk {
             new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
           ];
           this.otherChara.cache(0, 0, 960, 960);
-        }  else {
+        } else {
           stage.setChildIndex(this.mainChara, stage.getNumChildren() + 1);
           stage.setChildIndex(this.otherChara, stage.getNumChildren() - 1);
           this.mainChara.filters = [

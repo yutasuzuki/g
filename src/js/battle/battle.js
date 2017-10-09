@@ -378,9 +378,7 @@ class Battle {
     btnBack.alpha = 1;
     btnBack.addEventListener('click', () => {
       route.to('map');
-      setTimeout(() => {
-        this.destroy();
-      }, 1200);
+      this.destroy();
     })
 
     result.addChild(bg, btnBack);

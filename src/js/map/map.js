@@ -84,8 +84,6 @@ class Map {
       if (window.innerHeight - this.squares.getBounds().height <= this.squares.y && this.squares.y <= 0) {
         this.squares.y = touch.history.y - diffY;
       }
-    }
-    this.touchendHandler = () => {
       if (this.squares.x < window.innerWidth - this.squares.getBounds().width) {
         this.squares.x = window.innerWidth - this.squares.getBounds().width;
       } else if (this.squares.x > 0) {
@@ -96,6 +94,8 @@ class Map {
       } else if (this.squares.y > 0) {
         this.squares.y = 0;
       }
+    }
+    this.touchendHandler = () => {
       touch.history.x = state.map.squares.pos.x = this.squares.x;
       touch.history.y = state.map.squares.pos.y = this.squares.y;
     }

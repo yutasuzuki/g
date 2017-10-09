@@ -6,7 +6,7 @@ window.stage = new Stage('content');
 window.route = router;
 window.state = {
   map: {
-    currentType: 3,
+    currentType: 2,
     piece: {
       pos: { x: 0, y: 0 }
     },
@@ -16,4 +16,4 @@ window.state = {
   }
 };
 
-route.to('talk');
+route.to('map');
