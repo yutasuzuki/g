@@ -3,6 +3,7 @@ import router from './router';
 import Battle from './battle/battle';
 
 window.stage = new Stage('content');
+createjs.Touch.enable(stage);
 window.route = router;
 window.state = {
   map: {

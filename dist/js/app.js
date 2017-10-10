@@ -19920,6 +19920,7 @@ var _battle2 = _interopRequireDefault(_battle);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 window.stage = new _stage2.default('content');
+createjs.Touch.enable(stage);
 window.route = _router2.default;
 window.state = {
   map: {
