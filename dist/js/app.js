@@ -70,7 +70,7 @@
 "use strict";
 
 
-var bind = __webpack_require__(51);
+var bind = __webpack_require__(50);
 var isBuffer = __webpack_require__(102);
 
 /*global toString:true*/
@@ -389,8 +389,8 @@ if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var store = __webpack_require__(36)('wks');
-var uid = __webpack_require__(37);
+var store = __webpack_require__(32)('wks');
+var uid = __webpack_require__(33);
 var Symbol = __webpack_require__(1).Symbol;
 var USE_SYMBOL = typeof Symbol == 'function';
 
@@ -404,6 +404,14 @@ $exports.store = store;
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports) {
+
+var core = module.exports = { version: '2.5.1' };
+if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -418,7 +426,7 @@ exports.default = function (instance, Constructor) {
 };
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -451,14 +459,6 @@ exports.default = function () {
 }();
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-var core = module.exports = { version: '2.5.1' };
-if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
-
-
-/***/ }),
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -474,7 +474,7 @@ module.exports = function (it) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
-var core = __webpack_require__(5);
+var core = __webpack_require__(3);
 var ctx = __webpack_require__(11);
 var hide = __webpack_require__(8);
 var PROTOTYPE = 'prototype';
@@ -577,7 +577,7 @@ exports.f = __webpack_require__(10) ? Object.defineProperty : function definePro
 /***/ (function(module, exports, __webpack_require__) {
 
 // Thank's IE8 for his funny defineProperty
-module.exports = !__webpack_require__(32)(function () {
+module.exports = !__webpack_require__(28)(function () {
   return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
 });
 
@@ -739,8 +739,8 @@ module.exports = function (it) {
 /* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var shared = __webpack_require__(36)('keys');
-var uid = __webpack_require__(37);
+var shared = __webpack_require__(32)('keys');
+var uid = __webpack_require__(33);
 module.exports = function (key) {
   return shared[key] || (shared[key] = uid(key));
 };
@@ -788,11 +788,1472 @@ module.exports.f = function (C) {
 /* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var utils = __webpack_require__(0);
+var normalizeHeaderName = __webpack_require__(104);
+
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = __webpack_require__(52);
+  } else if (typeof process !== 'undefined') {
+    // For node use HTTP adapter
+    adapter = __webpack_require__(52);
+  }
+  return adapter;
+}
+
+var defaults = {
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) { /* Ignore */ }
+    }
+    return data;
+  }],
+
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports) {
+
+module.exports = function (exec) {
+  try {
+    return !!exec();
+  } catch (e) {
+    return true;
+  }
+};
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $at = __webpack_require__(67)(true);
+
+// 21.1.3.27 String.prototype[@@iterator]()
+__webpack_require__(30)(String, 'String', function (iterated) {
+  this._t = String(iterated); // target
+  this._i = 0;                // next index
+// 21.1.5.2.1 %StringIteratorPrototype%.next()
+}, function () {
+  var O = this._t;
+  var index = this._i;
+  var point;
+  if (index >= O.length) return { value: undefined, done: true };
+  point = $at(O, index);
+  this._i += point.length;
+  return { value: point, done: false };
+});
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var LIBRARY = __webpack_require__(31);
+var $export = __webpack_require__(7);
+var redefine = __webpack_require__(68);
+var hide = __webpack_require__(8);
+var has = __webpack_require__(16);
+var Iterators = __webpack_require__(14);
+var $iterCreate = __webpack_require__(69);
+var setToStringTag = __webpack_require__(25);
+var getPrototypeOf = __webpack_require__(77);
+var ITERATOR = __webpack_require__(2)('iterator');
+var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
+var FF_ITERATOR = '@@iterator';
+var KEYS = 'keys';
+var VALUES = 'values';
+
+var returnThis = function () { return this; };
+
+module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
+  $iterCreate(Constructor, NAME, next);
+  var getMethod = function (kind) {
+    if (!BUGGY && kind in proto) return proto[kind];
+    switch (kind) {
+      case KEYS: return function keys() { return new Constructor(this, kind); };
+      case VALUES: return function values() { return new Constructor(this, kind); };
+    } return function entries() { return new Constructor(this, kind); };
+  };
+  var TAG = NAME + ' Iterator';
+  var DEF_VALUES = DEFAULT == VALUES;
+  var VALUES_BUG = false;
+  var proto = Base.prototype;
+  var $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
+  var $default = $native || getMethod(DEFAULT);
+  var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
+  var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
+  var methods, key, IteratorPrototype;
+  // Fix native
+  if ($anyNative) {
+    IteratorPrototype = getPrototypeOf($anyNative.call(new Base()));
+    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
+      // Set @@toStringTag to native iterators
+      setToStringTag(IteratorPrototype, TAG, true);
+      // fix for some old engines
+      if (!LIBRARY && !has(IteratorPrototype, ITERATOR)) hide(IteratorPrototype, ITERATOR, returnThis);
+    }
+  }
+  // fix Array#{values, @@iterator}.name in V8 / FF
+  if (DEF_VALUES && $native && $native.name !== VALUES) {
+    VALUES_BUG = true;
+    $default = function values() { return $native.call(this); };
+  }
+  // Define iterator
+  if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    hide(proto, ITERATOR, $default);
+  }
+  // Plug for library
+  Iterators[NAME] = $default;
+  Iterators[TAG] = returnThis;
+  if (DEFAULT) {
+    methods = {
+      values: DEF_VALUES ? $default : getMethod(VALUES),
+      keys: IS_SET ? $default : getMethod(KEYS),
+      entries: $entries
+    };
+    if (FORCED) for (key in methods) {
+      if (!(key in proto)) redefine(proto, key, methods[key]);
+    } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
+  }
+  return methods;
+};
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports) {
+
+module.exports = true;
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__(1);
+var SHARED = '__core-js_shared__';
+var store = global[SHARED] || (global[SHARED] = {});
+module.exports = function (key) {
+  return store[key] || (store[key] = {});
+};
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports) {
+
+var id = 0;
+var px = Math.random();
+module.exports = function (key) {
+  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+};
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports) {
+
+// IE 8- don't enum bug keys
+module.exports = (
+  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
+).split(',');
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var document = __webpack_require__(1).document;
+module.exports = document && document.documentElement;
+
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 7.1.13 ToObject(argument)
+var defined = __webpack_require__(21);
+module.exports = function (it) {
+  return Object(defined(it));
+};
+
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// getting tag from 19.1.3.6 Object.prototype.toString()
+var cof = __webpack_require__(17);
+var TAG = __webpack_require__(2)('toStringTag');
+// ES3 wrong here
+var ARG = cof(function () { return arguments; }()) == 'Arguments';
+
+// fallback for IE11 Script Access Denied error
+var tryGet = function (it, key) {
+  try {
+    return it[key];
+  } catch (e) { /* empty */ }
+};
+
+module.exports = function (it) {
+  var O, T, B;
+  return it === undefined ? 'Undefined' : it === null ? 'Null'
+    // @@toStringTag case
+    : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
+    // builtinTag case
+    : ARG ? cof(O)
+    // ES3 arguments fallback
+    : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+};
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// call something on iterator step with safe closing on error
+var anObject = __webpack_require__(6);
+module.exports = function (iterator, fn, value, entries) {
+  try {
+    return entries ? fn(anObject(value)[0], value[1]) : fn(value);
+  // 7.4.6 IteratorClose(iterator, completion)
+  } catch (e) {
+    var ret = iterator['return'];
+    if (ret !== undefined) anObject(ret.call(iterator));
+    throw e;
+  }
+};
+
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// check on default Array iterator
+var Iterators = __webpack_require__(14);
+var ITERATOR = __webpack_require__(2)('iterator');
+var ArrayProto = Array.prototype;
+
+module.exports = function (it) {
+  return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
+};
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var classof = __webpack_require__(37);
+var ITERATOR = __webpack_require__(2)('iterator');
+var Iterators = __webpack_require__(14);
+module.exports = __webpack_require__(3).getIteratorMethod = function (it) {
+  if (it != undefined) return it[ITERATOR]
+    || it['@@iterator']
+    || Iterators[classof(it)];
+};
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 7.3.20 SpeciesConstructor(O, defaultConstructor)
+var anObject = __webpack_require__(6);
+var aFunction = __webpack_require__(15);
+var SPECIES = __webpack_require__(2)('species');
+module.exports = function (O, D) {
+  var C = anObject(O).constructor;
+  var S;
+  return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? D : aFunction(S);
+};
+
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var ctx = __webpack_require__(11);
+var invoke = __webpack_require__(85);
+var html = __webpack_require__(35);
+var cel = __webpack_require__(18);
+var global = __webpack_require__(1);
+var process = global.process;
+var setTask = global.setImmediate;
+var clearTask = global.clearImmediate;
+var MessageChannel = global.MessageChannel;
+var Dispatch = global.Dispatch;
+var counter = 0;
+var queue = {};
+var ONREADYSTATECHANGE = 'onreadystatechange';
+var defer, channel, port;
+var run = function () {
+  var id = +this;
+  // eslint-disable-next-line no-prototype-builtins
+  if (queue.hasOwnProperty(id)) {
+    var fn = queue[id];
+    delete queue[id];
+    fn();
+  }
+};
+var listener = function (event) {
+  run.call(event.data);
+};
+// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
+if (!setTask || !clearTask) {
+  setTask = function setImmediate(fn) {
+    var args = [];
+    var i = 1;
+    while (arguments.length > i) args.push(arguments[i++]);
+    queue[++counter] = function () {
+      // eslint-disable-next-line no-new-func
+      invoke(typeof fn == 'function' ? fn : Function(fn), args);
+    };
+    defer(counter);
+    return counter;
+  };
+  clearTask = function clearImmediate(id) {
+    delete queue[id];
+  };
+  // Node.js 0.8-
+  if (__webpack_require__(17)(process) == 'process') {
+    defer = function (id) {
+      process.nextTick(ctx(run, id, 1));
+    };
+  // Sphere (JS game engine) Dispatch API
+  } else if (Dispatch && Dispatch.now) {
+    defer = function (id) {
+      Dispatch.now(ctx(run, id, 1));
+    };
+  // Browsers with MessageChannel, includes WebWorkers
+  } else if (MessageChannel) {
+    channel = new MessageChannel();
+    port = channel.port2;
+    channel.port1.onmessage = listener;
+    defer = ctx(port.postMessage, port, 1);
+  // Browsers with postMessage, skip WebWorkers
+  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
+  } else if (global.addEventListener && typeof postMessage == 'function' && !global.importScripts) {
+    defer = function (id) {
+      global.postMessage(id + '', '*');
+    };
+    global.addEventListener('message', listener, false);
+  // IE8-
+  } else if (ONREADYSTATECHANGE in cel('script')) {
+    defer = function (id) {
+      html.appendChild(cel('script'))[ONREADYSTATECHANGE] = function () {
+        html.removeChild(this);
+        run.call(id);
+      };
+    };
+  // Rest old browsers
+  } else {
+    defer = function (id) {
+      setTimeout(ctx(run, id, 1), 0);
+    };
+  }
+}
+module.exports = {
+  set: setTask,
+  clear: clearTask
+};
+
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports) {
+
+module.exports = function (exec) {
+  try {
+    return { e: false, v: exec() };
+  } catch (e) {
+    return { e: true, v: e };
+  }
+};
+
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var anObject = __webpack_require__(6);
+var isObject = __webpack_require__(12);
+var newPromiseCapability = __webpack_require__(26);
+
+module.exports = function (C, x) {
+  anObject(C);
+  if (isObject(x) && x.constructor === C) return x;
+  var promiseCapability = newPromiseCapability.f(C);
+  var resolve = promiseCapability.resolve;
+  resolve(x);
+  return promiseCapability.promise;
+};
+
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var ITERATOR = __webpack_require__(2)('iterator');
+var SAFE_CLOSING = false;
+
+try {
+  var riter = [7][ITERATOR]();
+  riter['return'] = function () { SAFE_CLOSING = true; };
+  // eslint-disable-next-line no-throw-literal
+  Array.from(riter, function () { throw 2; });
+} catch (e) { /* empty */ }
+
+module.exports = function (exec, skipClosing) {
+  if (!skipClosing && !SAFE_CLOSING) return false;
+  var safe = false;
+  try {
+    var arr = [7];
+    var iter = arr[ITERATOR]();
+    iter.next = function () { return { done: safe = true }; };
+    arr[ITERATOR] = function () { return iter; };
+    exec(arr);
+  } catch (e) { /* empty */ }
+  return safe;
+};
+
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _promise = __webpack_require__(13);
+
+var _promise2 = _interopRequireDefault(_promise);
+
+var _toConsumableArray2 = __webpack_require__(91);
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
+var _regenerator = __webpack_require__(47);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = __webpack_require__(48);
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+var _classCallCheck2 = __webpack_require__(4);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(5);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _lodash = __webpack_require__(49);
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _axios = __webpack_require__(100);
+
+var _axios2 = _interopRequireDefault(_axios);
+
+var _constants = __webpack_require__(119);
+
+var _constants2 = _interopRequireDefault(_constants);
+
+var _attack = __webpack_require__(120);
+
+var _attack2 = _interopRequireDefault(_attack);
+
+var _magic4 = __webpack_require__(121);
+
+var _magic5 = _interopRequireDefault(_magic4);
+
+var _damage = __webpack_require__(122);
+
+var _damage2 = _interopRequireDefault(_damage);
+
+var _util = __webpack_require__(56);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var attack = new _attack2.default();
+var magic = {};
+var damege = new _damage2.default();
+
+var Battle = function () {
+  function Battle() {
+    (0, _classCallCheck3.default)(this, Battle);
+
+    this.loaders = {};
+    this.commands = {
+      attack: {},
+      defense: {}
+    };
+    this.state = {
+      self: {
+        charactors: {},
+        current: {}
+      },
+      enemy: {
+        charactors: {},
+        current: {}
+      },
+      order: {
+        current: {},
+        self: 0,
+        enemy: 0,
+        total: 0
+      },
+      turn: {
+        count: 0,
+        finish: true
+      },
+      battle: {
+        finish: false
+      }
+    };
+    console.log('battle!');
+  }
+
+  (0, _createClass3.default)(Battle, [{
+    key: 'start',
+    value: function () {
+      var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+        var _this = this;
+
+        var queue, fieldManifest, commandManifest, magicManifest, resultManifest, myCharaManifest, enemyCharaManifest;
+        return _regenerator2.default.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                queue = new createjs.LoadQueue();
+                fieldManifest = [{ src: 'forest1.jpg', id: 'field' }];
+                commandManifest = [{ src: 'command_attack.png', id: 'attack' }, { src: 'command_magic.png', id: 'magic' }, { src: 'command_skill.png', id: 'skill' }, { src: 'command_skip.png', id: 'skip' }, { src: 'command_defense.png', id: 'defense' }, { src: 'command_magic_defense.png', id: 'magic_defense' }, { src: 'command_counter.png', id: 'counter' }, { src: 'command_recovery.png', id: 'recovery' }];
+                magicManifest = [{ src: 'air.png', id: 'air' }, { src: 'reflect.png', id: 'reflect' }];
+                resultManifest = [{ src: 'btn_back.png', id: 'btn_back' }];
+
+                this.state.self.charactors = MY_CHARACTOR;
+                myCharaManifest = this.createMainCharaManifest(this.state.self.charactors);
+                _context.next = 9;
+                return ayncGetChara(this.createEnemiesID());
+
+              case 9:
+                this.state.enemy.charactors = _context.sent;
+                enemyCharaManifest = this.createEnemyCharaManifest(this.state.enemy.charactors);
+
+                queue.loadManifest(commandManifest, true, '/assets/images/battle/command/');
+                queue.loadManifest(resultManifest, true, '/assets/images/battle/result/');
+                queue.loadManifest(fieldManifest, true, '/assets/images/field/');
+                queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
+                queue.loadManifest(enemyCharaManifest, true, '/assets/images/enemy/');
+                queue.loadManifest(magicManifest, true, '/assets/images/battle/effect/magic/');
+                queue.addEventListener('fileload', function (e) {
+                  return _this.loaders[e.item.id] = e.result;
+                });
+                queue.addEventListener('complete', function () {
+                  return _this.init();
+                });
+
+              case 19:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function start() {
+        return _ref.apply(this, arguments);
+      }
+
+      return start;
+    }()
+  }, {
+    key: 'createMainCharaManifest',
+    value: function createMainCharaManifest(charactors) {
+      return charactors.map(function (charactor) {
+        return {
+          src: 'chara_' + charactor.id + '.png',
+          id: 'chara_' + charactor.id
+        };
+      });
+    }
+  }, {
+    key: 'createEnemyCharaManifest',
+    value: function createEnemyCharaManifest(charactors) {
+      return charactors.map(function (charactor) {
+        return {
+          src: 'chara_' + charactor.id + '.png',
+          id: 'enemy_' + charactor.id
+        };
+      });
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      var _stage;
+
+      this.field = this.setField();
+      this.commands = this.setCommands();
+      this.myCharactors = this.setCharactors(this.state.self.charactors);
+      this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
+      this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
+      createjs.Ticker.timingMode = createjs.Ticker.RAF;
+      createjs.Ticker.addEventListener('tick', stage);
+      (_stage = stage).addChild.apply(_stage, [this.field, this.commands.attack, this.commands.defense].concat((0, _toConsumableArray3.default)(this.myCharactors), (0, _toConsumableArray3.default)(this.enemyCharactors)));
+      stage.update();
+      this.turn();
+    }
+  }, {
+    key: 'turn',
+    value: function turn() {
+      var _Flow$turn = this.Flow.turn(),
+          orderedMyChara = _Flow$turn.orderedMyChara,
+          orderedEnemyChara = _Flow$turn.orderedEnemyChara,
+          orderedAllChara = _Flow$turn.orderedAllChara;
+
+      this.orderedMyChara = this.getLivingCharas(orderedMyChara);
+      this.orderedEnemyChara = this.getLivingCharas(orderedEnemyChara);
+      this.orderAllChara = this.getLivingCharas(orderedAllChara);
+      this.switchCommand();
+    }
+  }, {
+    key: 'turnController',
+    value: function turnController() {
+      if (this.state.order.total < this.orderAllChara.length - 1) {
+        if (this.state.order.current.type === 'self') {
+          this.state.order.self++;
+        } else {
+          this.state.order.enemy++;
+        }
+        this.state.order.total++;
+        this.switchCommand();
+      } else {
+        this.state.order.self = 0;
+        this.state.order.enemy = 0;
+        this.state.order.total = 0;
+        this.state.turn.count++;
+        this.turn();
+      }
+    }
+  }, {
+    key: 'switchCommand',
+    value: function switchCommand() {
+      this.state.turn.finish = true;
+      this.state.order.current = this.orderAllChara[this.state.order.total];
+      if (0 < this.state.order.current.status.HP) {
+        if (this.state.order.current.type === 'self') {
+          this.state.self.current = this.state.order.current;
+          this.state.enemy.current = this.getRandomChara(this.orderedEnemyChara);
+          this.commands.attack.y = window.innerHeight - 200;
+          this.commands.defense.y = window.innerHeight;
+          this.setCurrentMark(this.state.self.current, this.state.enemy.current);
+        } else {
+          this.state.enemy.current = this.state.order.current;
+          this.state.self.current = this.getRandomChara(this.orderedMyChara);
+          this.commands.attack.y = window.innerHeight;
+          this.commands.defense.y = window.innerHeight - 200;
+          this.setCurrentMark(this.state.enemy.current, this.state.self.current);
+        }
+      } else {
+        this.resetCurrentMark();
+        this.turnController();
+      }
+    }
+  }, {
+    key: 'setCurrentMark',
+    value: function setCurrentMark(attcker, defender) {
+      this.resetCurrentMark();
+      if (!attcker || !defender) return;
+      attcker.filters = [new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 90, 90, 90, 0)];
+      attcker.cache(0, 0, 200, 200);
+      defender.filters = [new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 60, 60, 0, 0)];
+      defender.cache(0, 0, 200, 200);
+      stage.setChildIndex(attcker, -1);
+      stage.setChildIndex(defender, -1);
+      stage.addChild(attcker, defender);
+      stage.update();
+    }
+  }, {
+    key: 'resetCurrentMark',
+    value: function resetCurrentMark() {
+      var resetAllChara = this.orderAllChara.map(function (charactor) {
+        charactor.filters = [];
+        charactor.cache(0, 0, 200, 200);
+        return charactor;
+      });
+    }
+  }, {
+    key: 'setField',
+    value: function setField() {
+      var field = new createjs.Bitmap(this.loaders['field']);
+      field.skewX = field.width / 2;
+      field.skewY = field.height / 2;
+      field.scaleX = 1.5;
+      field.scaleY = 1.5;
+      field.y = -250;
+      return field;
+    }
+
+    // アニメーション中はコマンドが選択できないようにする判定
+
+  }, {
+    key: 'isCommandDisable',
+    value: function isCommandDisable() {
+      var bool = false;
+      if (!this.state.turn.finish || this.state.battle.finish) {
+        bool = true;
+      }
+      return bool;
+    }
+
+    // 通常攻撃を選択
+
+  }, {
+    key: 'attackHandler',
+    value: function attackHandler() {
+      var _this2 = this;
+
+      if (this.isCommandDisable()) return;
+      this.state.turn.finish = false;
+
+      var attacker = this.state.order.current;
+      var diffencer = this.state.enemy.current;
+      var commandType = this.choiceEnemyCommandType(diffencer);
+      console.log(' - - - - - - - - - - - -');
+      console.log('自分の選択(攻撃): ', 'ATK');
+      console.log(diffencer.status.name + '\u306E\u9078\u629E(\u9632\u5FA1): ', commandType);
+      console.log(' - - - - - - - - - - - -');
+      var damagePoint = this.calcAttackDamage(commandType, attacker, diffencer);
+      diffencer.damage(damagePoint);
+      damege.tween(damagePoint, diffencer);
+
+      attack.tween(attacker, diffencer).then(function () {
+        _this2.decideBattlePhase(_this2.orderedEnemyChara);
+      });
+    }
+
+    // 魔法攻撃を選択
+
+  }, {
+    key: 'magicHandler',
+    value: function magicHandler() {
+      var _this3 = this;
+
+      if (this.isCommandDisable()) return;
+      this.state.turn.finish = false;
+      var attacker = this.state.order.current;
+      var diffencers = this.orderedEnemyChara;
+      var commandType = this.choiceEnemyCommandType(this.state.enemy.current);
+      console.log(' - - - - - - - - - - - -');
+      console.log('自分の選択(攻撃): ', 'MGC');
+      console.log(this.state.enemy.current.status.name + '\u306E\u9078\u629E(\u9632\u5FA1): ', commandType);
+      console.log(' - - - - - - - - - - - -');
+      // ダメージの計算
+      if (commandType !== 'MGC') {
+        var magicPromises = [];
+        diffencers.forEach(function (diffencer) {
+          if (0 < diffencer.status.HP) {
+            var damage = _this3.calcMagicDamage(commandType, attacker, diffencer);
+            diffencer.damage(damage);
+            damege.tween(damage, diffencer);
+            var _magic = new _magic5.default(_this3.loaders['air']);
+            var magicPromise = _magic.tween(attacker, diffencer);
+            magicPromises.push(magicPromise);
+          }
+        });
+        _promise2.default.race(magicPromises).then(function () {
+          _this3.decideBattlePhase(diffencers);
+        }).catch(function (e) {
+          console.log(e);
+        });
+      } else {
+        this.reflectMagic(this.state.enemy.current, this.state.self.current, this.orderedMyChara);
+      }
+    }
+
+    // 敵の攻撃
+
+  }, {
+    key: 'enemyAttack',
+    value: function enemyAttack(diffenceType, attacker) {
+      var _this4 = this;
+
+      var commandType = this.choiceEnemyCommandType(attacker);
+      console.log(' - - - - - - - - - - - -');
+      console.log('自分の選択(防御): ', diffenceType);
+      console.log(attacker.status.name + '\u306E\u9078\u629E(\u653B\u6483): ', commandType);
+      console.log(' - - - - - - - - - - - -');
+      if (commandType === 'ATK') {
+        var diffencer = this.state.self.current;
+        var damagePoint = this.calcAttackDamage(diffenceType, attacker, diffencer);
+        diffencer.damage(damagePoint);
+        damege.tween(damagePoint, diffencer);
+
+        attack.tween(attacker, diffencer).then(function () {
+          _this4.decideBattlePhase(_this4.orderedMyChara);
+        });
+      } else if (commandType === 'MGC') {
+        if (diffenceType !== commandType) {
+          var diffencers = this.orderedMyChara;
+          var magicPromises = [];
+          diffencers.forEach(function (diffencer) {
+            if (0 < diffencer.status.HP) {
+              var damage = _this4.calcMagicDamage(diffenceType, attacker, diffencer);
+              diffencer.damage(damage);
+              damege.tween(damage, diffencer);
+              var _magic2 = new _magic5.default(_this4.loaders['air']);
+              var magicPromise = _magic2.tween(attacker, diffencer);
+              magicPromises.push(magicPromise);
+            }
+          });
+          _promise2.default.race(magicPromises).then(function () {
+            _this4.decideBattlePhase(_this4.orderedMyChara);
+          }).catch(function (e) {
+            console.log(e);
+          });
+        } else {
+          var _attacker = this.state.self.current;
+          var targetDiffencer = this.state.self.current;
+          this.reflectMagic(_attacker, targetDiffencer, this.orderedEnemyChara);
+        }
+      } else if (commandType === 'SP') {
+        console.log('敵のSP');
+        this.decideBattlePhase(this.orderedMyChara);
+      } else if (commandType === 'SKIP') {
+        console.log('敵がSKIP');
+        this.decideBattlePhase(this.orderedMyChara);
+      }
+    }
+
+    // 魔法防御が成功した時
+
+  }, {
+    key: 'reflectMagic',
+    value: function () {
+      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(attacker, targetDiffencer, diffencers) {
+        var _this5 = this;
+
+        var commandType, m, magicPromises;
+        return _regenerator2.default.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                commandType = 'REFLECT';
+
+                console.log('- - - - 魔法を反射 - - - -');
+                console.log('自分の選択(攻撃): ', 'MGC');
+                console.log(this.state.enemy.current.status.name + '\u306E\u9078\u629E(\u9632\u5FA1): ', commandType);
+                console.log(' - - - - - - - - - - - -');
+
+                m = new _magic5.default(this.loaders['reflect']);
+                _context2.next = 8;
+                return m.reflect(attacker);
+
+              case 8:
+
+                // ダメージの計算
+                magicPromises = [];
+
+                diffencers.forEach(function (diffencer) {
+                  if (0 < diffencer.status.HP) {
+                    var damage = _this5.calcMagicDamage(commandType, attacker, diffencer);
+                    console.log(diffencer.status.name + '\u306E\u30C0\u30E1\u30FC\u30B8', damage);
+                    diffencer.damage(damage);
+                    damege.tween(damage, diffencer);
+                    var _magic3 = new _magic5.default(_this5.loaders['air']);
+                    var magicPromise = _magic3.tween(attacker, diffencer);
+                    magicPromises.push(magicPromise);
+                  }
+                });
+                _promise2.default.race(magicPromises).then(function () {
+                  _this5.decideBattlePhase(diffencers);
+                }).catch(function (e) {
+                  console.log(e);
+                });
+
+              case 11:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function reflectMagic(_x, _x2, _x3) {
+        return _ref2.apply(this, arguments);
+      }
+
+      return reflectMagic;
+    }()
+
+    // 防御
+
+  }, {
+    key: 'defenseHandler',
+    value: function defenseHandler() {
+      if (this.isCommandDisable()) return;
+      this.state.turn.finish = false;
+      var diffencer = this.state.self.current;
+      var attacker = this.state.order.current;
+      if (diffencer.status.HP <= 0) return;
+
+      this.enemyAttack('ATK', attacker);
+    }
+
+    // 魔法防御
+
+  }, {
+    key: 'magicDefenseHandler',
+    value: function magicDefenseHandler() {
+      if (this.isCommandDisable()) return;
+      this.state.turn.finish = false;
+      var attacker = this.state.enemy.current;
+      var commandType = this.choiceEnemyCommandType(attacker);
+      this.enemyAttack('MGC', attacker);
+    }
+
+    // 敵を倒したか、全滅したかの判定
+
+  }, {
+    key: 'decideBattlePhase',
+    value: function decideBattlePhase(charactors) {
+      var _this6 = this;
+
+      var msg = charactors[0].type === 'self' ? '全滅した' : '敵を倒した';
+      if (this.getLivingCharas(charactors).length === 0) {
+        this.state.battle.finish = true;
+        console.log(msg);
+        setTimeout(function () {
+          _this6.showResult();
+        }, 1200);
+      } else {
+        this.turnController();
+      }
+    }
+  }, {
+    key: 'showResult',
+    value: function showResult() {
+      var _this7 = this;
+
+      var result = new createjs.Container();
+      var bg = new createjs.Shape();
+      bg.graphics.beginFill('rgba(0, 0, 0, 0.5)');
+      bg.graphics.rect(0, 0, window.innerWidth, window.innerHeight);
+
+      var btnBack = new createjs.Bitmap(this.loaders['btn_back']);
+      btnBack.x = window.innerWidth / 2 - btnBack.getBounds().width / 4;;
+      btnBack.y = window.innerHeight - btnBack.getBounds().height + 30;
+      btnBack.scaleX = 0.5;
+      btnBack.scaleY = 0.5;
+      btnBack.alpha = 1;
+      btnBack.addEventListener('click', function () {
+        route.to('map');
+        _this7.destroy();
+      });
+
+      result.addChild(bg, btnBack);
+      stage.addChild(result);
+      stage.update();
+    }
+  }, {
+    key: 'getRandomChara',
+    value: function getRandomChara(charactors) {
+      var charas = this.getLivingCharas(charactors);
+      var cnt = (0, _util.random)(0, charas.length - 1);
+      return charas[cnt];
+    }
+  }, {
+    key: 'getLivingCharas',
+    value: function getLivingCharas(charas) {
+      return charas.filter(function (chara) {
+        return 0 < chara.status.HP;
+      });
+    }
+
+    // 攻撃用のコマンドと防御用のコマンドをセット
+
+  }, {
+    key: 'setCommands',
+    value: function setCommands() {
+      var attackCommand = new createjs.Container();
+      var attack = new createjs.Bitmap(this.loaders['attack']);
+      attack.x = 0;
+      attack.y = 0;
+      attack.scaleX = .5;
+      attack.scaleY = .5;
+      attack.alpha = 1;
+      attack.cursor = "pointer";
+      attack.addEventListener('click', this.attackHandler.bind(this));
+      var magic = new createjs.Bitmap(this.loaders['magic']);
+      magic.x = window.innerWidth / 2;
+      magic.y = 0;
+      magic.scaleX = .5;
+      magic.scaleY = .5;
+      magic.addEventListener('click', this.magicHandler.bind(this));
+      var skill = new createjs.Bitmap(this.loaders['skill']);
+      skill.x = 0;
+      skill.y = 100;
+      skill.scaleX = .5;
+      skill.scaleY = .5;
+      var skip = new createjs.Bitmap(this.loaders['skip']);
+      skip.x = window.innerWidth / 2;
+      skip.y = 100;
+      skip.scaleX = .5;
+      skip.scaleY = .5;
+
+      attackCommand.addChild(attack, magic, skill, skip);
+      attackCommand.y = window.innerHeight - 200;
+
+      var defenseCommand = new createjs.Container();
+      var defense = new createjs.Bitmap(this.loaders['defense']);
+      defense.x = 0;
+      defense.y = 0;
+      defense.scaleX = .5;
+      defense.scaleY = .5;
+      defense.alpha = 1;
+      defense.cursor = "pointer";
+      defense.addEventListener('click', this.defenseHandler.bind(this));
+      var magicDefense = new createjs.Bitmap(this.loaders['magic_defense']);
+      magicDefense.x = window.innerWidth / 2;
+      magicDefense.y = 0;
+      magicDefense.scaleX = .5;
+      magicDefense.scaleY = .5;
+      magicDefense.addEventListener('click', this.magicDefenseHandler.bind(this));
+      var counter = new createjs.Bitmap(this.loaders['counter']);
+      counter.x = 0;
+      counter.y = 100;
+      counter.scaleX = .5;
+      counter.scaleY = .5;
+      var recovery = new createjs.Bitmap(this.loaders['recovery']);
+      recovery.x = window.innerWidth / 2;
+      recovery.y = 100;
+      recovery.scaleX = .5;
+      recovery.scaleY = .5;
+
+      defenseCommand.addChild(defense, magicDefense, counter, recovery);
+      defenseCommand.y = window.innerHeight - 100;
+
+      return {
+        attack: attackCommand,
+        defense: defenseCommand
+      };
+    }
+
+    // 敵が何を選択するのか決める関数
+
+  }, {
+    key: 'choiceEnemyCommandType',
+    value: function choiceEnemyCommandType(chara) {
+      var rates = chara.status.choice.rate;
+      var rateArray = _lodash2.default.map(rates, function (value, key) {
+        return value;
+      });
+      var rateTotal = rateArray.reduce(function (a, b) {
+        return a += b;
+      });
+      var choiceKey = (0, _util.random)(0, rateTotal);
+
+      if (0 < choiceKey && choiceKey < this.sumLimit(rateArray, 0)) {
+        return 'ATK';
+      } else if (this.sumLimit(rateArray, 0) < choiceKey && choiceKey < this.sumLimit(rateArray, 1)) {
+        return 'MGC';
+      } else if (this.sumLimit(rateArray, 1) < choiceKey && choiceKey < this.sumLimit(rateArray, 2)) {
+        return 'SP';
+      } else if (this.sumLimit(rateArray, 2) < choiceKey && choiceKey < this.sumLimit(rateArray, 3)) {
+        return 'SKIP';
+      } else {
+        return 'SKIP';
+      }
+    }
+
+    // 攻撃の計算ロジック（適当）
+
+  }, {
+    key: 'calcAttackDamage',
+    value: function calcAttackDamage(type, attacker, diffencer) {
+      var coefficient = (0, _util.random)(85, 115);
+      var damage = Math.floor(attacker.status.ATK * coefficient / 100);
+
+      var df = 0;
+      switch (type) {
+        case 'ATK':
+          df = diffencer.status.DF * 0.15;
+          return Math.floor(damage * 0.5 - df);
+          break;
+        case 'MGC':
+          df = diffencer.status.DF * 0.20;
+          return Math.floor(damage * 1.25 - df);
+          break;
+        case 'SP':
+          df = diffencer.status.DF * 0.05;
+          return Math.floor(damage - df);
+          break;
+        case 'SKIP':
+          df = diffencer.status.DF * 0.1;
+          return Math.floor(damage - df);
+          break;
+        default:
+          break;
+      }
+    }
+
+    // 魔法攻撃の計算ロジック（適当）
+
+  }, {
+    key: 'calcMagicDamage',
+    value: function calcMagicDamage(type, attacker, diffencer) {
+      var coefficient = (0, _util.random)(85, 115);
+      var damage = Math.floor(attacker.status.MGC * coefficient / 100);
+
+      var df = 0;
+      var dmg = 0;
+      switch (type) {
+        case 'ATK':
+          df = diffencer.status.DF * 0.1;
+          dmg = Math.floor(damage * 0.5 - df);
+          return 0 < dmg ? dmg : 1;
+          break;
+        case 'MGC':
+          df = diffencer.status.DF * 0.3;
+          dmg = Math.floor(damage * 0.5 - df);
+          return 0 < dmg ? dmg : 1;
+          break;
+        case 'SP':
+          df = diffencer.status.DF * 0.075;
+          dmg = Math.floor(damage * 0.5 - df);
+          return 0 < dmg ? dmg : 1;
+          break;
+        case 'SKIP':
+          df = diffencer.status.DF * 0.05;
+          dmg = Math.floor(damage * 0.5 - df);
+          return 0 < dmg ? dmg : 1;
+          break;
+        case 'REFLECT':
+          df = diffencer.status.DF * 0.05;
+          dmg = Math.floor(damage * 0.75 - df);
+          return 0 < dmg ? dmg : 1;
+        default:
+          break;
+      }
+    }
+  }, {
+    key: 'sumLimit',
+    value: function sumLimit(array, x) {
+      var value = 0;
+      for (var i = 0; i <= x; i++) {
+        value += array[i];
+      }
+      return value;
+    }
+  }, {
+    key: 'createEnemiesID',
+    value: function createEnemiesID() {
+      var len = (0, _util.random)(1, 5);
+      var items = [];
+      for (var i = 0; i < len; i++) {
+        items.push((0, _util.random)(1, 24));
+      }
+      return items;
+    }
+  }, {
+    key: 'setCharactors',
+    value: function setCharactors(charactors) {
+      var _this8 = this;
+
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'self';
+
+      return charactors.map(function (charactor, index) {
+        var key = type === 'self' ? 'chara_' + charactor.id : 'enemy_' + charactor.id;
+        var container = new createjs.Container();
+        var chara = new createjs.Bitmap(_this8.loaders[key]);
+        container.regX = chara.getBounds().width / 4;
+        container.regY = chara.getBounds().height / 4;
+        container.x = _constants2.default[type].pos[index].x + 20;
+        container.y = _constants2.default[type].pos[index].y + 20;
+        chara.scaleX = 0.5;
+        chara.scaleY = 0.5;
+        container.damage = function (point) {
+          container.status.HP -= point;
+        };
+        container.status = charactor;
+        container.type = type;
+        container.addChild(chara);
+        return container;
+      });
+    }
+  }, {
+    key: 'win',
+    value: function win() {}
+  }, {
+    key: 'loose',
+    value: function loose() {}
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      var _stage2;
+
+      (_stage2 = stage).removeChild.apply(_stage2, [this.field, this.commands.attack, this.commands.defense].concat((0, _toConsumableArray3.default)(this.myCharactors), (0, _toConsumableArray3.default)(this.enemyCharactors)));
+    }
+  }]);
+  return Battle;
+}();
+
+var Flow = function () {
+  function Flow(self, enemy) {
+    (0, _classCallCheck3.default)(this, Flow);
+
+    this.current = 0;
+    this.chara = {
+      self: self,
+      enemy: enemy
+    };
+  }
+
+  (0, _createClass3.default)(Flow, [{
+    key: 'getCurrent',
+    value: function getCurrent() {
+      return this.current;
+    }
+  }, {
+    key: 'turn',
+    value: function turn() {
+      var orderedMyChara = this.setAttackOrder(_lodash2.default.clone(this.chara.self));
+      var orderedEnemyChara = this.setAttackOrder(_lodash2.default.clone(this.chara.enemy));
+      return {
+        orderedMyChara: orderedMyChara,
+        orderedEnemyChara: orderedEnemyChara,
+        orderedAllChara: _lodash2.default.sortBy([].concat((0, _toConsumableArray3.default)(orderedMyChara), (0, _toConsumableArray3.default)(orderedEnemyChara)), function (c) {
+          return c.status.SP;
+        }).reverse()
+      };
+    }
+  }, {
+    key: 'next',
+    value: function next() {
+      this.chara.self.map();
+      this.current++;
+    }
+  }, {
+    key: 'setAttackOrder',
+    value: function setAttackOrder(charactors) {
+      // 幅を設定
+      var min = 85;
+      var max = 115;
+
+      var charas = charactors.map(function (charactor) {
+        var coefficient = (0, _util.random)(min, max);
+        charactor.status.SP = charactor.status.SP * coefficient / 100;
+        return charactor;
+      });
+
+      return _lodash2.default.sortBy(charas, function (c) {
+        return c.status.SP;
+      }).reverse();
+    }
+  }]);
+  return Flow;
+}();
+
+// 本当はDBから取得するけど、今はjsonファイルから取得するように
+
+
+function ayncGetChara(charactorsID) {
+
+  return new _promise2.default(function (resolve, reject) {
+    var charactors = charactorsID.map(function (value) {
+      return _axios2.default.get('/assets/data/enemy/' + value + '.json');
+    });
+    _promise2.default.all(charactors).then(function (charas) {
+      var c = charas.map(function (chara) {
+        return chara.data;
+      });
+      resolve(c);
+    });
+  });
+}
+
+var MY_CHARACTOR = [{
+  id: 8,
+  name: 'ルシェ',
+  MAX_HP: 50,
+  HP: 50,
+  ATK: 20,
+  MGC: 30,
+  DF: 25,
+  SP: 20,
+  choice: {
+    rate: {
+      ATK: 20,
+      MGC: 50,
+      SP: 40,
+      OTHER: 10
+    }
+  }
+}, {
+  id: 13,
+  name: '天穂',
+  MAX_HP: 45,
+  HP: 45,
+  ATK: 18,
+  MGC: 18,
+  DF: 22,
+  SP: 32,
+  choice: {
+    rate: {
+      ATK: 50,
+      MGC: 10,
+      SP: 30,
+      OTHER: 10
+    }
+  }
+}, {
+  id: 17,
+  name: 'ベルナドット',
+  MAX_HP: 48,
+  HP: 48,
+  ATK: 14,
+  MGC: 22,
+  DF: 25,
+  SP: 12,
+  choice: {
+    rate: {
+      ATK: 30,
+      MGC: 10,
+      SP: 30,
+      OTHER: 30
+    }
+  }
+}, {
+  id: 14,
+  name: 'ネマーニャ',
+  MAX_HP: 42,
+  HP: 42,
+  ATK: 12,
+  MGC: 25,
+  DF: 25,
+  SP: 16,
+  choice: {
+    rate: {
+      ATK: 10,
+      MGC: 40,
+      SP: 20,
+      OTHER: 30
+    }
+  }
+}, {
+  id: 1,
+  name: 'カフ',
+  MAX_HP: 55,
+  HP: 55,
+  ATK: 16,
+  MGC: 10,
+  DF: 40,
+  SP: 15,
+  choice: {
+    rate: {
+      ATK: 10,
+      MGC: 40,
+      SP: 20,
+      OTHER: 30
+    }
+  }
+}];
+
+exports.default = Battle;
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
 module.exports = __webpack_require__(96);
 
 
 /***/ }),
-/* 28 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -836,7 +2297,7 @@ exports.default = function (fn) {
 };
 
 /***/ }),
-/* 29 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -17928,1519 +19389,7 @@ exports.default = function (fn) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(98), __webpack_require__(99)(module)))
 
 /***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-var utils = __webpack_require__(0);
-var normalizeHeaderName = __webpack_require__(104);
-
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-
-function getDefaultAdapter() {
-  var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = __webpack_require__(53);
-  } else if (typeof process !== 'undefined') {
-    // For node use HTTP adapter
-    adapter = __webpack_require__(53);
-  }
-  return adapter;
-}
-
-var defaults = {
-  adapter: getDefaultAdapter(),
-
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Content-Type');
-    if (utils.isFormData(data) ||
-      utils.isArrayBuffer(data) ||
-      utils.isBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
-    ) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
-    }
-    return data;
-  }],
-
-  transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
-      try {
-        data = JSON.parse(data);
-      } catch (e) { /* Ignore */ }
-    }
-    return data;
-  }],
-
-  timeout: 0,
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-
-  maxContentLength: -1,
-
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  }
-};
-
-defaults.headers = {
-  common: {
-    'Accept': 'application/json, text/plain, */*'
-  }
-};
-
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-  defaults.headers[method] = {};
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-
-module.exports = defaults;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(52)))
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.random = random;
-exports.wrapText = wrapText;
-// 幅を指定するランダム関数
-function random() {
-  var min = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-  var max = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
-
-  return Math.floor(Math.random() * (max + 1 - min)) + min;
-}
-
-/**
- * @description
- * `Text`クラスのインスタンス`textInstance`の`text`プロパティに、  
- * `textInstance`の幅をはみ出さないように、自動で折り返した`text`を格納する。
- * @param {Text} textInstance 自動で折り返した`text`を格納する`Text`クラスのインスタンス
- * @param {string} text `textInstance.text`に格納する自動で折り返す文字列
- */
-function wrapText(textInstance, text) {
-  var initWidth = textInstance.lineWidth;
-  var textArray = text.split('');
-  var i = -1;
-  var prevText = '';
-  var lines = [];
-
-  textInstance.text = '';
-
-  while (textArray[++i]) {
-    textInstance.text += textArray[i];
-    if (textInstance.getMeasuredWidth() > initWidth) {
-      lines.push(prevText);
-      textInstance.text = textArray[i];
-    }
-    prevText = textInstance.text;
-  }
-
-  lines.push(prevText);
-  textInstance.text = lines.join('\n');
-
-  return textInstance.text;
-}
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports) {
-
-module.exports = function (exec) {
-  try {
-    return !!exec();
-  } catch (e) {
-    return true;
-  }
-};
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var $at = __webpack_require__(67)(true);
-
-// 21.1.3.27 String.prototype[@@iterator]()
-__webpack_require__(34)(String, 'String', function (iterated) {
-  this._t = String(iterated); // target
-  this._i = 0;                // next index
-// 21.1.5.2.1 %StringIteratorPrototype%.next()
-}, function () {
-  var O = this._t;
-  var index = this._i;
-  var point;
-  if (index >= O.length) return { value: undefined, done: true };
-  point = $at(O, index);
-  this._i += point.length;
-  return { value: point, done: false };
-});
-
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var LIBRARY = __webpack_require__(35);
-var $export = __webpack_require__(7);
-var redefine = __webpack_require__(68);
-var hide = __webpack_require__(8);
-var has = __webpack_require__(16);
-var Iterators = __webpack_require__(14);
-var $iterCreate = __webpack_require__(69);
-var setToStringTag = __webpack_require__(25);
-var getPrototypeOf = __webpack_require__(77);
-var ITERATOR = __webpack_require__(2)('iterator');
-var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
-var FF_ITERATOR = '@@iterator';
-var KEYS = 'keys';
-var VALUES = 'values';
-
-var returnThis = function () { return this; };
-
-module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
-  $iterCreate(Constructor, NAME, next);
-  var getMethod = function (kind) {
-    if (!BUGGY && kind in proto) return proto[kind];
-    switch (kind) {
-      case KEYS: return function keys() { return new Constructor(this, kind); };
-      case VALUES: return function values() { return new Constructor(this, kind); };
-    } return function entries() { return new Constructor(this, kind); };
-  };
-  var TAG = NAME + ' Iterator';
-  var DEF_VALUES = DEFAULT == VALUES;
-  var VALUES_BUG = false;
-  var proto = Base.prototype;
-  var $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
-  var $default = $native || getMethod(DEFAULT);
-  var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
-  var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
-  var methods, key, IteratorPrototype;
-  // Fix native
-  if ($anyNative) {
-    IteratorPrototype = getPrototypeOf($anyNative.call(new Base()));
-    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
-      // Set @@toStringTag to native iterators
-      setToStringTag(IteratorPrototype, TAG, true);
-      // fix for some old engines
-      if (!LIBRARY && !has(IteratorPrototype, ITERATOR)) hide(IteratorPrototype, ITERATOR, returnThis);
-    }
-  }
-  // fix Array#{values, @@iterator}.name in V8 / FF
-  if (DEF_VALUES && $native && $native.name !== VALUES) {
-    VALUES_BUG = true;
-    $default = function values() { return $native.call(this); };
-  }
-  // Define iterator
-  if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
-    hide(proto, ITERATOR, $default);
-  }
-  // Plug for library
-  Iterators[NAME] = $default;
-  Iterators[TAG] = returnThis;
-  if (DEFAULT) {
-    methods = {
-      values: DEF_VALUES ? $default : getMethod(VALUES),
-      keys: IS_SET ? $default : getMethod(KEYS),
-      entries: $entries
-    };
-    if (FORCED) for (key in methods) {
-      if (!(key in proto)) redefine(proto, key, methods[key]);
-    } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
-  }
-  return methods;
-};
-
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports) {
-
-module.exports = true;
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var global = __webpack_require__(1);
-var SHARED = '__core-js_shared__';
-var store = global[SHARED] || (global[SHARED] = {});
-module.exports = function (key) {
-  return store[key] || (store[key] = {});
-};
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports) {
-
-var id = 0;
-var px = Math.random();
-module.exports = function (key) {
-  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-};
-
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports) {
-
-// IE 8- don't enum bug keys
-module.exports = (
-  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
-).split(',');
-
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var document = __webpack_require__(1).document;
-module.exports = document && document.documentElement;
-
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 7.1.13 ToObject(argument)
-var defined = __webpack_require__(21);
-module.exports = function (it) {
-  return Object(defined(it));
-};
-
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// getting tag from 19.1.3.6 Object.prototype.toString()
-var cof = __webpack_require__(17);
-var TAG = __webpack_require__(2)('toStringTag');
-// ES3 wrong here
-var ARG = cof(function () { return arguments; }()) == 'Arguments';
-
-// fallback for IE11 Script Access Denied error
-var tryGet = function (it, key) {
-  try {
-    return it[key];
-  } catch (e) { /* empty */ }
-};
-
-module.exports = function (it) {
-  var O, T, B;
-  return it === undefined ? 'Undefined' : it === null ? 'Null'
-    // @@toStringTag case
-    : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
-    // builtinTag case
-    : ARG ? cof(O)
-    // ES3 arguments fallback
-    : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-};
-
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// call something on iterator step with safe closing on error
-var anObject = __webpack_require__(6);
-module.exports = function (iterator, fn, value, entries) {
-  try {
-    return entries ? fn(anObject(value)[0], value[1]) : fn(value);
-  // 7.4.6 IteratorClose(iterator, completion)
-  } catch (e) {
-    var ret = iterator['return'];
-    if (ret !== undefined) anObject(ret.call(iterator));
-    throw e;
-  }
-};
-
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// check on default Array iterator
-var Iterators = __webpack_require__(14);
-var ITERATOR = __webpack_require__(2)('iterator');
-var ArrayProto = Array.prototype;
-
-module.exports = function (it) {
-  return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
-};
-
-
-/***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var classof = __webpack_require__(41);
-var ITERATOR = __webpack_require__(2)('iterator');
-var Iterators = __webpack_require__(14);
-module.exports = __webpack_require__(5).getIteratorMethod = function (it) {
-  if (it != undefined) return it[ITERATOR]
-    || it['@@iterator']
-    || Iterators[classof(it)];
-};
-
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 7.3.20 SpeciesConstructor(O, defaultConstructor)
-var anObject = __webpack_require__(6);
-var aFunction = __webpack_require__(15);
-var SPECIES = __webpack_require__(2)('species');
-module.exports = function (O, D) {
-  var C = anObject(O).constructor;
-  var S;
-  return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? D : aFunction(S);
-};
-
-
-/***/ }),
-/* 46 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var ctx = __webpack_require__(11);
-var invoke = __webpack_require__(85);
-var html = __webpack_require__(39);
-var cel = __webpack_require__(18);
-var global = __webpack_require__(1);
-var process = global.process;
-var setTask = global.setImmediate;
-var clearTask = global.clearImmediate;
-var MessageChannel = global.MessageChannel;
-var Dispatch = global.Dispatch;
-var counter = 0;
-var queue = {};
-var ONREADYSTATECHANGE = 'onreadystatechange';
-var defer, channel, port;
-var run = function () {
-  var id = +this;
-  // eslint-disable-next-line no-prototype-builtins
-  if (queue.hasOwnProperty(id)) {
-    var fn = queue[id];
-    delete queue[id];
-    fn();
-  }
-};
-var listener = function (event) {
-  run.call(event.data);
-};
-// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
-if (!setTask || !clearTask) {
-  setTask = function setImmediate(fn) {
-    var args = [];
-    var i = 1;
-    while (arguments.length > i) args.push(arguments[i++]);
-    queue[++counter] = function () {
-      // eslint-disable-next-line no-new-func
-      invoke(typeof fn == 'function' ? fn : Function(fn), args);
-    };
-    defer(counter);
-    return counter;
-  };
-  clearTask = function clearImmediate(id) {
-    delete queue[id];
-  };
-  // Node.js 0.8-
-  if (__webpack_require__(17)(process) == 'process') {
-    defer = function (id) {
-      process.nextTick(ctx(run, id, 1));
-    };
-  // Sphere (JS game engine) Dispatch API
-  } else if (Dispatch && Dispatch.now) {
-    defer = function (id) {
-      Dispatch.now(ctx(run, id, 1));
-    };
-  // Browsers with MessageChannel, includes WebWorkers
-  } else if (MessageChannel) {
-    channel = new MessageChannel();
-    port = channel.port2;
-    channel.port1.onmessage = listener;
-    defer = ctx(port.postMessage, port, 1);
-  // Browsers with postMessage, skip WebWorkers
-  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
-  } else if (global.addEventListener && typeof postMessage == 'function' && !global.importScripts) {
-    defer = function (id) {
-      global.postMessage(id + '', '*');
-    };
-    global.addEventListener('message', listener, false);
-  // IE8-
-  } else if (ONREADYSTATECHANGE in cel('script')) {
-    defer = function (id) {
-      html.appendChild(cel('script'))[ONREADYSTATECHANGE] = function () {
-        html.removeChild(this);
-        run.call(id);
-      };
-    };
-  // Rest old browsers
-  } else {
-    defer = function (id) {
-      setTimeout(ctx(run, id, 1), 0);
-    };
-  }
-}
-module.exports = {
-  set: setTask,
-  clear: clearTask
-};
-
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports) {
-
-module.exports = function (exec) {
-  try {
-    return { e: false, v: exec() };
-  } catch (e) {
-    return { e: true, v: e };
-  }
-};
-
-
-/***/ }),
-/* 48 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var anObject = __webpack_require__(6);
-var isObject = __webpack_require__(12);
-var newPromiseCapability = __webpack_require__(26);
-
-module.exports = function (C, x) {
-  anObject(C);
-  if (isObject(x) && x.constructor === C) return x;
-  var promiseCapability = newPromiseCapability.f(C);
-  var resolve = promiseCapability.resolve;
-  resolve(x);
-  return promiseCapability.promise;
-};
-
-
-/***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var ITERATOR = __webpack_require__(2)('iterator');
-var SAFE_CLOSING = false;
-
-try {
-  var riter = [7][ITERATOR]();
-  riter['return'] = function () { SAFE_CLOSING = true; };
-  // eslint-disable-next-line no-throw-literal
-  Array.from(riter, function () { throw 2; });
-} catch (e) { /* empty */ }
-
-module.exports = function (exec, skipClosing) {
-  if (!skipClosing && !SAFE_CLOSING) return false;
-  var safe = false;
-  try {
-    var arr = [7];
-    var iter = arr[ITERATOR]();
-    iter.next = function () { return { done: safe = true }; };
-    arr[ITERATOR] = function () { return iter; };
-    exec(arr);
-  } catch (e) { /* empty */ }
-  return safe;
-};
-
-
-/***/ }),
 /* 50 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _promise = __webpack_require__(13);
-
-var _promise2 = _interopRequireDefault(_promise);
-
-var _toConsumableArray2 = __webpack_require__(91);
-
-var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
-
-var _regenerator = __webpack_require__(27);
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _asyncToGenerator2 = __webpack_require__(28);
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-var _classCallCheck2 = __webpack_require__(3);
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = __webpack_require__(4);
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _lodash = __webpack_require__(29);
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-var _axios = __webpack_require__(100);
-
-var _axios2 = _interopRequireDefault(_axios);
-
-var _constants = __webpack_require__(119);
-
-var _constants2 = _interopRequireDefault(_constants);
-
-var _attack = __webpack_require__(120);
-
-var _attack2 = _interopRequireDefault(_attack);
-
-var _magic4 = __webpack_require__(121);
-
-var _magic5 = _interopRequireDefault(_magic4);
-
-var _damage = __webpack_require__(122);
-
-var _damage2 = _interopRequireDefault(_damage);
-
-var _util = __webpack_require__(31);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var attack = new _attack2.default();
-var magic = {};
-var damege = new _damage2.default();
-
-var Battle = function () {
-  function Battle() {
-    (0, _classCallCheck3.default)(this, Battle);
-
-    this.loaders = {};
-    this.commands = {
-      attack: {},
-      defense: {}
-    };
-    this.state = {
-      self: {
-        charactors: {},
-        current: {}
-      },
-      enemy: {
-        charactors: {},
-        current: {}
-      },
-      order: {
-        current: {},
-        self: 0,
-        enemy: 0,
-        total: 0
-      },
-      turn: {
-        count: 0,
-        finish: true
-      },
-      battle: {
-        finish: false
-      }
-    };
-    console.log('battle!');
-  }
-
-  (0, _createClass3.default)(Battle, [{
-    key: 'start',
-    value: function () {
-      var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-        var _this = this;
-
-        var queue, fieldManifest, commandManifest, magicManifest, resultManifest, myCharaManifest, enemyCharaManifest;
-        return _regenerator2.default.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                queue = new createjs.LoadQueue();
-                fieldManifest = [{ src: 'forest1.jpg', id: 'field' }];
-                commandManifest = [{ src: 'command_attack.png', id: 'attack' }, { src: 'command_magic.png', id: 'magic' }, { src: 'command_skill.png', id: 'skill' }, { src: 'command_skip.png', id: 'skip' }, { src: 'command_defense.png', id: 'defense' }, { src: 'command_magic_defense.png', id: 'magic_defense' }, { src: 'command_counter.png', id: 'counter' }, { src: 'command_recovery.png', id: 'recovery' }];
-                magicManifest = [{ src: 'air.png', id: 'air' }, { src: 'reflect.png', id: 'reflect' }];
-                resultManifest = [{ src: 'btn_back.png', id: 'btn_back' }];
-
-                this.state.self.charactors = MY_CHARACTOR;
-                myCharaManifest = this.createMainCharaManifest(this.state.self.charactors);
-                _context.next = 9;
-                return ayncGetChara(this.createEnemiesID());
-
-              case 9:
-                this.state.enemy.charactors = _context.sent;
-                enemyCharaManifest = this.createEnemyCharaManifest(this.state.enemy.charactors);
-
-                queue.loadManifest(commandManifest, true, '/assets/images/battle/command/');
-                queue.loadManifest(resultManifest, true, '/assets/images/battle/result/');
-                queue.loadManifest(fieldManifest, true, '/assets/images/field/');
-                queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
-                queue.loadManifest(enemyCharaManifest, true, '/assets/images/enemy/');
-                queue.loadManifest(magicManifest, true, '/assets/images/battle/effect/magic/');
-                queue.addEventListener('fileload', function (e) {
-                  return _this.loaders[e.item.id] = e.result;
-                });
-                queue.addEventListener('complete', function () {
-                  return _this.init();
-                });
-
-              case 19:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function start() {
-        return _ref.apply(this, arguments);
-      }
-
-      return start;
-    }()
-  }, {
-    key: 'createMainCharaManifest',
-    value: function createMainCharaManifest(charactors) {
-      return charactors.map(function (charactor) {
-        return {
-          src: 'chara_' + charactor.id + '.png',
-          id: 'chara_' + charactor.id
-        };
-      });
-    }
-  }, {
-    key: 'createEnemyCharaManifest',
-    value: function createEnemyCharaManifest(charactors) {
-      return charactors.map(function (charactor) {
-        return {
-          src: 'chara_' + charactor.id + '.png',
-          id: 'enemy_' + charactor.id
-        };
-      });
-    }
-  }, {
-    key: 'init',
-    value: function init() {
-      var _stage;
-
-      this.field = this.setField();
-      this.commands = this.setCommands();
-      this.myCharactors = this.setCharactors(this.state.self.charactors);
-      this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
-      this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
-      createjs.Ticker.timingMode = createjs.Ticker.RAF;
-      createjs.Ticker.addEventListener('tick', stage);
-      (_stage = stage).addChild.apply(_stage, [this.field, this.commands.attack, this.commands.defense].concat((0, _toConsumableArray3.default)(this.myCharactors), (0, _toConsumableArray3.default)(this.enemyCharactors)));
-      stage.update();
-      this.turn();
-    }
-  }, {
-    key: 'turn',
-    value: function turn() {
-      var _Flow$turn = this.Flow.turn(),
-          orderedMyChara = _Flow$turn.orderedMyChara,
-          orderedEnemyChara = _Flow$turn.orderedEnemyChara,
-          orderedAllChara = _Flow$turn.orderedAllChara;
-
-      this.orderedMyChara = this.getLivingCharas(orderedMyChara);
-      this.orderedEnemyChara = this.getLivingCharas(orderedEnemyChara);
-      this.orderAllChara = this.getLivingCharas(orderedAllChara);
-      this.switchCommand();
-    }
-  }, {
-    key: 'turnController',
-    value: function turnController() {
-      if (this.state.order.total < this.orderAllChara.length - 1) {
-        if (this.state.order.current.type === 'self') {
-          this.state.order.self++;
-        } else {
-          this.state.order.enemy++;
-        }
-        this.state.order.total++;
-        this.switchCommand();
-      } else {
-        this.state.order.self = 0;
-        this.state.order.enemy = 0;
-        this.state.order.total = 0;
-        this.state.turn.count++;
-        this.turn();
-      }
-    }
-  }, {
-    key: 'switchCommand',
-    value: function switchCommand() {
-      this.state.turn.finish = true;
-      this.state.order.current = this.orderAllChara[this.state.order.total];
-      if (0 < this.state.order.current.status.HP) {
-        if (this.state.order.current.type === 'self') {
-          this.state.self.current = this.state.order.current;
-          this.state.enemy.current = this.getRandomChara(this.orderedEnemyChara);
-          this.commands.attack.y = window.innerHeight - 200;
-          this.commands.defense.y = window.innerHeight;
-          this.setCurrentMark(this.state.self.current, this.state.enemy.current);
-        } else {
-          this.state.enemy.current = this.state.order.current;
-          this.state.self.current = this.getRandomChara(this.orderedMyChara);
-          this.commands.attack.y = window.innerHeight;
-          this.commands.defense.y = window.innerHeight - 200;
-          this.setCurrentMark(this.state.enemy.current, this.state.self.current);
-        }
-      } else {
-        this.resetCurrentMark();
-        this.turnController();
-      }
-    }
-  }, {
-    key: 'setCurrentMark',
-    value: function setCurrentMark(attcker, defenser) {
-      this.resetCurrentMark();
-      if (!attcker || !defenser) return;
-      attcker.filters = [new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 90, 90, 90, 0)];
-      attcker.cache(0, 0, 200, 200);
-      defenser.filters = [new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 60, 60, 0, 0)];
-      defenser.cache(0, 0, 200, 200);
-      stage.setChildIndex(attcker, -1);
-      stage.setChildIndex(defenser, -1);
-      stage.addChild(attcker, defenser);
-      stage.update();
-    }
-  }, {
-    key: 'resetCurrentMark',
-    value: function resetCurrentMark() {
-      var resetAllChara = this.orderAllChara.map(function (charactor) {
-        charactor.filters = [];
-        charactor.cache(0, 0, 200, 200);
-        return charactor;
-      });
-    }
-  }, {
-    key: 'setField',
-    value: function setField() {
-      var field = new createjs.Bitmap(this.loaders['field']);
-      field.skewX = field.width / 2;
-      field.skewY = field.height / 2;
-      field.scaleX = 1.5;
-      field.scaleY = 1.5;
-      field.y = -250;
-      return field;
-    }
-
-    // アニメーション中はコマンドが選択できないようにする判定
-
-  }, {
-    key: 'isCommandDisable',
-    value: function isCommandDisable() {
-      var bool = false;
-      if (!this.state.turn.finish || this.state.battle.finish) {
-        bool = true;
-      }
-      return bool;
-    }
-
-    // 通常攻撃を選択
-
-  }, {
-    key: 'attackHandler',
-    value: function attackHandler() {
-      var _this2 = this;
-
-      if (this.isCommandDisable()) return;
-      this.state.turn.finish = false;
-
-      var attacker = this.state.order.current;
-      var diffencer = this.state.enemy.current;
-      var commandType = this.choiceEnemyCommandType(diffencer);
-      console.log(' - - - - - - - - - - - -');
-      console.log('自分の選択(攻撃): ', 'ATK');
-      console.log(diffencer.status.name + '\u306E\u9078\u629E(\u9632\u5FA1): ', commandType);
-      console.log(' - - - - - - - - - - - -');
-      var damagePoint = this.calcAttackDamage(commandType, attacker, diffencer);
-      diffencer.damage(damagePoint);
-      damege.tween(damagePoint, diffencer);
-
-      attack.tween(attacker, diffencer).then(function () {
-        _this2.decideBattlePhase(_this2.orderedEnemyChara);
-      });
-    }
-
-    // 魔法攻撃を選択
-
-  }, {
-    key: 'magicHandler',
-    value: function magicHandler() {
-      var _this3 = this;
-
-      if (this.isCommandDisable()) return;
-      this.state.turn.finish = false;
-      var attacker = this.state.order.current;
-      var diffencers = this.orderedEnemyChara;
-      var commandType = this.choiceEnemyCommandType(this.state.enemy.current);
-      console.log(' - - - - - - - - - - - -');
-      console.log('自分の選択(攻撃): ', 'MGC');
-      console.log(this.state.enemy.current.status.name + '\u306E\u9078\u629E(\u9632\u5FA1): ', commandType);
-      console.log(' - - - - - - - - - - - -');
-      // ダメージの計算
-      if (commandType !== 'MGC') {
-        var magicPromises = [];
-        diffencers.forEach(function (diffencer) {
-          if (0 < diffencer.status.HP) {
-            var damage = _this3.calcMagicDamage(commandType, attacker, diffencer);
-            diffencer.damage(damage);
-            damege.tween(damage, diffencer);
-            var _magic = new _magic5.default(_this3.loaders['air']);
-            var magicPromise = _magic.tween(attacker, diffencer);
-            magicPromises.push(magicPromise);
-          }
-        });
-        _promise2.default.race(magicPromises).then(function () {
-          _this3.decideBattlePhase(diffencers);
-        }).catch(function (e) {
-          console.log(e);
-        });
-      } else {
-        this.reflectMagic(this.state.enemy.current, this.state.self.current, this.orderedMyChara);
-      }
-    }
-
-    // 敵の攻撃
-
-  }, {
-    key: 'enemyAttack',
-    value: function enemyAttack(diffenceType, attacker) {
-      var _this4 = this;
-
-      var commandType = this.choiceEnemyCommandType(attacker);
-      console.log(' - - - - - - - - - - - -');
-      console.log('自分の選択(防御): ', diffenceType);
-      console.log(attacker.status.name + '\u306E\u9078\u629E(\u653B\u6483): ', commandType);
-      console.log(' - - - - - - - - - - - -');
-      if (commandType === 'ATK') {
-        var diffencer = this.state.self.current;
-        var damagePoint = this.calcAttackDamage(diffenceType, attacker, diffencer);
-        diffencer.damage(damagePoint);
-        damege.tween(damagePoint, diffencer);
-
-        attack.tween(attacker, diffencer).then(function () {
-          _this4.decideBattlePhase(_this4.orderedMyChara);
-        });
-      } else if (commandType === 'MGC') {
-        if (diffenceType !== commandType) {
-          var diffencers = this.orderedMyChara;
-          var magicPromises = [];
-          diffencers.forEach(function (diffencer) {
-            if (0 < diffencer.status.HP) {
-              var damage = _this4.calcMagicDamage(diffenceType, attacker, diffencer);
-              diffencer.damage(damage);
-              damege.tween(damage, diffencer);
-              var _magic2 = new _magic5.default(_this4.loaders['air']);
-              var magicPromise = _magic2.tween(attacker, diffencer);
-              magicPromises.push(magicPromise);
-            }
-          });
-          _promise2.default.race(magicPromises).then(function () {
-            _this4.decideBattlePhase(_this4.orderedMyChara);
-          }).catch(function (e) {
-            console.log(e);
-          });
-        } else {
-          var _attacker = this.state.self.current;
-          var targetDiffencer = this.state.self.current;
-          this.reflectMagic(_attacker, targetDiffencer, this.orderedEnemyChara);
-        }
-      } else if (commandType === 'SP') {
-        console.log('敵のSP');
-        this.decideBattlePhase(this.orderedMyChara);
-      } else if (commandType === 'SKIP') {
-        console.log('敵がSKIP');
-        this.decideBattlePhase(this.orderedMyChara);
-      }
-    }
-
-    // 魔法防御が成功した時
-
-  }, {
-    key: 'reflectMagic',
-    value: function () {
-      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(attacker, targetDiffencer, diffencers) {
-        var _this5 = this;
-
-        var commandType, m, magicPromises;
-        return _regenerator2.default.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                commandType = 'REFLECT';
-
-                console.log('- - - - 魔法を反射 - - - -');
-                console.log('自分の選択(攻撃): ', 'MGC');
-                console.log(this.state.enemy.current.status.name + '\u306E\u9078\u629E(\u9632\u5FA1): ', commandType);
-                console.log(' - - - - - - - - - - - -');
-
-                m = new _magic5.default(this.loaders['reflect']);
-                _context2.next = 8;
-                return m.reflect(attacker);
-
-              case 8:
-
-                // ダメージの計算
-                magicPromises = [];
-
-                diffencers.forEach(function (diffencer) {
-                  if (0 < diffencer.status.HP) {
-                    var damage = _this5.calcMagicDamage(commandType, attacker, diffencer);
-                    console.log(diffencer.status.name + '\u306E\u30C0\u30E1\u30FC\u30B8', damage);
-                    diffencer.damage(damage);
-                    damege.tween(damage, diffencer);
-                    var _magic3 = new _magic5.default(_this5.loaders['air']);
-                    var magicPromise = _magic3.tween(attacker, diffencer);
-                    magicPromises.push(magicPromise);
-                  }
-                });
-                _promise2.default.race(magicPromises).then(function () {
-                  _this5.decideBattlePhase(diffencers);
-                }).catch(function (e) {
-                  console.log(e);
-                });
-
-              case 11:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function reflectMagic(_x, _x2, _x3) {
-        return _ref2.apply(this, arguments);
-      }
-
-      return reflectMagic;
-    }()
-
-    // 防御
-
-  }, {
-    key: 'defenseHandler',
-    value: function defenseHandler() {
-      if (this.isCommandDisable()) return;
-      this.state.turn.finish = false;
-      var diffencer = this.state.self.current;
-      var attacker = this.state.order.current;
-      if (diffencer.status.HP <= 0) return;
-
-      this.enemyAttack('ATK', attacker);
-    }
-
-    // 魔法防御
-
-  }, {
-    key: 'magicDefenseHandler',
-    value: function magicDefenseHandler() {
-      if (this.isCommandDisable()) return;
-      this.state.turn.finish = false;
-      var attacker = this.state.enemy.current;
-      var commandType = this.choiceEnemyCommandType(attacker);
-      this.enemyAttack('MGC', attacker);
-    }
-
-    // 敵を倒したか、全滅したかの判定
-
-  }, {
-    key: 'decideBattlePhase',
-    value: function decideBattlePhase(charactors) {
-      var _this6 = this;
-
-      var msg = charactors[0].type === 'self' ? '全滅した' : '敵を倒した';
-      if (this.getLivingCharas(charactors).length === 0) {
-        this.state.battle.finish = true;
-        console.log(msg);
-        setTimeout(function () {
-          _this6.showResult();
-        }, 1200);
-      } else {
-        this.turnController();
-      }
-    }
-  }, {
-    key: 'showResult',
-    value: function showResult() {
-      var _this7 = this;
-
-      var result = new createjs.Container();
-      var bg = new createjs.Shape();
-      bg.graphics.beginFill('rgba(0, 0, 0, 0.5)');
-      bg.graphics.rect(0, 0, window.innerWidth, window.innerHeight);
-
-      var btnBack = new createjs.Bitmap(this.loaders['btn_back']);
-      btnBack.x = window.innerWidth / 2 - btnBack.getBounds().width / 4;;
-      btnBack.y = window.innerHeight - btnBack.getBounds().height + 30;
-      btnBack.scaleX = 0.5;
-      btnBack.scaleY = 0.5;
-      btnBack.alpha = 1;
-      btnBack.addEventListener('click', function () {
-        route.to('map');
-        _this7.destroy();
-      });
-
-      result.addChild(bg, btnBack);
-      stage.addChild(result);
-      stage.update();
-    }
-  }, {
-    key: 'getRandomChara',
-    value: function getRandomChara(charactors) {
-      var charas = this.getLivingCharas(charactors);
-      var cnt = (0, _util.random)(0, charas.length - 1);
-      return charas[cnt];
-    }
-  }, {
-    key: 'getLivingCharas',
-    value: function getLivingCharas(charas) {
-      return charas.filter(function (chara) {
-        return 0 < chara.status.HP;
-      });
-    }
-
-    // 攻撃用のコマンドと防御用のコマンドをセット
-
-  }, {
-    key: 'setCommands',
-    value: function setCommands() {
-      var attackCommand = new createjs.Container();
-      var attack = new createjs.Bitmap(this.loaders['attack']);
-      attack.x = 0;
-      attack.y = 0;
-      attack.scaleX = .5;
-      attack.scaleY = .5;
-      attack.alpha = 1;
-      attack.cursor = "pointer";
-      attack.addEventListener('click', this.attackHandler.bind(this));
-      var magic = new createjs.Bitmap(this.loaders['magic']);
-      magic.x = window.innerWidth / 2;
-      magic.y = 0;
-      magic.scaleX = .5;
-      magic.scaleY = .5;
-      magic.addEventListener('click', this.magicHandler.bind(this));
-      var skill = new createjs.Bitmap(this.loaders['skill']);
-      skill.x = 0;
-      skill.y = 100;
-      skill.scaleX = .5;
-      skill.scaleY = .5;
-      var skip = new createjs.Bitmap(this.loaders['skip']);
-      skip.x = window.innerWidth / 2;
-      skip.y = 100;
-      skip.scaleX = .5;
-      skip.scaleY = .5;
-
-      attackCommand.addChild(attack, magic, skill, skip);
-      attackCommand.y = window.innerHeight - 200;
-
-      var defenseCommand = new createjs.Container();
-      var defense = new createjs.Bitmap(this.loaders['defense']);
-      defense.x = 0;
-      defense.y = 0;
-      defense.scaleX = .5;
-      defense.scaleY = .5;
-      defense.alpha = 1;
-      defense.cursor = "pointer";
-      defense.addEventListener('click', this.defenseHandler.bind(this));
-      var magicDefense = new createjs.Bitmap(this.loaders['magic_defense']);
-      magicDefense.x = window.innerWidth / 2;
-      magicDefense.y = 0;
-      magicDefense.scaleX = .5;
-      magicDefense.scaleY = .5;
-      magicDefense.addEventListener('click', this.magicDefenseHandler.bind(this));
-      var counter = new createjs.Bitmap(this.loaders['counter']);
-      counter.x = 0;
-      counter.y = 100;
-      counter.scaleX = .5;
-      counter.scaleY = .5;
-      var recovery = new createjs.Bitmap(this.loaders['recovery']);
-      recovery.x = window.innerWidth / 2;
-      recovery.y = 100;
-      recovery.scaleX = .5;
-      recovery.scaleY = .5;
-
-      defenseCommand.addChild(defense, magicDefense, counter, recovery);
-      defenseCommand.y = window.innerHeight - 100;
-
-      return {
-        attack: attackCommand,
-        defense: defenseCommand
-      };
-    }
-
-    // 敵が何を選択するのか決める関数
-
-  }, {
-    key: 'choiceEnemyCommandType',
-    value: function choiceEnemyCommandType(chara) {
-      var rates = chara.status.choice.rate;
-      var rateArray = _lodash2.default.map(rates, function (value, key) {
-        return value;
-      });
-      var rateTotal = rateArray.reduce(function (a, b) {
-        return a += b;
-      });
-      var choiceKey = (0, _util.random)(0, rateTotal);
-
-      if (0 < choiceKey && choiceKey < this.sumLimit(rateArray, 0)) {
-        return 'ATK';
-      } else if (this.sumLimit(rateArray, 0) < choiceKey && choiceKey < this.sumLimit(rateArray, 1)) {
-        return 'MGC';
-      } else if (this.sumLimit(rateArray, 1) < choiceKey && choiceKey < this.sumLimit(rateArray, 2)) {
-        return 'SP';
-      } else if (this.sumLimit(rateArray, 2) < choiceKey && choiceKey < this.sumLimit(rateArray, 3)) {
-        return 'SKIP';
-      } else {
-        return 'SKIP';
-      }
-    }
-
-    // 攻撃の計算ロジック（適当）
-
-  }, {
-    key: 'calcAttackDamage',
-    value: function calcAttackDamage(type, attacker, diffencer) {
-      var coefficient = (0, _util.random)(85, 115);
-      var damage = Math.floor(attacker.status.ATK * coefficient / 100);
-
-      var df = 0;
-      switch (type) {
-        case 'ATK':
-          df = diffencer.status.DF * 0.15;
-          return Math.floor(damage * 0.5 - df);
-          break;
-        case 'MGC':
-          df = diffencer.status.DF * 0.20;
-          return Math.floor(damage * 1.25 - df);
-          break;
-        case 'SP':
-          df = diffencer.status.DF * 0.05;
-          return Math.floor(damage - df);
-          break;
-        case 'SKIP':
-          df = diffencer.status.DF * 0.1;
-          return Math.floor(damage - df);
-          break;
-        default:
-          break;
-      }
-    }
-
-    // 魔法攻撃の計算ロジック（適当）
-
-  }, {
-    key: 'calcMagicDamage',
-    value: function calcMagicDamage(type, attacker, diffencer) {
-      var coefficient = (0, _util.random)(85, 115);
-      var damage = Math.floor(attacker.status.MGC * coefficient / 100);
-
-      var df = 0;
-      var dmg = 0;
-      switch (type) {
-        case 'ATK':
-          df = diffencer.status.DF * 0.1;
-          dmg = Math.floor(damage * 0.5 - df);
-          return 0 < dmg ? dmg : 1;
-          break;
-        case 'MGC':
-          df = diffencer.status.DF * 0.3;
-          dmg = Math.floor(damage * 0.5 - df);
-          return 0 < dmg ? dmg : 1;
-          break;
-        case 'SP':
-          df = diffencer.status.DF * 0.075;
-          dmg = Math.floor(damage * 0.5 - df);
-          return 0 < dmg ? dmg : 1;
-          break;
-        case 'SKIP':
-          df = diffencer.status.DF * 0.05;
-          dmg = Math.floor(damage * 0.5 - df);
-          return 0 < dmg ? dmg : 1;
-          break;
-        case 'REFLECT':
-          df = diffencer.status.DF * 0.05;
-          dmg = Math.floor(damage * 0.75 - df);
-          return 0 < dmg ? dmg : 1;
-        default:
-          break;
-      }
-    }
-  }, {
-    key: 'sumLimit',
-    value: function sumLimit(array, x) {
-      var value = 0;
-      for (var i = 0; i <= x; i++) {
-        value += array[i];
-      }
-      return value;
-    }
-  }, {
-    key: 'createEnemiesID',
-    value: function createEnemiesID() {
-      var len = (0, _util.random)(1, 5);
-      var items = [];
-      for (var i = 0; i < len; i++) {
-        items.push((0, _util.random)(1, 24));
-      }
-      return items;
-    }
-  }, {
-    key: 'setCharactors',
-    value: function setCharactors(charactors) {
-      var _this8 = this;
-
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'self';
-
-      return charactors.map(function (charactor, index) {
-        var key = type === 'self' ? 'chara_' + charactor.id : 'enemy_' + charactor.id;
-        var container = new createjs.Container();
-        var chara = new createjs.Bitmap(_this8.loaders[key]);
-        container.regX = chara.getBounds().width / 4;
-        container.regY = chara.getBounds().height / 4;
-        container.x = _constants2.default[type].pos[index].x + 20;
-        container.y = _constants2.default[type].pos[index].y + 20;
-        chara.scaleX = 0.5;
-        chara.scaleY = 0.5;
-        container.damage = function (point) {
-          container.status.HP -= point;
-        };
-        container.status = charactor;
-        container.type = type;
-        container.addChild(chara);
-        return container;
-      });
-    }
-  }, {
-    key: 'win',
-    value: function win() {}
-  }, {
-    key: 'loose',
-    value: function loose() {}
-  }, {
-    key: 'destroy',
-    value: function destroy() {
-      var _stage2;
-
-      (_stage2 = stage).removeChild.apply(_stage2, [this.field, this.commands.attack, this.commands.defense].concat((0, _toConsumableArray3.default)(this.myCharactors), (0, _toConsumableArray3.default)(this.enemyCharactors)));
-    }
-  }]);
-  return Battle;
-}();
-
-var Flow = function () {
-  function Flow(self, enemy) {
-    (0, _classCallCheck3.default)(this, Flow);
-
-    this.current = 0;
-    this.chara = {
-      self: self,
-      enemy: enemy
-    };
-  }
-
-  (0, _createClass3.default)(Flow, [{
-    key: 'getCurrent',
-    value: function getCurrent() {
-      return this.current;
-    }
-  }, {
-    key: 'turn',
-    value: function turn() {
-      var orderedMyChara = this.setAttackOrder(_lodash2.default.clone(this.chara.self));
-      var orderedEnemyChara = this.setAttackOrder(_lodash2.default.clone(this.chara.enemy));
-      return {
-        orderedMyChara: orderedMyChara,
-        orderedEnemyChara: orderedEnemyChara,
-        orderedAllChara: _lodash2.default.sortBy([].concat((0, _toConsumableArray3.default)(orderedMyChara), (0, _toConsumableArray3.default)(orderedEnemyChara)), function (c) {
-          return c.status.SP;
-        }).reverse()
-      };
-    }
-  }, {
-    key: 'next',
-    value: function next() {
-      this.chara.self.map();
-      this.current++;
-    }
-  }, {
-    key: 'setAttackOrder',
-    value: function setAttackOrder(charactors) {
-      // 幅を設定
-      var min = 85;
-      var max = 115;
-
-      var charas = charactors.map(function (charactor) {
-        var coefficient = (0, _util.random)(min, max);
-        charactor.status.SP = charactor.status.SP * coefficient / 100;
-        return charactor;
-      });
-
-      return _lodash2.default.sortBy(charas, function (c) {
-        return c.status.SP;
-      }).reverse();
-    }
-  }]);
-  return Flow;
-}();
-
-// 本当はDBから取得するけど、今はjsonファイルから取得するように
-
-
-function ayncGetChara(charactorsID) {
-
-  return new _promise2.default(function (resolve, reject) {
-    var charactors = charactorsID.map(function (value) {
-      return _axios2.default.get('/assets/data/enemy/' + value + '.json');
-    });
-    _promise2.default.all(charactors).then(function (charas) {
-      var c = charas.map(function (chara) {
-        return chara.data;
-      });
-      resolve(c);
-    });
-  });
-}
-
-var MY_CHARACTOR = [{
-  id: 8,
-  name: 'ルシェ',
-  MAX_HP: 50,
-  HP: 50,
-  ATK: 20,
-  MGC: 30,
-  DF: 25,
-  SP: 20,
-  choice: {
-    rate: {
-      ATK: 20,
-      MGC: 50,
-      SP: 40,
-      OTHER: 10
-    }
-  }
-}, {
-  id: 13,
-  name: '天穂',
-  MAX_HP: 45,
-  HP: 45,
-  ATK: 18,
-  MGC: 18,
-  DF: 22,
-  SP: 32,
-  choice: {
-    rate: {
-      ATK: 50,
-      MGC: 10,
-      SP: 30,
-      OTHER: 10
-    }
-  }
-}, {
-  id: 17,
-  name: 'ベルナドット',
-  MAX_HP: 48,
-  HP: 48,
-  ATK: 14,
-  MGC: 22,
-  DF: 25,
-  SP: 12,
-  choice: {
-    rate: {
-      ATK: 30,
-      MGC: 10,
-      SP: 30,
-      OTHER: 30
-    }
-  }
-}, {
-  id: 14,
-  name: 'ネマーニャ',
-  MAX_HP: 42,
-  HP: 42,
-  ATK: 12,
-  MGC: 25,
-  DF: 25,
-  SP: 16,
-  choice: {
-    rate: {
-      ATK: 10,
-      MGC: 40,
-      SP: 20,
-      OTHER: 30
-    }
-  }
-}, {
-  id: 1,
-  name: 'カフ',
-  MAX_HP: 55,
-  HP: 55,
-  ATK: 16,
-  MGC: 10,
-  DF: 40,
-  SP: 15,
-  choice: {
-    rate: {
-      ATK: 10,
-      MGC: 40,
-      SP: 20,
-      OTHER: 30
-    }
-  }
-}];
-
-exports.default = Battle;
-
-/***/ }),
-/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19458,7 +19407,7 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -19648,7 +19597,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19659,7 +19608,7 @@ var settle = __webpack_require__(105);
 var buildURL = __webpack_require__(107);
 var parseHeaders = __webpack_require__(108);
 var isURLSameOrigin = __webpack_require__(109);
-var createError = __webpack_require__(54);
+var createError = __webpack_require__(53);
 var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(110);
 
 module.exports = function xhrAdapter(config) {
@@ -19833,10 +19782,10 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(52)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19861,7 +19810,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19873,7 +19822,7 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 56 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19899,6 +19848,57 @@ module.exports = Cancel;
 
 
 /***/ }),
+/* 56 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.random = random;
+exports.wrapText = wrapText;
+// 幅を指定するランダム関数
+function random() {
+  var min = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var max = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+
+  return Math.floor(Math.random() * (max + 1 - min)) + min;
+}
+
+/**
+ * @description
+ * `Text`クラスのインスタンス`textInstance`の`text`プロパティに、  
+ * `textInstance`の幅をはみ出さないように、自動で折り返した`text`を格納する。
+ * @param {Text} textInstance 自動で折り返した`text`を格納する`Text`クラスのインスタンス
+ * @param {string} text `textInstance.text`に格納する自動で折り返す文字列
+ */
+function wrapText(textInstance, text) {
+  var initWidth = textInstance.lineWidth;
+  var textArray = text.split('');
+  var i = -1;
+  var prevText = '';
+  var lines = [];
+
+  textInstance.text = '';
+
+  while (textArray[++i]) {
+    textInstance.text += textArray[i];
+    if (textInstance.getMeasuredWidth() > initWidth) {
+      lines.push(prevText);
+      textInstance.text = textArray[i];
+    }
+    prevText = textInstance.text;
+  }
+
+  lines.push(prevText);
+  textInstance.text = lines.join('\n');
+
+  return textInstance.text;
+}
+
+/***/ }),
 /* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19913,7 +19913,7 @@ var _router = __webpack_require__(64);
 
 var _router2 = _interopRequireDefault(_router);
 
-var _battle = __webpack_require__(50);
+var _battle = __webpack_require__(46);
 
 var _battle2 = _interopRequireDefault(_battle);
 
@@ -19946,11 +19946,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _classCallCheck2 = __webpack_require__(3);
+var _classCallCheck2 = __webpack_require__(4);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(4);
+var _createClass2 = __webpack_require__(5);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -20007,7 +20007,7 @@ module.exports = { "default": __webpack_require__(60), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(61);
-var $Object = __webpack_require__(5).Object;
+var $Object = __webpack_require__(3).Object;
 module.exports = function defineProperty(it, key, desc) {
   return $Object.defineProperty(it, key, desc);
 };
@@ -20026,7 +20026,7 @@ $export($export.S + $export.F * !__webpack_require__(10), 'Object', { defineProp
 /* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = !__webpack_require__(10) && !__webpack_require__(32)(function () {
+module.exports = !__webpack_require__(10) && !__webpack_require__(28)(function () {
   return Object.defineProperty(__webpack_require__(18)('div'), 'a', { get: function () { return 7; } }).a != 7;
 });
 
@@ -20064,15 +20064,15 @@ var _promise = __webpack_require__(13);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _classCallCheck2 = __webpack_require__(3);
+var _classCallCheck2 = __webpack_require__(4);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(4);
+var _createClass2 = __webpack_require__(5);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-var _battle = __webpack_require__(50);
+var _battle = __webpack_require__(46);
 
 var _battle2 = _interopRequireDefault(_battle);
 
@@ -20080,7 +20080,7 @@ var _map = __webpack_require__(123);
 
 var _map2 = _interopRequireDefault(_map);
 
-var _talk = __webpack_require__(124);
+var _talk = __webpack_require__(126);
 
 var _talk2 = _interopRequireDefault(_talk);
 
@@ -20152,12 +20152,12 @@ exports.default = router;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(66);
-__webpack_require__(33);
+__webpack_require__(29);
 __webpack_require__(78);
 __webpack_require__(82);
 __webpack_require__(89);
 __webpack_require__(90);
-module.exports = __webpack_require__(5).Promise;
+module.exports = __webpack_require__(3).Promise;
 
 
 /***/ }),
@@ -20223,7 +20223,7 @@ module.exports = function (Constructor, NAME, next) {
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
 var anObject = __webpack_require__(6);
 var dPs = __webpack_require__(71);
-var enumBugKeys = __webpack_require__(38);
+var enumBugKeys = __webpack_require__(34);
 var IE_PROTO = __webpack_require__(24)('IE_PROTO');
 var Empty = function () { /* empty */ };
 var PROTOTYPE = 'prototype';
@@ -20237,7 +20237,7 @@ var createDict = function () {
   var gt = '>';
   var iframeDocument;
   iframe.style.display = 'none';
-  __webpack_require__(39).appendChild(iframe);
+  __webpack_require__(35).appendChild(iframe);
   iframe.src = 'javascript:'; // eslint-disable-line no-script-url
   // createDict = iframe.contentWindow.Object;
   // html.removeChild(iframe);
@@ -20288,7 +20288,7 @@ module.exports = __webpack_require__(10) ? Object.defineProperties : function de
 
 // 19.1.2.14 / 15.2.3.14 Object.keys(O)
 var $keys = __webpack_require__(73);
-var enumBugKeys = __webpack_require__(38);
+var enumBugKeys = __webpack_require__(34);
 
 module.exports = Object.keys || function keys(O) {
   return $keys(O, enumBugKeys);
@@ -20378,7 +20378,7 @@ module.exports = function (index, length) {
 
 // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
 var has = __webpack_require__(16);
-var toObject = __webpack_require__(40);
+var toObject = __webpack_require__(36);
 var IE_PROTO = __webpack_require__(24)('IE_PROTO');
 var ObjectProto = Object.prototype;
 
@@ -20431,7 +20431,7 @@ var toIObject = __webpack_require__(22);
 // 22.1.3.13 Array.prototype.keys()
 // 22.1.3.29 Array.prototype.values()
 // 22.1.3.30 Array.prototype[@@iterator]()
-module.exports = __webpack_require__(34)(Array, 'Array', function (iterated, kind) {
+module.exports = __webpack_require__(30)(Array, 'Array', function (iterated, kind) {
   this._t = toIObject(iterated); // target
   this._i = 0;                   // next index
   this._k = kind;                // kind
@@ -20479,21 +20479,21 @@ module.exports = function (done, value) {
 
 "use strict";
 
-var LIBRARY = __webpack_require__(35);
+var LIBRARY = __webpack_require__(31);
 var global = __webpack_require__(1);
 var ctx = __webpack_require__(11);
-var classof = __webpack_require__(41);
+var classof = __webpack_require__(37);
 var $export = __webpack_require__(7);
 var isObject = __webpack_require__(12);
 var aFunction = __webpack_require__(15);
 var anInstance = __webpack_require__(83);
 var forOf = __webpack_require__(84);
-var speciesConstructor = __webpack_require__(45);
-var task = __webpack_require__(46).set;
+var speciesConstructor = __webpack_require__(41);
+var task = __webpack_require__(42).set;
 var microtask = __webpack_require__(86)();
 var newPromiseCapabilityModule = __webpack_require__(26);
-var perform = __webpack_require__(47);
-var promiseResolve = __webpack_require__(48);
+var perform = __webpack_require__(43);
+var promiseResolve = __webpack_require__(44);
 var PROMISE = 'Promise';
 var TypeError = global.TypeError;
 var process = global.process;
@@ -20696,7 +20696,7 @@ if (!USE_NATIVE) {
 $export($export.G + $export.W + $export.F * !USE_NATIVE, { Promise: $Promise });
 __webpack_require__(25)($Promise, PROMISE);
 __webpack_require__(88)(PROMISE);
-Wrapper = __webpack_require__(5)[PROMISE];
+Wrapper = __webpack_require__(3)[PROMISE];
 
 // statics
 $export($export.S + $export.F * !USE_NATIVE, PROMISE, {
@@ -20714,7 +20714,7 @@ $export($export.S + $export.F * (LIBRARY || !USE_NATIVE), PROMISE, {
     return promiseResolve(LIBRARY && this === Wrapper ? $Promise : this, x);
   }
 });
-$export($export.S + $export.F * !(USE_NATIVE && __webpack_require__(49)(function (iter) {
+$export($export.S + $export.F * !(USE_NATIVE && __webpack_require__(45)(function (iter) {
   $Promise.all(iter)['catch'](empty);
 })), PROMISE, {
   // 25.4.4.1 Promise.all(iterable)
@@ -20776,11 +20776,11 @@ module.exports = function (it, Constructor, name, forbiddenField) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var ctx = __webpack_require__(11);
-var call = __webpack_require__(42);
-var isArrayIter = __webpack_require__(43);
+var call = __webpack_require__(38);
+var isArrayIter = __webpack_require__(39);
 var anObject = __webpack_require__(6);
 var toLength = __webpack_require__(23);
-var getIterFn = __webpack_require__(44);
+var getIterFn = __webpack_require__(40);
 var BREAK = {};
 var RETURN = {};
 var exports = module.exports = function (iterable, entries, fn, that, ITERATOR) {
@@ -20829,7 +20829,7 @@ module.exports = function (fn, args, that) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
-var macrotask = __webpack_require__(46).set;
+var macrotask = __webpack_require__(42).set;
 var Observer = global.MutationObserver || global.WebKitMutationObserver;
 var process = global.process;
 var Promise = global.Promise;
@@ -20918,7 +20918,7 @@ module.exports = function (target, src, safe) {
 "use strict";
 
 var global = __webpack_require__(1);
-var core = __webpack_require__(5);
+var core = __webpack_require__(3);
 var dP = __webpack_require__(9);
 var DESCRIPTORS = __webpack_require__(10);
 var SPECIES = __webpack_require__(2)('species');
@@ -20940,10 +20940,10 @@ module.exports = function (KEY) {
 // https://github.com/tc39/proposal-promise-finally
 
 var $export = __webpack_require__(7);
-var core = __webpack_require__(5);
+var core = __webpack_require__(3);
 var global = __webpack_require__(1);
-var speciesConstructor = __webpack_require__(45);
-var promiseResolve = __webpack_require__(48);
+var speciesConstructor = __webpack_require__(41);
+var promiseResolve = __webpack_require__(44);
 
 $export($export.P + $export.R, 'Promise', { 'finally': function (onFinally) {
   var C = speciesConstructor(this, core.Promise || global.Promise);
@@ -20968,7 +20968,7 @@ $export($export.P + $export.R, 'Promise', { 'finally': function (onFinally) {
 // https://github.com/tc39/proposal-promise-try
 var $export = __webpack_require__(7);
 var newPromiseCapability = __webpack_require__(26);
-var perform = __webpack_require__(47);
+var perform = __webpack_require__(43);
 
 $export($export.S, 'Promise', { 'try': function (callbackfn) {
   var promiseCapability = newPromiseCapability.f(this);
@@ -21015,9 +21015,9 @@ module.exports = { "default": __webpack_require__(93), __esModule: true };
 /* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(33);
+__webpack_require__(29);
 __webpack_require__(94);
-module.exports = __webpack_require__(5).Array.from;
+module.exports = __webpack_require__(3).Array.from;
 
 
 /***/ }),
@@ -21028,14 +21028,14 @@ module.exports = __webpack_require__(5).Array.from;
 
 var ctx = __webpack_require__(11);
 var $export = __webpack_require__(7);
-var toObject = __webpack_require__(40);
-var call = __webpack_require__(42);
-var isArrayIter = __webpack_require__(43);
+var toObject = __webpack_require__(36);
+var call = __webpack_require__(38);
+var isArrayIter = __webpack_require__(39);
 var toLength = __webpack_require__(23);
 var createProperty = __webpack_require__(95);
-var getIterFn = __webpack_require__(44);
+var getIterFn = __webpack_require__(40);
 
-$export($export.S + $export.F * !__webpack_require__(49)(function (iter) { Array.from(iter); }), 'Array', {
+$export($export.S + $export.F * !__webpack_require__(45)(function (iter) { Array.from(iter); }), 'Array', {
   // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
   from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
     var O = toObject(arrayLike);
@@ -21918,9 +21918,9 @@ module.exports = __webpack_require__(101);
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(51);
+var bind = __webpack_require__(50);
 var Axios = __webpack_require__(103);
-var defaults = __webpack_require__(30);
+var defaults = __webpack_require__(27);
 
 /**
  * Create an instance of Axios
@@ -21953,9 +21953,9 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(56);
+axios.Cancel = __webpack_require__(55);
 axios.CancelToken = __webpack_require__(117);
-axios.isCancel = __webpack_require__(55);
+axios.isCancel = __webpack_require__(54);
 
 // Expose all/spread
 axios.all = function all(promises) {
@@ -22003,7 +22003,7 @@ function isSlowBuffer (obj) {
 "use strict";
 
 
-var defaults = __webpack_require__(30);
+var defaults = __webpack_require__(27);
 var utils = __webpack_require__(0);
 var InterceptorManager = __webpack_require__(112);
 var dispatchRequest = __webpack_require__(113);
@@ -22115,7 +22115,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 "use strict";
 
 
-var createError = __webpack_require__(54);
+var createError = __webpack_require__(53);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -22534,8 +22534,8 @@ module.exports = InterceptorManager;
 
 var utils = __webpack_require__(0);
 var transformData = __webpack_require__(114);
-var isCancel = __webpack_require__(55);
-var defaults = __webpack_require__(30);
+var isCancel = __webpack_require__(54);
+var defaults = __webpack_require__(27);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -22687,7 +22687,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 "use strict";
 
 
-var Cancel = __webpack_require__(56);
+var Cancel = __webpack_require__(55);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -22844,11 +22844,11 @@ var _promise = __webpack_require__(13);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _classCallCheck2 = __webpack_require__(3);
+var _classCallCheck2 = __webpack_require__(4);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(4);
+var _createClass2 = __webpack_require__(5);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -22954,11 +22954,11 @@ var _promise = __webpack_require__(13);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _classCallCheck2 = __webpack_require__(3);
+var _classCallCheck2 = __webpack_require__(4);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(4);
+var _createClass2 = __webpack_require__(5);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -23142,11 +23142,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _classCallCheck2 = __webpack_require__(3);
+var _classCallCheck2 = __webpack_require__(4);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(4);
+var _createClass2 = __webpack_require__(5);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -23204,27 +23204,27 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _regenerator = __webpack_require__(27);
+var _regenerator = __webpack_require__(47);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _asyncToGenerator2 = __webpack_require__(28);
+var _asyncToGenerator2 = __webpack_require__(48);
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
-var _classCallCheck2 = __webpack_require__(3);
+var _classCallCheck2 = __webpack_require__(4);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(4);
+var _createClass2 = __webpack_require__(5);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-var _lodash = __webpack_require__(29);
+var _lodash = __webpack_require__(49);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(56);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23544,7 +23544,9 @@ var Map = function () {
 exports.default = Map;
 
 /***/ }),
-/* 124 */
+/* 124 */,
+/* 125 */,
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23554,27 +23556,27 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _regenerator = __webpack_require__(27);
+var _regenerator = __webpack_require__(47);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _asyncToGenerator2 = __webpack_require__(28);
+var _asyncToGenerator2 = __webpack_require__(48);
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
-var _classCallCheck2 = __webpack_require__(3);
+var _classCallCheck2 = __webpack_require__(4);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(4);
+var _createClass2 = __webpack_require__(5);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-var _lodash = __webpack_require__(29);
+var _lodash = __webpack_require__(49);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(56);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

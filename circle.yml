@@ -1,9 +1,16 @@
-deployment:
-  production:
-    branch: master
-    commands:
-    - ./bin/deploy-ghpages.sh build
-
 test:
   override:
-    - exit 0
+    - true
+
+deployment:
+  publish:
+    branch: master
+    commands:
+      - npm run build
+      - git config --global user.name "circleci"
+      - git config --global user.email "circleci@chatbox-inc.com"
+      - git rm .gitignore
+      - git add public
+      - git commit -m "[ci skip] build on circle ci"
+      - git subtree split --branch gh-pages --prefix public
+      - git push origin gh-pages:gh-pages -f
