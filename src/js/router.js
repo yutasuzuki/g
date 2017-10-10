@@ -23,7 +23,7 @@ class Router {
     const fieldManifest = [
       {src: 'loadingBG.png', id: 'loadingBG'},
     ];
-    queue.loadManifest(fieldManifest, true, '/assets/images/loading/');
+    queue.loadManifest(fieldManifest, true, './assets/images/loading/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.load());
   }

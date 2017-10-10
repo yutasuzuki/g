@@ -1424,12 +1424,12 @@ var Battle = function () {
                 this.state.enemy.charactors = _context.sent;
                 enemyCharaManifest = this.createEnemyCharaManifest(this.state.enemy.charactors);
 
-                queue.loadManifest(commandManifest, true, '/assets/images/battle/command/');
-                queue.loadManifest(resultManifest, true, '/assets/images/battle/result/');
-                queue.loadManifest(fieldManifest, true, '/assets/images/field/');
-                queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
-                queue.loadManifest(enemyCharaManifest, true, '/assets/images/enemy/');
-                queue.loadManifest(magicManifest, true, '/assets/images/battle/effect/magic/');
+                queue.loadManifest(commandManifest, true, './assets/images/battle/command/');
+                queue.loadManifest(resultManifest, true, './assets/images/battle/result/');
+                queue.loadManifest(fieldManifest, true, './assets/images/field/');
+                queue.loadManifest(myCharaManifest, true, './assets/images/chara/');
+                queue.loadManifest(enemyCharaManifest, true, './assets/images/enemy/');
+                queue.loadManifest(magicManifest, true, './assets/images/battle/effect/magic/');
                 queue.addEventListener('fileload', function (e) {
                   return _this.loaders[e.item.id] = e.result;
                 });
@@ -2145,7 +2145,7 @@ function ayncGetChara(charactorsID) {
 
   return new _promise2.default(function (resolve, reject) {
     var charactors = charactorsID.map(function (value) {
-      return _axios2.default.get('/assets/data/enemy/' + value + '.json');
+      return _axios2.default.get('./assets/data/enemy/' + value + '.json');
     });
     _promise2.default.all(charactors).then(function (charas) {
       var c = charas.map(function (chara) {
@@ -20109,7 +20109,7 @@ var Router = function () {
     };
     var queue = new createjs.LoadQueue();
     var fieldManifest = [{ src: 'loadingBG.png', id: 'loadingBG' }];
-    queue.loadManifest(fieldManifest, true, '/assets/images/loading/');
+    queue.loadManifest(fieldManifest, true, './assets/images/loading/');
     queue.addEventListener('fileload', function (e) {
       return _this.loaders[e.item.id] = e.result;
     });
@@ -23263,8 +23263,8 @@ var Map = function () {
                 mapManifest = [{ src: 'btn_dice.png', id: 'btn_dice' }, { src: 'dice_bg.png', id: 'dice_bg' }, { src: 'square_0.png', id: 'square_0' }, { src: 'square_1.png', id: 'square_1' }, { src: 'square_2.png', id: 'square_2' }, { src: 'square_3.png', id: 'square_3' }];
                 walkManifest = [{ src: 'chara_8.png', id: 'walk' }];
 
-                queue.loadManifest(mapManifest, true, '/assets/images/map/');
-                queue.loadManifest(walkManifest, true, '/assets/images/map/sprite/walk/');
+                queue.loadManifest(mapManifest, true, './assets/images/map/');
+                queue.loadManifest(walkManifest, true, './assets/images/map/sprite/walk/');
                 queue.addEventListener('fileload', function (e) {
                   return _this.loaders[e.item.id] = e.result;
                 });
@@ -23665,7 +23665,7 @@ var Talk = function () {
                 queue = new createjs.LoadQueue();
                 charaManifest = [{ src: 'inn.jpg', id: 'inn' }, { src: 'castle.jpg', id: 'castle' }, { src: 'chara_8.png', id: 'main_chara' }, { src: 'king.png', id: 'king' }, { src: 'person_2.png', id: 'person' }];
 
-                queue.loadManifest(charaManifest, true, '/assets/images/talk/');
+                queue.loadManifest(charaManifest, true, './assets/images/talk/');
                 queue.addEventListener('fileload', function (e) {
                   return _this.loaders[e.item.id] = e.result;
                 });

@@ -45,8 +45,8 @@ class Map {
     const walkManifest = [
       {src: 'chara_8.png', id: 'walk'},
     ];
-    queue.loadManifest(mapManifest, true, '/assets/images/map/');
-    queue.loadManifest(walkManifest, true, '/assets/images/map/sprite/walk/');
+    queue.loadManifest(mapManifest, true, './assets/images/map/');
+    queue.loadManifest(walkManifest, true, './assets/images/map/sprite/walk/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.init());
   }
