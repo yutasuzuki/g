@@ -65,7 +65,7 @@ class Battle {
     const resultManifest = [
       {src: 'btn_back.png', id: 'btn_back'}
     ];
-    this.state.self.charactors = MY_CHARACTOR;
+    this.state.self.charactors = state.party;
     const myCharaManifest = this.createMainCharaManifest(this.state.self.charactors);
     this.state.enemy.charactors = await ayncGetChara(this.createEnemiesID());
     const enemyCharaManifest = this.createEnemyCharaManifest(this.state.enemy.charactors);
@@ -98,6 +98,7 @@ class Battle {
   }
 
   init() {
+    this.container = new createjs.Container();
     this.field = this.setField();
     this.commands = this.setCommands();
     this.myCharactors = this.setCharactors(this.state.self.charactors);
@@ -105,7 +106,8 @@ class Battle {
     this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.addEventListener('tick', stage);
-    stage.addChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
+    this.container.addChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
+    stage.addChild(this.container);
     stage.update();
     this.turn();
   }
@@ -172,7 +174,6 @@ class Battle {
     defender.cache(0, 0, 200, 200);
     stage.setChildIndex(attcker, -1);
     stage.setChildIndex(defender, -1);
-    stage.addChild(attcker, defender);
     stage.update();
   }
 
@@ -391,7 +392,8 @@ class Battle {
     })
 
     result.addChild(bg, btnBack);
-    stage.addChild(result);
+    this.container.addChild(result);
+    stage.addChild(this.container);
     stage.update();
   }
 
@@ -604,7 +606,7 @@ class Battle {
   }
 
   destroy() {
-    stage.removeChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
+    stage.removeChild(this.container);
   }
 }
 
@@ -666,98 +668,5 @@ function ayncGetChara(charactorsID) {
     })
   });
 }
-
-const MY_CHARACTOR = [
-  {
-    id: 8,
-    name: 'ルシェ',
-    MAX_HP: 50,
-    HP: 50,
-    ATK: 20,
-    MGC: 30,
-    DF: 25,
-    SP: 20,
-    choice: {
-      rate: {
-        ATK: 20,
-        MGC: 50,
-        SP: 40,
-        OTHER: 10
-      }
-    }
-  },
-  {
-    id: 13,
-    name: '天穂',
-    MAX_HP: 45,
-    HP: 45,
-    ATK: 18,
-    MGC: 18,
-    DF: 22,
-    SP: 32,
-    choice: {
-      rate: {
-        ATK: 50,
-        MGC: 10,
-        SP: 30,
-        OTHER: 10
-      }
-    }
-  },
-  {
-    id: 17,
-    name: 'ベルナドット',
-    MAX_HP: 48,
-    HP: 48,
-    ATK: 14,
-    MGC: 22,
-    DF: 25,
-    SP: 12,
-    choice: {
-      rate: {
-        ATK: 30,
-        MGC: 10,
-        SP: 30,
-        OTHER: 30
-      }
-    }
-  },
-  {
-    id: 14,
-    name: 'ネマーニャ',
-    MAX_HP: 42,
-    HP: 42,
-    ATK: 12,
-    MGC: 25,
-    DF: 25,
-    SP: 16,
-    choice: {
-      rate: {
-        ATK: 10,
-        MGC: 40,
-        SP: 20,
-        OTHER: 30
-      }
-    }
-  },
-  {
-    id: 1,
-    name: 'カフ',
-    MAX_HP: 55,
-    HP: 55,
-    ATK: 16,
-    MGC: 10,
-    DF: 40,
-    SP: 15,
-    choice: {
-      rate: {
-        ATK: 10,
-        MGC: 40,
-        SP: 20,
-        OTHER: 30
-      }
-    }
-  }
-]
 
 export default Battle;

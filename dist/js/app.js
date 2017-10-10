@@ -1415,7 +1415,7 @@ var Battle = function () {
                 magicManifest = [{ src: 'air.png', id: 'air' }, { src: 'reflect.png', id: 'reflect' }];
                 resultManifest = [{ src: 'btn_back.png', id: 'btn_back' }];
 
-                this.state.self.charactors = MY_CHARACTOR;
+                this.state.self.charactors = state.party;
                 myCharaManifest = this.createMainCharaManifest(this.state.self.charactors);
                 _context.next = 9;
                 return ayncGetChara(this.createEnemiesID());
@@ -1474,8 +1474,9 @@ var Battle = function () {
   }, {
     key: 'init',
     value: function init() {
-      var _stage;
+      var _container;
 
+      this.container = new createjs.Container();
       this.field = this.setField();
       this.commands = this.setCommands();
       this.myCharactors = this.setCharactors(this.state.self.charactors);
@@ -1483,7 +1484,8 @@ var Battle = function () {
       this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
       createjs.Ticker.timingMode = createjs.Ticker.RAF;
       createjs.Ticker.addEventListener('tick', stage);
-      (_stage = stage).addChild.apply(_stage, [this.field, this.commands.attack, this.commands.defense].concat((0, _toConsumableArray3.default)(this.myCharactors), (0, _toConsumableArray3.default)(this.enemyCharactors)));
+      (_container = this.container).addChild.apply(_container, [this.field, this.commands.attack, this.commands.defense].concat((0, _toConsumableArray3.default)(this.myCharactors), (0, _toConsumableArray3.default)(this.enemyCharactors)));
+      stage.addChild(this.container);
       stage.update();
       this.turn();
     }
@@ -1554,7 +1556,6 @@ var Battle = function () {
       defender.cache(0, 0, 200, 200);
       stage.setChildIndex(attcker, -1);
       stage.setChildIndex(defender, -1);
-      stage.addChild(attcker, defender);
       stage.update();
     }
   }, {
@@ -1836,7 +1837,8 @@ var Battle = function () {
       });
 
       result.addChild(bg, btnBack);
-      stage.addChild(result);
+      this.container.addChild(result);
+      stage.addChild(this.container);
       stage.update();
     }
   }, {
@@ -2074,9 +2076,7 @@ var Battle = function () {
   }, {
     key: 'destroy',
     value: function destroy() {
-      var _stage2;
-
-      (_stage2 = stage).removeChild.apply(_stage2, [this.field, this.commands.attack, this.commands.defense].concat((0, _toConsumableArray3.default)(this.myCharactors), (0, _toConsumableArray3.default)(this.enemyCharactors)));
+      stage.removeChild(this.container);
     }
   }]);
   return Battle;
@@ -2155,93 +2155,6 @@ function ayncGetChara(charactorsID) {
     });
   });
 }
-
-var MY_CHARACTOR = [{
-  id: 8,
-  name: 'ルシェ',
-  MAX_HP: 50,
-  HP: 50,
-  ATK: 20,
-  MGC: 30,
-  DF: 25,
-  SP: 20,
-  choice: {
-    rate: {
-      ATK: 20,
-      MGC: 50,
-      SP: 40,
-      OTHER: 10
-    }
-  }
-}, {
-  id: 13,
-  name: '天穂',
-  MAX_HP: 45,
-  HP: 45,
-  ATK: 18,
-  MGC: 18,
-  DF: 22,
-  SP: 32,
-  choice: {
-    rate: {
-      ATK: 50,
-      MGC: 10,
-      SP: 30,
-      OTHER: 10
-    }
-  }
-}, {
-  id: 17,
-  name: 'ベルナドット',
-  MAX_HP: 48,
-  HP: 48,
-  ATK: 14,
-  MGC: 22,
-  DF: 25,
-  SP: 12,
-  choice: {
-    rate: {
-      ATK: 30,
-      MGC: 10,
-      SP: 30,
-      OTHER: 30
-    }
-  }
-}, {
-  id: 14,
-  name: 'ネマーニャ',
-  MAX_HP: 42,
-  HP: 42,
-  ATK: 12,
-  MGC: 25,
-  DF: 25,
-  SP: 16,
-  choice: {
-    rate: {
-      ATK: 10,
-      MGC: 40,
-      SP: 20,
-      OTHER: 30
-    }
-  }
-}, {
-  id: 1,
-  name: 'カフ',
-  MAX_HP: 55,
-  HP: 55,
-  ATK: 16,
-  MGC: 10,
-  DF: 40,
-  SP: 15,
-  choice: {
-    rate: {
-      ATK: 10,
-      MGC: 40,
-      SP: 20,
-      OTHER: 30
-    }
-  }
-}];
 
 exports.default = Battle;
 
@@ -19919,10 +19832,98 @@ var _battle2 = _interopRequireDefault(_battle);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var MyParty = [{
+  id: 8,
+  name: 'ルシェ',
+  MAX_HP: 50,
+  HP: 50,
+  ATK: 20,
+  MGC: 30,
+  DF: 25,
+  SP: 20,
+  choice: {
+    rate: {
+      ATK: 20,
+      MGC: 50,
+      SP: 40,
+      OTHER: 10
+    }
+  }
+}, {
+  id: 13,
+  name: '天穂',
+  MAX_HP: 45,
+  HP: 45,
+  ATK: 18,
+  MGC: 18,
+  DF: 22,
+  SP: 32,
+  choice: {
+    rate: {
+      ATK: 50,
+      MGC: 10,
+      SP: 30,
+      OTHER: 10
+    }
+  }
+}, {
+  id: 17,
+  name: 'ベルナドット',
+  MAX_HP: 48,
+  HP: 48,
+  ATK: 14,
+  MGC: 22,
+  DF: 25,
+  SP: 12,
+  choice: {
+    rate: {
+      ATK: 30,
+      MGC: 10,
+      SP: 30,
+      OTHER: 30
+    }
+  }
+}, {
+  id: 14,
+  name: 'ネマーニャ',
+  MAX_HP: 42,
+  HP: 42,
+  ATK: 12,
+  MGC: 25,
+  DF: 25,
+  SP: 16,
+  choice: {
+    rate: {
+      ATK: 10,
+      MGC: 40,
+      SP: 20,
+      OTHER: 30
+    }
+  }
+}, {
+  id: 1,
+  name: 'カフ',
+  MAX_HP: 55,
+  HP: 55,
+  ATK: 16,
+  MGC: 10,
+  DF: 40,
+  SP: 15,
+  choice: {
+    rate: {
+      ATK: 10,
+      MGC: 40,
+      SP: 20,
+      OTHER: 30
+    }
+  }
+}];
+
 window.stage = new _stage2.default('content');
 createjs.Touch.enable(stage);
 window.route = _router2.default;
 window.state = {
+  party: MyParty,
   map: {
     currentType: 3,
     piece: {
@@ -23581,7 +23582,6 @@ var _util = __webpack_require__(56);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var talkscript = [];
 var castleTalk = [{
   type: 2,
   name: '王様',
@@ -23642,6 +23642,7 @@ var Talk = function () {
   function Talk(type) {
     (0, _classCallCheck3.default)(this, Talk);
 
+    this.container = {};
     this.loaders = [];
     this.talk = {
       current: 0,
@@ -23649,7 +23650,7 @@ var Talk = function () {
       name: {},
       text: {}
     };
-    console.log(state);
+    this.talkscript = [];
   }
 
   (0, _createClass3.default)(Talk, [{
@@ -23691,15 +23692,16 @@ var Talk = function () {
   }, {
     key: 'init',
     value: function init() {
+      this.container = new createjs.Container();
       this.mainChara = this.setMainCharactor('main_chara');
       if (state.map.currentType === 2) {
         this.background = this.setBackground('inn');
         this.otherChara = this.setOtherCharactor('person');
-        talkscript = innTalk;
+        this.talkscript = innTalk;
       } else if (state.map.currentType === 3) {
         this.background = this.setBackground('castle');
         this.otherChara = this.setOtherCharactor('king');
-        talkscript = castleTalk;
+        this.talkscript = castleTalk;
       }
       this.comment = this.setCommentBox();
 
@@ -23708,7 +23710,9 @@ var Talk = function () {
       this.otherChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
       this.otherChara.cache(0, 0, 960, 960);
 
-      stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
+      this.container.addChild(this.background, this.otherChara, this.mainChara, this.comment);
+
+      stage.addChild(this.container);
       stage.update();
     }
   }, {
@@ -23772,7 +23776,7 @@ var Talk = function () {
       this.talk.text.y = 60;
 
       bg.addEventListener('click', function () {
-        var item = talkscript[_this2.talk.current];
+        var item = _this2.talkscript[_this2.talk.current];
         if (item) {
           if (item.type === 0) {
             _this2.mainChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
@@ -23811,7 +23815,7 @@ var Talk = function () {
   }, {
     key: 'destroy',
     value: function destroy() {
-      stage.removeChild(this.background, this.otherChara, this.mainChara, this.comment);
+      stage.removeChild(this.container);
       stage.update();
     }
   }]);

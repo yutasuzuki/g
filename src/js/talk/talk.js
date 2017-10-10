@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { random, wrapText } from '../util';
 
-let talkscript = [];
 const castleTalk = [
   {
     type: 2,
@@ -76,6 +75,7 @@ const innTalk = [
 
 class Talk {
   constructor(type) {
+    this.container = {};
     this.loaders = [];
     this.talk = {
       current: 0,
@@ -83,7 +83,7 @@ class Talk {
       name: {},
       text: {}
     }
-    console.log(state)
+    this.talkscript = [];
   }
 
   async start() {
@@ -101,15 +101,16 @@ class Talk {
   }
 
   init() {
+    this.container = new createjs.Container();
     this.mainChara = this.setMainCharactor('main_chara');
     if (state.map.currentType === 2) {
       this.background = this.setBackground('inn');
       this.otherChara = this.setOtherCharactor('person');
-      talkscript = innTalk;
+      this.talkscript = innTalk;
     } else if (state.map.currentType === 3) {
       this.background = this.setBackground('castle');
       this.otherChara = this.setOtherCharactor('king');
-      talkscript = castleTalk;
+      this.talkscript = castleTalk;
     }
     this.comment = this.setCommentBox();
 
@@ -122,7 +123,9 @@ class Talk {
     ];
     this.otherChara.cache(0, 0, 960, 960);
 
-    stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
+    this.container.addChild(this.background, this.otherChara, this.mainChara, this.comment)
+
+    stage.addChild(this.container);
     stage.update();
   }
 
@@ -180,7 +183,7 @@ class Talk {
     this.talk.text.y = 60;
 
     bg.addEventListener('click', () => {
-      const item = talkscript[this.talk.current];
+      const item = this.talkscript[this.talk.current];
       if (item) {
         if (item.type === 0) {
           this.mainChara.filters = [
@@ -226,7 +229,7 @@ class Talk {
   }
 
   destroy() {
-    stage.removeChild(this.background, this.otherChara, this.mainChara, this.comment);
+    stage.removeChild(this.container);
     stage.update();
   }
 }
