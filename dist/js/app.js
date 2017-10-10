@@ -23642,7 +23642,6 @@ var Talk = function () {
   function Talk(type) {
     (0, _classCallCheck3.default)(this, Talk);
 
-    this.container = {};
     this.loaders = [];
     this.talk = {
       current: 0,
@@ -23692,7 +23691,6 @@ var Talk = function () {
   }, {
     key: 'init',
     value: function init() {
-      this.container = new createjs.Container();
       this.mainChara = this.setMainCharactor('main_chara');
       if (state.map.currentType === 2) {
         this.background = this.setBackground('inn');
@@ -23710,9 +23708,7 @@ var Talk = function () {
       this.otherChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
       this.otherChara.cache(0, 0, 960, 960);
 
-      this.container.addChild(this.background, this.otherChara, this.mainChara, this.comment);
-
-      stage.addChild(this.container);
+      stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
       stage.update();
     }
   }, {
@@ -23815,7 +23811,7 @@ var Talk = function () {
   }, {
     key: 'destroy',
     value: function destroy() {
-      stage.removeChild(this.container);
+      stage.removeChild(this.background, this.otherChara, this.mainChara, this.comment);
       stage.update();
     }
   }]);

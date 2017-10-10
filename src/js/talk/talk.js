@@ -75,7 +75,6 @@ const innTalk = [
 
 class Talk {
   constructor(type) {
-    this.container = {};
     this.loaders = [];
     this.talk = {
       current: 0,
@@ -101,7 +100,6 @@ class Talk {
   }
 
   init() {
-    this.container = new createjs.Container();
     this.mainChara = this.setMainCharactor('main_chara');
     if (state.map.currentType === 2) {
       this.background = this.setBackground('inn');
@@ -123,9 +121,7 @@ class Talk {
     ];
     this.otherChara.cache(0, 0, 960, 960);
 
-    this.container.addChild(this.background, this.otherChara, this.mainChara, this.comment)
-
-    stage.addChild(this.container);
+    stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
     stage.update();
   }
 
@@ -229,7 +225,7 @@ class Talk {
   }
 
   destroy() {
-    stage.removeChild(this.container);
+    stage.removeChild(this.background, this.otherChara, this.mainChara, this.comment);
     stage.update();
   }
 }
