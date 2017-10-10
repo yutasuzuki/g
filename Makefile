@@ -4,6 +4,7 @@ push:
 	git push origin master
 
 deploy:
+	git fetch && \
 	git checkout master && \
 	git pull origin master && \
 	git push origin master && \
