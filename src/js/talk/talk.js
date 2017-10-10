@@ -95,7 +95,7 @@ class Talk {
       {src: 'king.png', id: 'king'},
       {src: 'person_2.png', id: 'person'},
     ];
-    queue.loadManifest(charaManifest, true, '/assets/images/talk/');
+    queue.loadManifest(charaManifest, true, './assets/images/talk/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.init());
   }

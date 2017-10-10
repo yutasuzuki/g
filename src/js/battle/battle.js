@@ -69,12 +69,12 @@ class Battle {
     const myCharaManifest = this.createMainCharaManifest(this.state.self.charactors);
     this.state.enemy.charactors = await ayncGetChara(this.createEnemiesID());
     const enemyCharaManifest = this.createEnemyCharaManifest(this.state.enemy.charactors);
-    queue.loadManifest(commandManifest, true, '/assets/images/battle/command/');
-    queue.loadManifest(resultManifest, true, '/assets/images/battle/result/');
-    queue.loadManifest(fieldManifest, true, '/assets/images/field/');
-    queue.loadManifest(myCharaManifest, true, '/assets/images/chara/');
-    queue.loadManifest(enemyCharaManifest, true, '/assets/images/enemy/');
-    queue.loadManifest(magicManifest, true, '/assets/images/battle/effect/magic/')
+    queue.loadManifest(commandManifest, true, './assets/images/battle/command/');
+    queue.loadManifest(resultManifest, true, './assets/images/battle/result/');
+    queue.loadManifest(fieldManifest, true, './assets/images/field/');
+    queue.loadManifest(myCharaManifest, true, './assets/images/chara/');
+    queue.loadManifest(enemyCharaManifest, true, './assets/images/enemy/');
+    queue.loadManifest(magicManifest, true, './assets/images/battle/effect/magic/')
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.init());
   }
@@ -658,7 +658,7 @@ function ayncGetChara(charactorsID) {
 
   return new Promise((resolve, reject) => {
     let charactors = charactorsID.map((value) => {
-      return axios.get(`/assets/data/enemy/${value}.json`);
+      return axios.get(`./assets/data/enemy/${value}.json`);
     });
     Promise.all(charactors).then((charas) => {
       const c = charas.map(chara => chara.data);
