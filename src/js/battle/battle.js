@@ -159,20 +159,20 @@ class Battle {
     }
   }
 
-  setCurrentMark(attcker, defenser) {
+  setCurrentMark(attcker, defender) {
     this.resetCurrentMark();
-    if (!attcker || !defenser) return
+    if (!attcker || !defender) return
     attcker.filters = [
       new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 90, 90, 90, 0)
     ];
     attcker.cache(0, 0, 200, 200);
-    defenser.filters = [
+    defender.filters = [
       new createjs.ColorFilter(0.7, 0.7, 0.7, 1, 60, 60, 0, 0)
     ];
-    defenser.cache(0, 0, 200, 200);
+    defender.cache(0, 0, 200, 200);
     stage.setChildIndex(attcker, -1);
-    stage.setChildIndex(defenser, -1);
-    stage.addChild(attcker, defenser);
+    stage.setChildIndex(defender, -1);
+    stage.addChild(attcker, defender);
     stage.update();
   }
 
