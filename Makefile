@@ -12,4 +12,5 @@ deploy:
 	git merge master && \
 	git add --all && \
 	git commit -m "deploy" --allow-empty && \
-	git push origin gh-pages
+	git push origin gh-pages  && \
+	git checkout master
