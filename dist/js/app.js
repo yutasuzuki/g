@@ -23358,7 +23358,7 @@ var Map = function () {
     key: 'setCharaSprite',
     value: function setCharaSprite() {
       var data = {
-        images: ['/assets/images/map/sprite/walk/chara_8.png'],
+        images: ['./assets/images/map/sprite/walk/chara_8.png'],
         frames: { width: 160, height: 160, regX: 0, regY: 0, scaleX: 0.5, scaleY: 0.5 },
         animations: {
           walk: {
