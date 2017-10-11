@@ -173,8 +173,9 @@ class Map {
 
   setSquare() {
     const charactor = this.setCharaSprite();
-
     const squares = new createjs.Container();
+    let isSquareEneble = true;
+
     const length = MapPosition.length;
     for (let i = 0; i < length; i++) {
       const item = MapPosition[i];
@@ -192,6 +193,8 @@ class Map {
         };
         if (square.type) {
           square.addEventListener('click', (obj) => {
+            if (!isSquareEneble) return;
+            isSquareEneble = false;
             const posDiffX = obj.target.pos.x - state.map.piece.pos.x;
             const posDiffY = obj.target.pos.y - state.map.piece.pos.y;
             const posDiff = Math.abs(posDiffX) + Math.abs(posDiffY);
