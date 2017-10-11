@@ -20095,6 +20095,9 @@ var Router = function () {
     (0, _classCallCheck3.default)(this, Router);
 
     this.loaders = [];
+    this.loading = {
+      circles: []
+    };
     this.config = {
       battle: {
         name: 'battle',
@@ -20134,6 +20137,42 @@ var Router = function () {
   }, {
     key: 'to',
     value: function to(scene) {
+      var circleSetting = {
+        width: 10,
+        x: 40,
+        y: 40
+      };
+      var screenWidth = window.innerWidth;
+      var screenHeight = window.innerHeight;
+      // while (false) {
+      // setTimeout(() => {
+      //   var circle = new createjs.Shape();
+
+      //   circle.graphics.beginFill('DeepSkyBlue').drawCircle(0,0, circleSetting.width);
+      //   circle.x = circleSetting.x;
+      //   circle.y = circleSetting.y;
+      //   circle.alpha = 0;
+
+      //   stage.addChild(circle);
+      //   var filter = new createjs.ColorFilter(1, 1, 1, 1); 
+      //   circle.filters = [filter];
+      //   circle.cache(-20, -20, 40, 40);
+
+      //   createjs.Ticker.setFPS(60);
+      //   createjs.Ticker.addEventListener("tick", function(event){
+      //     circle.updateCache();
+      //     stage.update(event);
+      //   });
+
+      //   createjs.Tween.get(filter, { loop: false })
+      //     .to({}, 500)
+      //     .to({redMultiplier: 1, greenMultiplier: 1, blueMultiplier: 1, alphaMultiplier: 1, redOffset: 255, greenOffset: 255, blueOffset: 255, alphaOffset: 1 }, 500);
+
+      //   createjs.Tween.get(circle)
+      //     .to({alpha: 1}, 500)
+      //     .to({ scaleX: 40, scaleY: 40 }, 500);
+      // }, 500);
+      // }
 
       var route = new this.config[scene].component();
       route.start();
