@@ -209,7 +209,7 @@ class Map {
                 }, 400)
                 .call(() => {
                   charactor.stop();
-                  isSquareEneble = true;;
+                  isSquareEneble = true;
                   if (!this.dice.count) {
                     console.log(obj.target.type);
                     state.map.currentType = obj.target.type;
@@ -252,6 +252,7 @@ class Map {
               this.diceText.text = this.dice.count;
               stage.update();
             } else {
+              isSquareEneble = true;
               console.log('そこは進めません');
             }
           });
