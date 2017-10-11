@@ -209,6 +209,7 @@ class Map {
                 }, 400)
                 .call(() => {
                   charactor.stop();
+                  isSquareEneble = true;;
                   if (!this.dice.count) {
                     console.log(obj.target.type);
                     state.map.currentType = obj.target.type;

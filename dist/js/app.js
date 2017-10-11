@@ -23422,8 +23422,9 @@ var Map = function () {
       var _this4 = this;
 
       var charactor = this.setCharaSprite();
-
       var squares = new createjs.Container();
+      var isSquareEneble = true;
+
       var length = MapPosition.length;
       for (var i = 0; i < length; i++) {
         var item = MapPosition[i];
@@ -23441,6 +23442,8 @@ var Map = function () {
           };
           if (square.type) {
             square.addEventListener('click', function (obj) {
+              if (!isSquareEneble) return;
+              isSquareEneble = false;
               var posDiffX = obj.target.pos.x - state.map.piece.pos.x;
               var posDiffY = obj.target.pos.y - state.map.piece.pos.y;
               var posDiff = Math.abs(posDiffX) + Math.abs(posDiffY);
@@ -23453,6 +23456,7 @@ var Map = function () {
                   y: obj.target.y
                 }, 400).call(function () {
                   charactor.stop();
+                  isSquareEneble = true;;
                   if (!_this4.dice.count) {
                     console.log(obj.target.type);
                     state.map.currentType = obj.target.type;
