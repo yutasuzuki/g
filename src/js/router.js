@@ -1,6 +1,7 @@
 import battle from './battle/battle';
 import map from './map/map';
 import talk from './talk/talk';
+import party from './party/party';
 
 class Router {
   constructor() {
@@ -20,6 +21,10 @@ class Router {
       talk: {
         name: 'talk',
         component: talk
+      },
+      party: {
+        name: 'party',
+        component: party
       },
     }
     const queue = new createjs.LoadQueue();

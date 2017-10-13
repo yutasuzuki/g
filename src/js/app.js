@@ -111,4 +111,4 @@ window.state = {
   }
 };
 
-route.to('talk');
+route.to('party');
