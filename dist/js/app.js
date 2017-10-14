@@ -23641,61 +23641,67 @@ var _util = __webpack_require__(56);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var castleTalk = [{
-  type: 2,
-  name: '王様',
-  text: 'よく参られた！'
-}, {
-  type: 1,
-  name: 'ルシェ',
-  text: 'こんにちは'
-}, {
-  type: 2,
-  name: '王様',
-  text: '今回は城の周りをモンスターをよくぞ討伐してくれた'
-}, {
-  type: 2,
-  name: '王様',
-  text: '後ほど褒美を取らせよう！'
-}, {
-  type: 1,
-  name: 'ルシェ',
-  text: 'こちらの口座に振り込んでください'
-}, {
-  type: 0,
-  name: '',
-  text: 'ルシェはカバンから通帳を取り出した'
-}];
+var castleTalk = {
+  talk: [{
+    type: 2,
+    name: '王様',
+    text: 'よく参られた！'
+  }, {
+    type: 1,
+    name: 'ルシェ',
+    text: 'こんにちは'
+  }, {
+    type: 2,
+    name: '王様',
+    text: '今回は城の周りをモンスターをよくぞ討伐してくれた'
+  }, {
+    type: 2,
+    name: '王様',
+    text: '後ほど褒美を取らせよう！'
+  }, {
+    type: 1,
+    name: 'ルシェ',
+    text: 'こちらの口座に振り込んでください'
+  }, {
+    type: 0,
+    name: '',
+    text: 'ルシェはカバンから通帳を取り出した'
+  }],
+  next: 'home'
+};
 
-var innTalk = [{
-  type: 1,
-  name: 'ルシェ',
-  text: 'こんにちは'
-}, {
-  type: 2,
-  name: '宿屋',
-  text: 'いらっしゃいませ！'
-}, {
-  type: 2,
-  name: '宿屋',
-  text: '宿屋へようこそ！'
-}, {
-  type: 0,
-  name: '',
-  text: '（沈黙）'
-}, {
-  type: 1,
-  name: 'ルシェ',
-  text: '今日泊まりたいのだけれども・・・'
-}, {
-  type: 2,
-  name: '宿屋',
-  text: 'お好きな部屋をお使いください！'
-}, {
-  type: 1,
-  name: 'ルシェ',
-  text: 'ありがとう'
-}];
+var innTalk = {
+  talk: [{
+    type: 1,
+    name: 'ルシェ',
+    text: 'こんにちは'
+  }, {
+    type: 2,
+    name: '宿屋',
+    text: 'いらっしゃいませ！'
+  }, {
+    type: 2,
+    name: '宿屋',
+    text: '宿屋へようこそ！'
+  }, {
+    type: 0,
+    name: '',
+    text: '（沈黙）'
+  }, {
+    type: 1,
+    name: 'ルシェ',
+    text: '今日泊まりたいのだけれども・・・'
+  }, {
+    type: 2,
+    name: '宿屋',
+    text: 'お好きな部屋をお使いください！'
+  }, {
+    type: 1,
+    name: 'ルシェ',
+    text: 'ありがとう'
+  }],
+  next: 'map'
+};
 
 var Talk = function () {
   function Talk(type) {
@@ -23833,7 +23839,7 @@ var Talk = function () {
       this.talk.text.y = 60;
 
       bg.addEventListener('click', function () {
-        var item = _this2.talkscript[_this2.talk.current];
+        var item = _this2.talkscript.talk[_this2.talk.current];
         if (item) {
           if (item.type === 0) {
             _this2.mainChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
@@ -23861,7 +23867,7 @@ var Talk = function () {
           stage.update();
           _this2.talk.current++;
         } else {
-          route.to('map');
+          route.to(_this2.talkscript.next);
           _this2.destroy();
         }
       });
@@ -23921,6 +23927,7 @@ var Party = function () {
     (0, _classCallCheck3.default)(this, Party);
 
     this.loaders = [];
+    this.members = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
   }
 
   (0, _createClass3.default)(Party, [{
@@ -23929,15 +23936,16 @@ var Party = function () {
       var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
         var _this = this;
 
-        var queue, walkManifest;
+        var queue, myCharaManifest, memberManifest;
         return _regenerator2.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 queue = new createjs.LoadQueue();
-                walkManifest = [{ src: 'chara_8.png', id: 'walk' }];
+                myCharaManifest = [{ src: 'chara_8.png', id: 'chara_8' }];
+                memberManifest = this.createMemberManifest();
 
-                queue.loadManifest(walkManifest, true, './assets/images/map/sprite/walk/');
+                queue.loadManifest(memberManifest, true, './assets/images/chara/deformer/');
                 queue.addEventListener('fileload', function (e) {
                   return _this.loaders[e.item.id] = e.result;
                 });
@@ -23945,7 +23953,7 @@ var Party = function () {
                   return _this.init();
                 });
 
-              case 5:
+              case 6:
               case 'end':
                 return _context.stop();
             }
@@ -23963,11 +23971,22 @@ var Party = function () {
     key: 'init',
     value: function init() {
       var container = new createjs.Container();
-      var sprite = this.setBitmap('walk');
+      var sprite = this.setBitmap('chara_8');
+      var charaContainer = this.setMember();
 
-      container.addChild(sprite);
+      container.addChild(sprite, charaContainer);
       stage.addChild(container);
       stage.update();
+    }
+  }, {
+    key: 'createMemberManifest',
+    value: function createMemberManifest() {
+      return this.members.map(function (id) {
+        return {
+          src: 'chara_' + id + '.png',
+          id: 'chara_' + id
+        };
+      });
     }
   }, {
     key: 'setBitmap',
@@ -23980,14 +23999,39 @@ var Party = function () {
       return chara;
     }
   }, {
-    key: 'setField',
-    value: function setField() {
-      var field = new createjs.Bitmap(this.loaders['field']);
-      field.skewX = field.width / 2;
-      field.skewY = field.height / 2;
-      field.scaleX = 2;
-      field.scaleY = 2;
-      return field;
+    key: 'setMember',
+    value: function setMember() {
+      var _this2 = this;
+
+      var COLUMN_COUNT = 6;
+      var charactorsContainer = new createjs.Container();
+      var length = this.members.length;
+      var lengthY = Math.ceil(length / COLUMN_COUNT);
+
+      var i = 0;
+      var t = 0;
+      this.members.forEach(function (id) {
+        var charactorContainer = new createjs.Container();
+        var charactor = new createjs.Bitmap(_this2.loaders['chara_' + id]);
+        charactor.scaleX = window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
+        charactor.scaleY = window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
+        charactor.x = i * charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
+        charactor.y = t * charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
+
+        charactorContainer.addChild(charactor);
+        charactorsContainer.addChild(charactorContainer);
+
+        if (i < COLUMN_COUNT - 1) {
+          i++;
+        } else {
+          i = 0;
+          t++;
+        }
+      });
+
+      charactorsContainer.y = 200;
+
+      return charactorsContainer;
     }
   }, {
     key: 'destroy',
@@ -24085,11 +24129,11 @@ var Home = function () {
     key: 'init',
     value: function init() {
       ;
+      this.container = new createjs.Container();
       var bg = this.setBackground('bg');
       var mainCharactor = this.setMainCharactor('main_chara');
       this.header = this.setHeader();
       this.footer = this.setFooter();
-      this.container = new createjs.Container();
       this.container.addChild(bg, mainCharactor);
       this.container.y = -100;
       stage.addChild(this.container, this.header, this.footer);
@@ -24138,6 +24182,10 @@ var Home = function () {
       var btnParty = new createjs.Bitmap(this.loaders['btn_party']);
       btnParty.x = window.innerWidth / 2;
       btnParty.y = 10;
+      btnParty.addEventListener('click', function () {
+        route.to('party');
+        _this2.destroy();
+      });
 
       container.addChild(btnQuest, btnParty);
       return container;

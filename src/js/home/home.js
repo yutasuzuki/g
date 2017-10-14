@@ -24,11 +24,11 @@ class Home {
   }
 
   init() {;
+    this.container = new createjs.Container();
     const bg = this.setBackground('bg');
     const mainCharactor = this.setMainCharactor('main_chara');
     this.header = this.setHeader();
     this.footer = this.setFooter();
-    this.container = new createjs.Container();
     this.container.addChild(bg, mainCharactor);
     this.container.y = - 100;
     stage.addChild(this.container, this.header, this.footer);
@@ -72,6 +72,10 @@ class Home {
     const btnParty = new createjs.Bitmap(this.loaders['btn_party']);
     btnParty.x = window.innerWidth / 2;
     btnParty.y = 10;
+    btnParty.addEventListener('click', () => {
+      route.to('party');
+      this.destroy()
+    })
     
     container.addChild(btnQuest, btnParty);
     return container;

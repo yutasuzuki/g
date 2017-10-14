@@ -1,76 +1,82 @@
 import _ from 'lodash';
 import { random, wrapText } from '../util';
 
-const castleTalk = [
-  {
-    type: 2,
-    name: '王様',
-    text: 'よく参られた！'
-  },
-  {
-    type: 1,
-    name: 'ルシェ',
-    text: 'こんにちは'
-  },
-  {
-    type: 2,
-    name: '王様',
-    text: '今回は城の周りをモンスターをよくぞ討伐してくれた'
-  },
-  {
-    type: 2,
-    name: '王様',
-    text: '後ほど褒美を取らせよう！'
-  },
-  {
-    type: 1,
-    name: 'ルシェ',
-    text: 'こちらの口座に振り込んでください'
-  },
-  {
-    type: 0,
-    name: '',
-    text: 'ルシェはカバンから通帳を取り出した'
-  },
-];
+const castleTalk = {
+  talk: [
+    {
+      type: 2,
+      name: '王様',
+      text: 'よく参られた！'
+    },
+    {
+      type: 1,
+      name: 'ルシェ',
+      text: 'こんにちは'
+    },
+    {
+      type: 2,
+      name: '王様',
+      text: '今回は城の周りをモンスターをよくぞ討伐してくれた'
+    },
+    {
+      type: 2,
+      name: '王様',
+      text: '後ほど褒美を取らせよう！'
+    },
+    {
+      type: 1,
+      name: 'ルシェ',
+      text: 'こちらの口座に振り込んでください'
+    },
+    {
+      type: 0,
+      name: '',
+      text: 'ルシェはカバンから通帳を取り出した'
+    }
+  ],
+  next: 'home'
+};
 
-const innTalk = [
-  {
-    type: 1,
-    name: 'ルシェ',
-    text: 'こんにちは'
-  },
-  {
-    type: 2,
-    name: '宿屋',
-    text: 'いらっしゃいませ！'
-  },
-  {
-    type: 2,
-    name: '宿屋',
-    text: '宿屋へようこそ！'
-  },
-  {
-    type: 0,
-    name: '',
-    text: '（沈黙）'
-  },
-  {
-    type: 1,
-    name: 'ルシェ',
-    text: '今日泊まりたいのだけれども・・・'
-  },
-  {
-    type: 2,
-    name: '宿屋',
-    text: 'お好きな部屋をお使いください！'
-  },
-  {
-    type: 1,
-    name: 'ルシェ',
-    text: 'ありがとう'
-  }
-];
+const innTalk = {
+  talk: [ 
+    {
+      type: 1,
+      name: 'ルシェ',
+      text: 'こんにちは'
+    },
+    {
+      type: 2,
+      name: '宿屋',
+      text: 'いらっしゃいませ！'
+    },
+    {
+      type: 2,
+      name: '宿屋',
+      text: '宿屋へようこそ！'
+    },
+    {
+      type: 0,
+      name: '',
+      text: '（沈黙）'
+    },
+    {
+      type: 1,
+      name: 'ルシェ',
+      text: '今日泊まりたいのだけれども・・・'
+    },
+    {
+      type: 2,
+      name: '宿屋',
+      text: 'お好きな部屋をお使いください！'
+    },
+    {
+      type: 1,
+      name: 'ルシェ',
+      text: 'ありがとう'
+    }
+  ],
+  next: 'map'
+};
 
 
 class Talk {
@@ -182,7 +188,7 @@ class Talk {
     this.talk.text.y = 60;
 
     bg.addEventListener('click', () => {
-      const item = this.talkscript[this.talk.current];
+      const item = this.talkscript.talk[this.talk.current];
       if (item) {
         if (item.type === 0) {
           this.mainChara.filters = [
@@ -218,7 +224,7 @@ class Talk {
         stage.update();
         this.talk.current++;
       } else {
-        route.to('map');
+        route.to(this.talkscript.next);
         this.destroy();
       }
     });
