@@ -22849,37 +22849,37 @@ var constants = {
   self: {
     pos: [{
       x: 35,
-      y: 260
+      y: 220
     }, {
       x: 85,
-      y: 190
+      y: 150
     }, {
       x: 85,
-      y: 330
+      y: 290
     }, {
       x: 35,
-      y: 120
+      y: 80
     }, {
       x: 35,
-      y: 400
+      y: 360
     }]
   },
   enemy: {
     pos: [{
       x: 300,
-      y: 260
+      y: 220
     }, {
       x: 250,
-      y: 190
+      y: 150
     }, {
       x: 250,
-      y: 330
+      y: 290
     }, {
       x: 300,
-      y: 120
+      y: 80
     }, {
       x: 300,
-      y: 400
+      y: 360
     }]
   }
 };
@@ -22956,9 +22956,13 @@ var Attack = function () {
       var _this2 = this;
 
       var x = this.attacker.x;
+      var moveX = 40;
+      if (this.attacker.type === 'enemy') {
+        moveX = -40;
+      }
       return new _promise2.default(function (resolve, reject) {
         createjs.Tween.get(_this2.attacker).to({
-          x: _this2.attacker.x + 40
+          x: _this2.attacker.x + moveX
         }, 150).to({
           x: x
         }, 150).call(function () {
