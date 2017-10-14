@@ -23766,9 +23766,9 @@ var Talk = function () {
       }
       this.comment = this.setCommentBox();
 
-      this.mainChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
+      this.mainChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.5, 1, 0, 0, 0, 0)];
       this.mainChara.cache(0, 0, 960, 960);
-      this.otherChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
+      this.otherChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.5, 1, 0, 0, 0, 0)];
       this.otherChara.cache(0, 0, 960, 960);
 
       stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
