@@ -87,14 +87,17 @@ class Talk {
 
   async start() {
     const queue = new createjs.LoadQueue();
-    const charaManifest = [
+    const talkManifest = [
       {src: 'inn.jpg', id: 'inn'},
       {src: 'castle.jpg', id: 'castle'},
-      {src: 'chara_8.png', id: 'main_chara'},
       {src: 'king.png', id: 'king'},
-      {src: 'person_2.png', id: 'person'},
+      {src: 'person_2.png', id: 'person'}
     ];
-    queue.loadManifest(charaManifest, true, './assets/images/talk/');
+    const charaManifest = [
+      {src: 'chara_8.png', id: 'main_chara'}
+    ];
+    queue.loadManifest(talkManifest, true, './assets/images/talk/');
+    queue.loadManifest(charaManifest, true, './assets/images/chara/talk/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.init());
   }

@@ -1,3 +1,4 @@
+import home from './home/home';
 import battle from './battle/battle';
 import map from './map/map';
 import talk from './talk/talk';
@@ -10,6 +11,10 @@ class Router {
       circles: []
     };
     this.config = {
+      home: {
+        name: 'home',
+        component: home
+      },
       battle: {
         name: 'battle',
         component: battle

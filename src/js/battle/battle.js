@@ -72,7 +72,7 @@ class Battle {
     queue.loadManifest(commandManifest, true, './assets/images/battle/command/');
     queue.loadManifest(resultManifest, true, './assets/images/battle/result/');
     queue.loadManifest(fieldManifest, true, './assets/images/field/');
-    queue.loadManifest(myCharaManifest, true, './assets/images/chara/');
+    queue.loadManifest(myCharaManifest, true, './assets/images/chara/deformer/');
     queue.loadManifest(enemyCharaManifest, true, './assets/images/enemy/');
     queue.loadManifest(magicManifest, true, './assets/images/battle/effect/magic/')
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
@@ -191,7 +191,7 @@ class Battle {
     field.skewY = field.height / 2;
     field.scaleX = 1.5;
     field.scaleY = 1.5;
-    field.y = -250;
+    field.y = - 210;
     return field;
   }
 

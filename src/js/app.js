@@ -111,4 +111,4 @@ window.state = {
   }
 };
 
-route.to('party');
+route.to('home');
