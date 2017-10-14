@@ -585,6 +585,8 @@ class Battle {
       container.y = constants[type].pos[index].y + 20;
       chara.scaleX = 0.5;
       chara.scaleY = 0.5;
+      console.log(charactor);
+      chara.alpha = 0 < charactor.HP ? 1 : 0;
       container.damage = function(point) {
         container.status.HP -= point;
       }
@@ -593,14 +595,6 @@ class Battle {
       container.addChild(chara);
       return container;
     });
-  }
-
-  win() {
-
-  }
-
-  loose() {
-
   }
 
   destroy() {

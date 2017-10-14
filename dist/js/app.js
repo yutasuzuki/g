@@ -2056,6 +2056,8 @@ var Battle = function () {
         container.y = _constants2.default[type].pos[index].y + 20;
         chara.scaleX = 0.5;
         chara.scaleY = 0.5;
+        console.log(charactor);
+        chara.alpha = 0 < charactor.HP ? 1 : 0;
         container.damage = function (point) {
           container.status.HP -= point;
         };
@@ -2065,12 +2067,6 @@ var Battle = function () {
         return container;
       });
     }
-  }, {
-    key: 'win',
-    value: function win() {}
-  }, {
-    key: 'loose',
-    value: function loose() {}
   }, {
     key: 'destroy',
     value: function destroy() {
@@ -23903,6 +23899,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _promise = __webpack_require__(13);
+
+var _promise2 = _interopRequireDefault(_promise);
+
 var _keys = __webpack_require__(129);
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -23926,6 +23926,10 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 var _lodash = __webpack_require__(49);
 
 var _lodash2 = _interopRequireDefault(_lodash);
+
+var _axios = __webpack_require__(100);
+
+var _axios2 = _interopRequireDefault(_axios);
 
 var _util = __webpack_require__(56);
 
@@ -24019,12 +24023,11 @@ var Party = function () {
       var _this2 = this;
 
       var container = new createjs.Container();
-      var ids = state.party.map(function (value) {
-        return value.id;
-      });
 
       var i = 0;
-      ids.forEach(function (id) {
+      state.party.map(function (value) {
+        return value.id;
+      }).forEach(function (id) {
         var charactorContainer = new createjs.Container();
         var charactor = new createjs.Bitmap(_this2.loaders['chara_' + id]);
         charactor.scaleX = window.innerWidth / charactor.getBounds().width / 5;
@@ -24048,7 +24051,7 @@ var Party = function () {
             e.target.filters = [];
             e.target.cache(0, 0, 960, 960);
           }
-          console.log(_this2.selected);
+          _this2.changeParty();
           stage.update();
         });
         container.addChild(charactorContainer);
@@ -24058,9 +24061,25 @@ var Party = function () {
       return container;
     }
   }, {
+    key: 'changeParty',
+    value: function changeParty() {
+      var _this3 = this;
+
+      if ((0, _keys2.default)(this.selected.main).length && (0, _keys2.default)(this.selected.sub).length) {
+        state.party = state.party.map(function (charactor) {
+          if (charactor.id == _this3.selected.main.charaID) {
+            charactor = _this3.selected.sub.parent.status;
+          }
+          return charactor;
+        });
+        this.selected.main = this.selected.sub = {};
+        this.init();
+      }
+    }
+  }, {
     key: 'setMember',
     value: function setMember() {
-      var _this3 = this;
+      var _this4 = this;
 
       var COLUMN_COUNT = 6;
       var container = new createjs.Container();
@@ -24072,13 +24091,16 @@ var Party = function () {
       this.members.forEach(function (id) {
         var charactorContainer = new createjs.Container();
         var historyCharactor = '';
-        var charactor = new createjs.Bitmap(_this3.loaders['chara_' + id]);
+        var charactor = new createjs.Bitmap(_this4.loaders['chara_' + id]);
         charactor.scaleX = window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
         charactor.scaleY = window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
         charactor.x = i * charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
         charactor.y = t * charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
         charactor.charaID = id;
 
+        ayncGetChara([id]).then(function (data) {
+          charactorContainer.status = data[0];
+        });
         charactorContainer.charaID = id;
         charactorContainer.addChild(charactor);
 
@@ -24087,21 +24109,21 @@ var Party = function () {
             return value.id;
           }).indexOf(e.target.charaID) !== -1) return;
 
-          if (_this3.selected.sub.charaID !== e.target.charaID) {
+          if (_this4.selected.sub.charaID !== e.target.charaID) {
 
-            if ((0, _keys2.default)(_this3.selected.sub).length) {
-              _this3.selected.sub.filters = [];
-              _this3.selected.sub.cache(0, 0, 960, 960);
+            if ((0, _keys2.default)(_this4.selected.sub).length) {
+              _this4.selected.sub.filters = [];
+              _this4.selected.sub.cache(0, 0, 960, 960);
             }
             e.target.filters = [new createjs.ColorFilter(0.4, 0.4, 0.4, 1, 10, 10, 60, 0)];
             e.target.cache(0, 0, 960, 960);
-            _this3.selected.sub = e.target;
+            _this4.selected.sub = e.target;
           } else {
-            _this3.selected.sub = {};
+            _this4.selected.sub = {};
             e.target.filters = [];
             e.target.cache(0, 0, 960, 960);
           }
-          console.log(_this3.selected);
+          _this4.changeParty();
           stage.update();
         });
 
@@ -24152,6 +24174,24 @@ var Party = function () {
   }]);
   return Party;
 }();
+
+// 本当はDBから取得するけど、今はjsonファイルから取得するように
+
+
+function ayncGetChara(charactorsID) {
+
+  return new _promise2.default(function (resolve, reject) {
+    var charactors = charactorsID.map(function (value) {
+      return _axios2.default.get('./assets/data/enemy/' + value + '.json');
+    });
+    _promise2.default.all(charactors).then(function (charas) {
+      var c = charas.map(function (chara) {
+        return chara.data;
+      });
+      resolve(c);
+    });
+  });
+}
 
 exports.default = Party;
 

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import axios from 'axios';
 import { random } from '../util';
 
 class Party {
@@ -54,10 +55,9 @@ class Party {
 
   setParty() {
     const container = new createjs.Container();
-    const ids = state.party.map(value => value.id)
 
     let i = 0;
-    ids.forEach((id) => {
+    state.party.map(value => value.id).forEach((id) => {
       const charactorContainer = new createjs.Container();
       const charactor = new createjs.Bitmap(this.loaders[`chara_${id}`]);
       charactor.scaleX = window.innerWidth / charactor.getBounds().width / 5;
@@ -83,7 +83,7 @@ class Party {
           e.target.filters = [];
           e.target.cache(0, 0, 960, 960);
         }
-        console.log(this.selected)
+        this.changeParty();
         stage.update();
       })
       container.addChild(charactorContainer);
@@ -91,6 +91,19 @@ class Party {
     })
 
     return container;
+  }
+
+  changeParty() {
+    if (Object.keys(this.selected.main).length && Object.keys(this.selected.sub).length) {
+      state.party = state.party.map((charactor) => {
+        if (charactor.id == this.selected.main.charaID) {
+          charactor = this.selected.sub.parent.status;
+        }
+        return charactor;
+      });
+      this.selected.main = this.selected.sub = {};
+      this.init();
+    }
   }
 
   setMember() {
@@ -111,6 +124,9 @@ class Party {
       charactor.y = t * charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
       charactor.charaID = id;
 
+      ayncGetChara([id]).then((data) => {
+        charactorContainer.status = data[0];
+      })
       charactorContainer.charaID = id;
       charactorContainer.addChild(charactor);
       
@@ -133,7 +149,7 @@ class Party {
           e.target.filters = [];
           e.target.cache(0, 0, 960, 960);
         }
-        console.log(this.selected)
+        this.changeParty();
         stage.update();
       });
 
@@ -179,5 +195,19 @@ class Party {
     stage.update();
   }
 }
+
+// 本当はDBから取得するけど、今はjsonファイルから取得するように
+function ayncGetChara(charactorsID) {
+  
+    return new Promise((resolve, reject) => {
+      let charactors = charactorsID.map((value) => {
+        return axios.get(`./assets/data/enemy/${value}.json`);
+      });
+      Promise.all(charactors).then((charas) => {
+        const c = charas.map(chara => chara.data);
+        resolve(c);
+      })
+    });
+  }
 
 export default Party;
