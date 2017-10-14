@@ -187,11 +187,9 @@ class Battle {
 
   setField() {
     const field = new createjs.Bitmap(this.loaders['field']);
-    field.skewX = field.width / 2;
-    field.skewY = field.height / 2;
-    field.scaleX = 1.5;
-    field.scaleY = 1.5;
-    field.y -= window.innerHeight - field.getBounds().height;
+    field.scaleX = 2;
+    field.scaleY = 2;
+    field.y = -450;
     return field;
   }
 

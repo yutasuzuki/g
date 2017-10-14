@@ -1571,11 +1571,9 @@ var Battle = function () {
     key: 'setField',
     value: function setField() {
       var field = new createjs.Bitmap(this.loaders['field']);
-      field.skewX = field.width / 2;
-      field.skewY = field.height / 2;
-      field.scaleX = 1.5;
-      field.scaleY = 1.5;
-      field.y -= window.innerHeight - field.getBounds().height;
+      field.scaleX = 2;
+      field.scaleY = 2;
+      field.y = -450;
       return field;
     }
 
@@ -22849,37 +22847,37 @@ var constants = {
   self: {
     pos: [{
       x: 35,
-      y: 180
+      y: 170
     }, {
       x: 85,
-      y: 110
+      y: 100
     }, {
       x: 85,
-      y: 250
+      y: 240
     }, {
       x: 35,
-      y: 40
+      y: 30
     }, {
       x: 35,
-      y: 320
+      y: 310
     }]
   },
   enemy: {
     pos: [{
       x: 300,
-      y: 180
+      y: 170
     }, {
       x: 250,
-      y: 110
+      y: 100
     }, {
       x: 250,
-      y: 250
+      y: 240
     }, {
       x: 300,
-      y: 40
+      y: 30
     }, {
       x: 300,
-      y: 320
+      y: 310
     }]
   }
 };
