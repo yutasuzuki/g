@@ -1575,7 +1575,7 @@ var Battle = function () {
       field.skewY = field.height / 2;
       field.scaleX = 1.5;
       field.scaleY = 1.5;
-      field.y = -210;
+      field.y -= window.innerHeight - field.getBounds().height;
       return field;
     }
 
