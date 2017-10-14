@@ -84,10 +84,10 @@ class Home {
   setHeader() {
     const container = new createjs.Container();
     const header = new createjs.Bitmap(this.loaders['header']);
+    header.scaleX = window.innerWidth / header.getBounds().width;
+    header.scaleY = window.innerWidth / header.getBounds().width;
     header.x = 0;
     header.y = 0;
-    // header.scaleX = 0.5;
-    // header.scaleY = 0.5;
 
     container.addChild(header);
     return container;

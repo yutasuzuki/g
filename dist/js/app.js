@@ -19839,6 +19839,7 @@ var MyParty = [{
   MGC: 30,
   DF: 25,
   SP: 20,
+  leader: true,
   choice: {
     rate: {
       ATK: 20,
@@ -19856,6 +19857,7 @@ var MyParty = [{
   MGC: 18,
   DF: 22,
   SP: 32,
+  leader: false,
   choice: {
     rate: {
       ATK: 50,
@@ -19873,6 +19875,7 @@ var MyParty = [{
   MGC: 22,
   DF: 25,
   SP: 12,
+  leader: false,
   choice: {
     rate: {
       ATK: 30,
@@ -19890,6 +19893,7 @@ var MyParty = [{
   MGC: 25,
   DF: 25,
   SP: 16,
+  leader: false,
   choice: {
     rate: {
       ATK: 10,
@@ -19907,6 +19911,7 @@ var MyParty = [{
   MGC: 10,
   DF: 40,
   SP: 15,
+  leader: false,
   choice: {
     rate: {
       ATK: 10,
@@ -19933,7 +19938,7 @@ window.state = {
   }
 };
 
-route.to('home');
+route.to('party');
 
 /***/ }),
 /* 58 */
@@ -23770,9 +23775,9 @@ var Talk = function () {
       }
       this.comment = this.setCommentBox();
 
-      this.mainChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.5, 1, 0, 0, 0, 0)];
+      this.mainChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
       this.mainChara.cache(0, 0, 960, 960);
-      this.otherChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.5, 1, 0, 0, 0, 0)];
+      this.otherChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
       this.otherChara.cache(0, 0, 960, 960);
 
       stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
@@ -23898,6 +23903,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _keys = __webpack_require__(129);
+
+var _keys2 = _interopRequireDefault(_keys);
+
 var _regenerator = __webpack_require__(47);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -23928,6 +23937,10 @@ var Party = function () {
 
     this.loaders = [];
     this.members = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
+    this.selected = {
+      main: {},
+      sub: {}
+    };
   }
 
   (0, _createClass3.default)(Party, [{
@@ -23936,16 +23949,17 @@ var Party = function () {
       var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
         var _this = this;
 
-        var queue, myCharaManifest, memberManifest;
+        var queue, memberManifest, homeManifest;
         return _regenerator2.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 queue = new createjs.LoadQueue();
-                myCharaManifest = [{ src: 'chara_8.png', id: 'chara_8' }];
                 memberManifest = this.createMemberManifest();
+                homeManifest = [{ src: 'header.png', id: 'header' }];
 
-                queue.loadManifest(memberManifest, true, './assets/images/chara/deformer/');
+                queue.loadManifest(memberManifest, true, './assets/images/chara/icon/');
+                queue.loadManifest(homeManifest, true, './assets/images/home//');
                 queue.addEventListener('fileload', function (e) {
                   return _this.loaders[e.item.id] = e.result;
                 });
@@ -23953,7 +23967,7 @@ var Party = function () {
                   return _this.init();
                 });
 
-              case 6:
+              case 7:
               case 'end':
                 return _context.stop();
             }
@@ -23971,11 +23985,12 @@ var Party = function () {
     key: 'init',
     value: function init() {
       var container = new createjs.Container();
-      var sprite = this.setBitmap('chara_8');
+      var header = this.setHeader();
+      var party = this.setParty();
       var charaContainer = this.setMember();
 
-      container.addChild(sprite, charaContainer);
-      stage.addChild(container);
+      container.addChild(charaContainer, party);
+      stage.addChild(container, header);
       stage.update();
     }
   }, {
@@ -23999,12 +24014,56 @@ var Party = function () {
       return chara;
     }
   }, {
-    key: 'setMember',
-    value: function setMember() {
+    key: 'setParty',
+    value: function setParty() {
       var _this2 = this;
 
+      var container = new createjs.Container();
+      var ids = state.party.map(function (value) {
+        return value.id;
+      });
+
+      var i = 0;
+      ids.forEach(function (id) {
+        var charactorContainer = new createjs.Container();
+        var charactor = new createjs.Bitmap(_this2.loaders['chara_' + id]);
+        charactor.scaleX = window.innerWidth / charactor.getBounds().width / 5;
+        charactor.scaleY = window.innerWidth / charactor.getBounds().width / 5;
+        charactor.x = i * charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / 5;
+        charactor.y = charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / 5;
+        charactor.charaID = id;
+        charactorContainer.addChild(charactor);
+        charactorContainer.addEventListener('click', function (e) {
+          if (_this2.selected.main.charaID !== e.target.charaID) {
+
+            if ((0, _keys2.default)(_this2.selected.main).length) {
+              _this2.selected.main.filters = [];
+              _this2.selected.main.cache(0, 0, 960, 960);
+            }
+            e.target.filters = [new createjs.ColorFilter(0.4, 0.4, 0.4, 1, 60, 10, 10, 0)];
+            e.target.cache(0, 0, 960, 960);
+            _this2.selected.main = e.target;
+          } else {
+            _this2.selected.main = {};
+            e.target.filters = [];
+            e.target.cache(0, 0, 960, 960);
+          }
+          console.log(_this2.selected);
+          stage.update();
+        });
+        container.addChild(charactorContainer);
+        i++;
+      });
+
+      return container;
+    }
+  }, {
+    key: 'setMember',
+    value: function setMember() {
+      var _this3 = this;
+
       var COLUMN_COUNT = 6;
-      var charactorsContainer = new createjs.Container();
+      var container = new createjs.Container();
       var length = this.members.length;
       var lengthY = Math.ceil(length / COLUMN_COUNT);
 
@@ -24012,14 +24071,47 @@ var Party = function () {
       var t = 0;
       this.members.forEach(function (id) {
         var charactorContainer = new createjs.Container();
-        var charactor = new createjs.Bitmap(_this2.loaders['chara_' + id]);
+        var historyCharactor = '';
+        var charactor = new createjs.Bitmap(_this3.loaders['chara_' + id]);
         charactor.scaleX = window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
         charactor.scaleY = window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
         charactor.x = i * charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
         charactor.y = t * charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
+        charactor.charaID = id;
 
+        charactorContainer.charaID = id;
         charactorContainer.addChild(charactor);
-        charactorsContainer.addChild(charactorContainer);
+
+        charactorContainer.addEventListener('click', function (e) {
+          if (state.party.map(function (value) {
+            return value.id;
+          }).indexOf(e.target.charaID) !== -1) return;
+
+          if (_this3.selected.sub.charaID !== e.target.charaID) {
+
+            if ((0, _keys2.default)(_this3.selected.sub).length) {
+              _this3.selected.sub.filters = [];
+              _this3.selected.sub.cache(0, 0, 960, 960);
+            }
+            e.target.filters = [new createjs.ColorFilter(0.4, 0.4, 0.4, 1, 10, 10, 60, 0)];
+            e.target.cache(0, 0, 960, 960);
+            _this3.selected.sub = e.target;
+          } else {
+            _this3.selected.sub = {};
+            e.target.filters = [];
+            e.target.cache(0, 0, 960, 960);
+          }
+          console.log(_this3.selected);
+          stage.update();
+        });
+
+        // main partyに入っているキャラはグレイアウト
+        if (state.party.map(function (value) {
+          return value.id;
+        }).indexOf(id) !== -1) {
+          charactorContainer.filters = [new createjs.ColorFilter(0.5, 0.5, 0.5, 1, 0, 0, 0, 0)];
+          charactorContainer.cache(0, 0, 960, 960);
+        }
 
         if (i < COLUMN_COUNT - 1) {
           i++;
@@ -24027,11 +24119,29 @@ var Party = function () {
           i = 0;
           t++;
         }
+
+        container.addChild(charactorContainer);
       });
 
-      charactorsContainer.y = 200;
+      container.y = 200;
 
-      return charactorsContainer;
+      return container;
+    }
+  }, {
+    key: 'setHeader',
+    value: function setHeader() {
+      var container = new createjs.Container();
+      var header = new createjs.Bitmap(this.loaders['header']);
+      header.scaleX = window.innerWidth / header.getBounds().width;
+      header.scaleY = window.innerWidth / header.getBounds().width;
+      header.x = 0;
+      header.y = 0;
+      header.addEventListener('click', function (e) {
+        return route.to('home');
+      });
+
+      container.addChild(header);
+      return container;
     }
   }, {
     key: 'destroy',
@@ -24195,10 +24305,10 @@ var Home = function () {
     value: function setHeader() {
       var container = new createjs.Container();
       var header = new createjs.Bitmap(this.loaders['header']);
+      header.scaleX = window.innerWidth / header.getBounds().width;
+      header.scaleY = window.innerWidth / header.getBounds().width;
       header.x = 0;
       header.y = 0;
-      // header.scaleX = 0.5;
-      // header.scaleY = 0.5;
 
       container.addChild(header);
       return container;
@@ -24213,6 +24323,51 @@ var Home = function () {
 }();
 
 exports.default = Home;
+
+/***/ }),
+/* 129 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(130), __esModule: true };
+
+/***/ }),
+/* 130 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(131);
+module.exports = __webpack_require__(3).Object.keys;
+
+
+/***/ }),
+/* 131 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.14 Object.keys(O)
+var toObject = __webpack_require__(36);
+var $keys = __webpack_require__(72);
+
+__webpack_require__(132)('keys', function () {
+  return function keys(it) {
+    return $keys(toObject(it));
+  };
+});
+
+
+/***/ }),
+/* 132 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// most Object methods by ES6 should accept primitives
+var $export = __webpack_require__(7);
+var core = __webpack_require__(3);
+var fails = __webpack_require__(28);
+module.exports = function (KEY, exec) {
+  var fn = (core.Object || {})[KEY] || Object[KEY];
+  var exp = {};
+  exp[KEY] = exec(fn);
+  $export($export.S + $export.F * fails(function () { fn(1); }), 'Object', exp);
+};
+
 
 /***/ })
 /******/ ]);
