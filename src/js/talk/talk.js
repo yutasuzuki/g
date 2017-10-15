@@ -89,6 +89,10 @@ class Talk {
       text: {}
     }
     this.talkscript = [];
+    this.setting = {
+      mask: [0.6, 0.6, 0.6, 1, 0, 0, 0, 0],
+      cache: [0, 0, 960, 960]
+    }
   }
 
   async start() {
@@ -122,13 +126,13 @@ class Talk {
     this.comment = this.setCommentBox();
 
     this.mainChara.filters = [
-      new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+      new createjs.ColorFilter(...this.setting.mask)
     ];
-    this.mainChara.cache(0, 0, 960, 960);
+    this.mainChara.cache(...this.setting.cache);
     this.otherChara.filters = [
-      new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+      new createjs.ColorFilter(...this.setting.mask)
     ];
-    this.otherChara.cache(0, 0, 960, 960);
+    this.otherChara.cache(...this.setting.cache);
 
     stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
     stage.update();
@@ -192,31 +196,31 @@ class Talk {
       if (item) {
         if (item.type === 0) {
           this.mainChara.filters = [
-            new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+            new createjs.ColorFilter(...this.setting.mask)
           ];
-          this.mainChara.cache(0, 0, 960, 960);
+          this.mainChara.cache(...this.setting.cache);
           this.otherChara.filters = [
-            new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+            new createjs.ColorFilter(...this.setting.mask)
           ];
-          this.otherChara.cache(0, 0, 960, 960);
+          this.otherChara.cache(...this.setting.cache);
         } else if (item.type === 1) {
           stage.setChildIndex(this.mainChara, stage.getNumChildren() - 1);
           stage.setChildIndex(this.otherChara, stage.getNumChildren() + 1);
           this.mainChara.filters = [];
-          this.mainChara.cache(0, 0, 960, 960);
+          this.mainChara.cache(...this.setting.cache);
           this.otherChara.filters = [
-            new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+            new createjs.ColorFilter(...this.setting.mask)
           ];
-          this.otherChara.cache(0, 0, 960, 960);
+          this.otherChara.cache(...this.setting.cache);
         } else if (item.type === 2) {
           stage.setChildIndex(this.mainChara, stage.getNumChildren() + 1);
           stage.setChildIndex(this.otherChara, stage.getNumChildren() - 1);
           this.mainChara.filters = [
-            new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+            new createjs.ColorFilter(...this.setting.mask)
           ];
-          this.mainChara.cache(0, 0, 960, 960);
+          this.mainChara.cache(...this.setting.cache);
           this.otherChara.filters = [];
-          this.otherChara.cache(0, 0, 960, 960);
+          this.otherChara.cache(...this.setting.cache);
         }
         stage.setChildIndex(this.comment, stage.getNumChildren() - 1);
         this.talk.name.text = item.name;

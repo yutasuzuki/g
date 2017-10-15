@@ -1863,27 +1863,27 @@ var Battle = function () {
       var attack = new createjs.Bitmap(this.loaders['attack']);
       attack.x = 0;
       attack.y = 0;
-      attack.scaleX = .5;
-      attack.scaleY = .5;
+      attack.scaleX = 0.5;
+      attack.scaleY = 0.5;
       attack.alpha = 1;
       attack.cursor = "pointer";
       attack.addEventListener('click', this.attackHandler.bind(this));
       var magic = new createjs.Bitmap(this.loaders['magic']);
       magic.x = window.innerWidth / 2;
       magic.y = 0;
-      magic.scaleX = .5;
-      magic.scaleY = .5;
+      magic.scaleX = 0.5;
+      magic.scaleY = 0.5;
       magic.addEventListener('click', this.magicHandler.bind(this));
       var skill = new createjs.Bitmap(this.loaders['skill']);
       skill.x = 0;
       skill.y = 100;
-      skill.scaleX = .5;
-      skill.scaleY = .5;
+      skill.scaleX = 0.5;
+      skill.scaleY = 0.5;
       var skip = new createjs.Bitmap(this.loaders['skip']);
       skip.x = window.innerWidth / 2;
       skip.y = 100;
-      skip.scaleX = .5;
-      skip.scaleY = .5;
+      skip.scaleX = 0.5;
+      skip.scaleY = 0.5;
 
       attackCommand.addChild(attack, magic, skill, skip);
       attackCommand.y = window.innerHeight - 200;
@@ -1892,27 +1892,27 @@ var Battle = function () {
       var defense = new createjs.Bitmap(this.loaders['defense']);
       defense.x = 0;
       defense.y = 0;
-      defense.scaleX = .5;
-      defense.scaleY = .5;
+      defense.scaleX = 0.5;
+      defense.scaleY = 0.5;
       defense.alpha = 1;
       defense.cursor = "pointer";
       defense.addEventListener('click', this.defenseHandler.bind(this));
       var magicDefense = new createjs.Bitmap(this.loaders['magic_defense']);
       magicDefense.x = window.innerWidth / 2;
       magicDefense.y = 0;
-      magicDefense.scaleX = .5;
-      magicDefense.scaleY = .5;
+      magicDefense.scaleX = 0.5;
+      magicDefense.scaleY = 0.5;
       magicDefense.addEventListener('click', this.magicDefenseHandler.bind(this));
       var counter = new createjs.Bitmap(this.loaders['counter']);
       counter.x = 0;
       counter.y = 100;
-      counter.scaleX = .5;
-      counter.scaleY = .5;
+      counter.scaleX = 0.5;
+      counter.scaleY = 0.5;
       var recovery = new createjs.Bitmap(this.loaders['recovery']);
       recovery.x = window.innerWidth / 2;
       recovery.y = 100;
-      recovery.scaleX = .5;
-      recovery.scaleY = .5;
+      recovery.scaleX = 0.5;
+      recovery.scaleY = 0.5;
 
       defenseCommand.addChild(defense, magicDefense, counter, recovery);
       defenseCommand.y = window.innerHeight - 100;
@@ -2050,6 +2050,7 @@ var Battle = function () {
         var key = type === 'self' ? 'chara_' + charactor.id : 'enemy_' + charactor.id;
         var container = new createjs.Container();
         var chara = new createjs.Bitmap(_this8.loaders[key]);
+        console.log(chara.getBounds().width);
         container.regX = chara.getBounds().width / 4;
         container.regY = chara.getBounds().height / 4;
         container.x = _constants2.default[type].pos[index].x + 20;
@@ -23233,10 +23234,10 @@ var Damage = function () {
       createjs.Tween.get(damageText).to({
         y: damageText.y - 10,
         alpha: 1
-      }, 400).to({
+      }, 300).to({
         y: damageText.y,
         alpha: 1
-      }, 400).to({
+      }, 300).to({
         y: damageText.y,
         alpha: 0
       }, 200).call(function () {
@@ -23618,6 +23619,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _toConsumableArray2 = __webpack_require__(91);
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
 var _regenerator = __webpack_require__(47);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -23716,6 +23721,10 @@ var Talk = function () {
       text: {}
     };
     this.talkscript = [];
+    this.setting = {
+      mask: [0.6, 0.6, 0.6, 1, 0, 0, 0, 0],
+      cache: [0, 0, 960, 960]
+    };
   }
 
   (0, _createClass3.default)(Talk, [{
@@ -23759,6 +23768,8 @@ var Talk = function () {
   }, {
     key: 'init',
     value: function init() {
+      var _mainChara, _otherChara;
+
       this.mainChara = this.setMainCharactor('main_chara');
       if (state.map.currentType === 2) {
         this.background = this.setBackground('inn');
@@ -23771,10 +23782,10 @@ var Talk = function () {
       }
       this.comment = this.setCommentBox();
 
-      this.mainChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
-      this.mainChara.cache(0, 0, 960, 960);
-      this.otherChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
-      this.otherChara.cache(0, 0, 960, 960);
+      this.mainChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(this.setting.mask))))()];
+      (_mainChara = this.mainChara).cache.apply(_mainChara, (0, _toConsumableArray3.default)(this.setting.cache));
+      this.otherChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(this.setting.mask))))()];
+      (_otherChara = this.otherChara).cache.apply(_otherChara, (0, _toConsumableArray3.default)(this.setting.cache));
 
       stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
       stage.update();
@@ -23843,24 +23854,30 @@ var Talk = function () {
         var item = _this2.talkscript.talk[_this2.talk.current];
         if (item) {
           if (item.type === 0) {
-            _this2.mainChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
-            _this2.mainChara.cache(0, 0, 960, 960);
-            _this2.otherChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
-            _this2.otherChara.cache(0, 0, 960, 960);
+            var _mainChara2, _otherChara2;
+
+            _this2.mainChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this2.setting.mask))))()];
+            (_mainChara2 = _this2.mainChara).cache.apply(_mainChara2, (0, _toConsumableArray3.default)(_this2.setting.cache));
+            _this2.otherChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this2.setting.mask))))()];
+            (_otherChara2 = _this2.otherChara).cache.apply(_otherChara2, (0, _toConsumableArray3.default)(_this2.setting.cache));
           } else if (item.type === 1) {
+            var _mainChara3, _otherChara3;
+
             stage.setChildIndex(_this2.mainChara, stage.getNumChildren() - 1);
             stage.setChildIndex(_this2.otherChara, stage.getNumChildren() + 1);
             _this2.mainChara.filters = [];
-            _this2.mainChara.cache(0, 0, 960, 960);
-            _this2.otherChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
-            _this2.otherChara.cache(0, 0, 960, 960);
+            (_mainChara3 = _this2.mainChara).cache.apply(_mainChara3, (0, _toConsumableArray3.default)(_this2.setting.cache));
+            _this2.otherChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this2.setting.mask))))()];
+            (_otherChara3 = _this2.otherChara).cache.apply(_otherChara3, (0, _toConsumableArray3.default)(_this2.setting.cache));
           } else if (item.type === 2) {
+            var _mainChara4, _otherChara4;
+
             stage.setChildIndex(_this2.mainChara, stage.getNumChildren() + 1);
             stage.setChildIndex(_this2.otherChara, stage.getNumChildren() - 1);
-            _this2.mainChara.filters = [new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)];
-            _this2.mainChara.cache(0, 0, 960, 960);
+            _this2.mainChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this2.setting.mask))))()];
+            (_mainChara4 = _this2.mainChara).cache.apply(_mainChara4, (0, _toConsumableArray3.default)(_this2.setting.cache));
             _this2.otherChara.filters = [];
-            _this2.otherChara.cache(0, 0, 960, 960);
+            (_otherChara4 = _this2.otherChara).cache.apply(_otherChara4, (0, _toConsumableArray3.default)(_this2.setting.cache));
           }
           stage.setChildIndex(_this2.comment, stage.getNumChildren() - 1);
           _this2.talk.name.text = item.name;
