@@ -1,76 +1,82 @@
 import _ from 'lodash';
 import { random, wrapText } from '../util';
 
-const castleTalk = [
-  {
-    type: 2,
-    name: '王様',
-    text: 'よく参られた！'
-  },
-  {
-    type: 1,
-    name: 'ルシェ',
-    text: 'こんにちは'
-  },
-  {
-    type: 2,
-    name: '王様',
-    text: '今回は城の周りをモンスターをよくぞ討伐してくれた'
-  },
-  {
-    type: 2,
-    name: '王様',
-    text: '後ほど褒美を取らせよう！'
-  },
-  {
-    type: 1,
-    name: 'ルシェ',
-    text: 'こちらの口座に振り込んでください'
-  },
-  {
-    type: 0,
-    name: '',
-    text: 'ルシェはカバンから通帳を取り出した'
-  },
-];
+const castleTalk = {
+  talk: [
+    {
+      type: 2,
+      name: '王様',
+      text: 'よく参られた！'
+    },
+    {
+      type: 1,
+      name: 'ルシェ',
+      text: 'こんにちは'
+    },
+    {
+      type: 2,
+      name: '王様',
+      text: '今回は城の周りをモンスターをよくぞ討伐してくれた'
+    },
+    {
+      type: 2,
+      name: '王様',
+      text: '後ほど褒美を取らせよう！'
+    },
+    {
+      type: 1,
+      name: 'ルシェ',
+      text: 'こちらの口座に振り込んでください'
+    },
+    {
+      type: 0,
+      name: '',
+      text: 'ルシェはカバンから通帳を取り出した'
+    }
+  ],
+  next: 'home'
+};
 
-const innTalk = [
-  {
-    type: 1,
-    name: 'ルシェ',
-    text: 'こんにちは'
-  },
-  {
-    type: 2,
-    name: '宿屋',
-    text: 'いらっしゃいませ！'
-  },
-  {
-    type: 2,
-    name: '宿屋',
-    text: '宿屋へようこそ！'
-  },
-  {
-    type: 0,
-    name: '',
-    text: '（沈黙）'
-  },
-  {
-    type: 1,
-    name: 'ルシェ',
-    text: '今日泊まりたいのだけれども・・・'
-  },
-  {
-    type: 2,
-    name: '宿屋',
-    text: 'お好きな部屋をお使いください！'
-  },
-  {
-    type: 1,
-    name: 'ルシェ',
-    text: 'ありがとう'
-  }
-];
+const innTalk = {
+  talk: [ 
+    {
+      type: 1,
+      name: 'ルシェ',
+      text: 'こんにちは'
+    },
+    {
+      type: 2,
+      name: '宿屋',
+      text: 'いらっしゃいませ！'
+    },
+    {
+      type: 2,
+      name: '宿屋',
+      text: '宿屋へようこそ！'
+    },
+    {
+      type: 0,
+      name: '',
+      text: '（沈黙）'
+    },
+    {
+      type: 1,
+      name: 'ルシェ',
+      text: '今日泊まりたいのだけれども・・・'
+    },
+    {
+      type: 2,
+      name: '宿屋',
+      text: 'お好きな部屋をお使いください！'
+    },
+    {
+      type: 1,
+      name: 'ルシェ',
+      text: 'ありがとう'
+    }
+  ],
+  next: 'map'
+};
 
 
 class Talk {
@@ -83,18 +89,25 @@ class Talk {
       text: {}
     }
     this.talkscript = [];
+    this.setting = {
+      mask: [0.6, 0.6, 0.6, 1, 0, 0, 0, 0],
+      cache: [0, 0, 960, 960]
+    }
   }
 
   async start() {
     const queue = new createjs.LoadQueue();
-    const charaManifest = [
+    const talkManifest = [
       {src: 'inn.jpg', id: 'inn'},
       {src: 'castle.jpg', id: 'castle'},
-      {src: 'chara_8.png', id: 'main_chara'},
       {src: 'king.png', id: 'king'},
-      {src: 'person_2.png', id: 'person'},
+      {src: 'person_2.png', id: 'person'}
     ];
-    queue.loadManifest(charaManifest, true, './assets/images/talk/');
+    const charaManifest = [
+      {src: 'chara_8.png', id: 'main_chara'}
+    ];
+    queue.loadManifest(talkManifest, true, './assets/images/talk/');
+    queue.loadManifest(charaManifest, true, './assets/images/chara/talk/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     queue.addEventListener('complete', () => this.init());
   }
@@ -113,13 +126,13 @@ class Talk {
     this.comment = this.setCommentBox();
 
     this.mainChara.filters = [
-      new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+      new createjs.ColorFilter(...this.setting.mask)
     ];
-    this.mainChara.cache(0, 0, 960, 960);
+    this.mainChara.cache(...this.setting.cache);
     this.otherChara.filters = [
-      new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+      new createjs.ColorFilter(...this.setting.mask)
     ];
-    this.otherChara.cache(0, 0, 960, 960);
+    this.otherChara.cache(...this.setting.cache);
 
     stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
     stage.update();
@@ -179,35 +192,35 @@ class Talk {
     this.talk.text.y = 60;
 
     bg.addEventListener('click', () => {
-      const item = this.talkscript[this.talk.current];
+      const item = this.talkscript.talk[this.talk.current];
       if (item) {
         if (item.type === 0) {
           this.mainChara.filters = [
-            new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+            new createjs.ColorFilter(...this.setting.mask)
           ];
-          this.mainChara.cache(0, 0, 960, 960);
+          this.mainChara.cache(...this.setting.cache);
           this.otherChara.filters = [
-            new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+            new createjs.ColorFilter(...this.setting.mask)
           ];
-          this.otherChara.cache(0, 0, 960, 960);
+          this.otherChara.cache(...this.setting.cache);
         } else if (item.type === 1) {
           stage.setChildIndex(this.mainChara, stage.getNumChildren() - 1);
           stage.setChildIndex(this.otherChara, stage.getNumChildren() + 1);
           this.mainChara.filters = [];
-          this.mainChara.cache(0, 0, 960, 960);
+          this.mainChara.cache(...this.setting.cache);
           this.otherChara.filters = [
-            new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+            new createjs.ColorFilter(...this.setting.mask)
           ];
-          this.otherChara.cache(0, 0, 960, 960);
+          this.otherChara.cache(...this.setting.cache);
         } else if (item.type === 2) {
           stage.setChildIndex(this.mainChara, stage.getNumChildren() + 1);
           stage.setChildIndex(this.otherChara, stage.getNumChildren() - 1);
           this.mainChara.filters = [
-            new createjs.ColorFilter(0.6, 0.6, 0.6, 1, 0, 0, 0, 0)
+            new createjs.ColorFilter(...this.setting.mask)
           ];
-          this.mainChara.cache(0, 0, 960, 960);
+          this.mainChara.cache(...this.setting.cache);
           this.otherChara.filters = [];
-          this.otherChara.cache(0, 0, 960, 960);
+          this.otherChara.cache(...this.setting.cache);
         }
         stage.setChildIndex(this.comment, stage.getNumChildren() - 1);
         this.talk.name.text = item.name;
@@ -215,7 +228,7 @@ class Talk {
         stage.update();
         this.talk.current++;
       } else {
-        route.to('map');
+        route.to(this.talkscript.next);
         this.destroy();
       }
     });

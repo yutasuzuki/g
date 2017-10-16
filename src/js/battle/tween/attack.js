@@ -33,16 +33,17 @@ class Attack {
   
   _attack() {
     const x = this.attacker.x;
-    const y = this.attacker.y;
+    let moveX = 40
+    if (this.attacker.type === 'enemy') {
+      moveX = -40
+    }
     return new Promise((resolve, reject) => {
       createjs.Tween.get(this.attacker)
         .to({
-          x: this.defenser.x,
-          y: this.defenser.y
+          x: this.attacker.x + moveX
         }, 150)
         .to({
           x,
-          y,
         }, 150)
         .call(() => {
           resolve();

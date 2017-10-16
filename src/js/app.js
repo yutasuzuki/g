@@ -12,6 +12,7 @@ const MyParty = [
     MGC: 30,
     DF: 25,
     SP: 20,
+    leader: true,
     choice: {
       rate: {
         ATK: 20,
@@ -30,6 +31,7 @@ const MyParty = [
     MGC: 18,
     DF: 22,
     SP: 32,
+    leader: false,
     choice: {
       rate: {
         ATK: 50,
@@ -48,6 +50,7 @@ const MyParty = [
     MGC: 22,
     DF: 25,
     SP: 12,
+    leader: false,
     choice: {
       rate: {
         ATK: 30,
@@ -66,6 +69,7 @@ const MyParty = [
     MGC: 25,
     DF: 25,
     SP: 16,
+    leader: false,
     choice: {
       rate: {
         ATK: 10,
@@ -84,6 +88,7 @@ const MyParty = [
     MGC: 10,
     DF: 40,
     SP: 15,
+    leader: false,
     choice: {
       rate: {
         ATK: 10,
@@ -111,4 +116,4 @@ window.state = {
   }
 };
 
-route.to('talk');
+route.to('home');

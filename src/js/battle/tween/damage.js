@@ -19,11 +19,11 @@ class Damage {
       .to({
         y: damageText.y - 10,
         alpha: 1
-      }, 400)
+      }, 300)
       .to({
         y: damageText.y,
         alpha: 1
-      }, 400)
+      }, 300)
       .to({
         y: damageText.y,
         alpha: 0
