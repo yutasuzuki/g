@@ -25,13 +25,13 @@ class Party {
   }
 
   init() {
-    const container = new createjs.Container();
-    const header = this.setHeader()
+    this.container = new createjs.Container();
+    this.header = this.setHeader()
     const party = this.setParty();
     const charaContainer = this.setMember();
 
-    container.addChild(charaContainer, party);
-    stage.addChild(container, header);
+    this.container.addChild(charaContainer, party);
+    stage.addChild(this.container, this.header);
     stage.update();
   }
 
@@ -184,14 +184,17 @@ class Party {
     header.scaleY = window.innerWidth / header.getBounds().width;
     header.x = 0;
     header.y = 0;
-    header.addEventListener('click', e => route.to('home'))
+    header.addEventListener('click', (e) => {
+      route.to('home');
+      this.destroy();
+    });
 
     container.addChild(header);
     return container;
   }
 
   destroy() {
-    stage.removeChild(this.field, this.squares, this.footer);
+    stage.removeChild(this.container, this.header);
     stage.update();
   }
 }
