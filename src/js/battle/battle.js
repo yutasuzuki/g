@@ -579,14 +579,12 @@ class Battle {
       const key = type === 'self' ? `chara_${charactor.id}` : `enemy_${charactor.id}`;
       const container = new createjs.Container();
       const chara = new createjs.Bitmap(this.loaders[key]);
-      console.log(chara.getBounds().width);
       container.regX = chara.getBounds().width / 4;
       container.regY = chara.getBounds().height / 4;
       container.x = constants[type].pos[index].x + 20;
       container.y = constants[type].pos[index].y + 20;
       chara.scaleX = 0.5;
       chara.scaleY = 0.5;
-      console.log(charactor);
       chara.alpha = 0 < charactor.HP ? 1 : 0;
       container.damage = function(point) {
         container.status.HP -= point;

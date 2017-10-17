@@ -102,6 +102,7 @@ class Party {
         return charactor;
       });
       this.selected.main = this.selected.sub = {};
+      this.destroy();
       this.init();
     }
   }

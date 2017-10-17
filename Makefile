@@ -4,10 +4,7 @@ push:
 	git push origin master
 
 deploy:
-	git fetch && \
-	git checkout master && \
-	git pull origin master && \
-	git push origin master && \
+	make push && \
 	git checkout gh-pages && \
 	git merge master && \
 	git add --all && \
