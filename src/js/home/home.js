@@ -48,7 +48,6 @@ class Home {
   setMainCharactor(key) {
     const container = new createjs.Container();
     const chara = new createjs.Bitmap(this.loaders[key]);
-    console.log(chara.getBounds().height);
     chara.y = window.innerHeight - chara.getBounds().height / 2;
     chara.scaleX = 0.5;
     chara.scaleY = 0.5;
