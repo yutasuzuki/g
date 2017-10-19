@@ -48,62 +48,71 @@ class Map {
     queue.loadManifest(mapManifest, true, './assets/images/map/');
     queue.loadManifest(walkManifest, true, './assets/images/map/sprite/walk/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
-    queue.addEventListener('complete', () => this.init());
+    return new Promise((resolve, reject) => {
+      queue.addEventListener('complete', () => { 
+        this.init().then((res) => {
+          resolve(res);
+        })
+      });
+    });
   }
 
   init() {
-    this.field = this.setField();
-    this.squares = this.setSquare();
-    this.footer = this.setFooter();
-    createjs.Ticker.timingMode = createjs.Ticker.RAF;
-    createjs.Ticker.addEventListener('tick', stage);
-    let touch = {
-      start: {
-        x: 0,
-        y: 0
-      },
-      history: {
-        x: state.map.squares.pos.x,
-        y: state.map.squares.pos.y
+    return new Promise((resolve, reject) => {
+      this.field = this.setField();
+      this.squares = this.setSquare();
+      this.footer = this.setFooter();
+      createjs.Ticker.timingMode = createjs.Ticker.RAF;
+      createjs.Ticker.addEventListener('tick', stage);
+      let touch = {
+        start: {
+          x: 0,
+          y: 0
+        },
+        history: {
+          x: state.map.squares.pos.x,
+          y: state.map.squares.pos.y
+        }
+      };
+      this.touchstartHandler = (e) => {
+        const t = e.changedTouches[0];
+        touch.start.x = t.pageX;
+        touch.start.y = t.pageY;
+        this.squares.x = touch.history.x;
+        this.squares.y = touch.history.y;
       }
-    };
-    this.touchstartHandler = (e) => {
-      const t = e.changedTouches[0];
-      touch.start.x = t.pageX;
-      touch.start.y = t.pageY;
-      this.squares.x = touch.history.x;
-      this.squares.y = touch.history.y;
-    }
-    this.touchmoveHandler = (e) => {
-      const t = e.changedTouches[0];
-      const diffX = touch.start.x - t.pageX;
-      const diffY = touch.start.y - t.pageY;
-      if (window.innerWidth - this.squares.getBounds().width <= this.squares.x && this.squares.x <= 0) {
-        this.squares.x = touch.history.x - diffX;
+      this.touchmoveHandler = (e) => {
+        const t = e.changedTouches[0];
+        const diffX = touch.start.x - t.pageX;
+        const diffY = touch.start.y - t.pageY;
+        if (window.innerWidth - this.squares.getBounds().width <= this.squares.x && this.squares.x <= 0) {
+          this.squares.x = touch.history.x - diffX;
+        }
+        if (window.innerHeight - this.squares.getBounds().height <= this.squares.y && this.squares.y <= 0) {
+          this.squares.y = touch.history.y - diffY;
+        }
+        if (this.squares.x < window.innerWidth - this.squares.getBounds().width) {
+          this.squares.x = window.innerWidth - this.squares.getBounds().width;
+        } else if (this.squares.x > 0) {
+          this.squares.x = 0;
+        }
+        if (this.squares.y < window.innerHeight - this.squares.getBounds().height) {
+          this.squares.y = window.innerHeight - this.squares.getBounds().height;
+        } else if (this.squares.y > 0) {
+          this.squares.y = 0;
+        }
       }
-      if (window.innerHeight - this.squares.getBounds().height <= this.squares.y && this.squares.y <= 0) {
-        this.squares.y = touch.history.y - diffY;
+      this.touchendHandler = () => {
+        touch.history.x = state.map.squares.pos.x = this.squares.x;
+        touch.history.y = state.map.squares.pos.y = this.squares.y;
       }
-      if (this.squares.x < window.innerWidth - this.squares.getBounds().width) {
-        this.squares.x = window.innerWidth - this.squares.getBounds().width;
-      } else if (this.squares.x > 0) {
-        this.squares.x = 0;
-      }
-      if (this.squares.y < window.innerHeight - this.squares.getBounds().height) {
-        this.squares.y = window.innerHeight - this.squares.getBounds().height;
-      } else if (this.squares.y > 0) {
-        this.squares.y = 0;
-      }
-    }
-    this.touchendHandler = () => {
-      touch.history.x = state.map.squares.pos.x = this.squares.x;
-      touch.history.y = state.map.squares.pos.y = this.squares.y;
-    }
-    window.addEventListener('touchstart', this.touchstartHandler);
-    window.addEventListener('touchmove', this.touchmoveHandler);
-    window.addEventListener('touchend', this.touchendHandler);
-    stage.addChild(this.field, this.squares, this.footer);
-    stage.update();
+      window.addEventListener('touchstart', this.touchstartHandler);
+      window.addEventListener('touchmove', this.touchmoveHandler);
+      window.addEventListener('touchend', this.touchendHandler);
+      stage.addChild(this.field, this.squares, this.footer);
+      stage.update();
+      resolve('map');
+    });
   }
     
   setBitmap(key) {
@@ -224,9 +233,7 @@ class Map {
                         route.to('talk');
                         break;
                     }
-                    setTimeout(() => {
-                      this.destroy();
-                    }, 1000);
+                    this.destroy();
                   }
                 })
               
