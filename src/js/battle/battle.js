@@ -76,7 +76,13 @@ class Battle {
     queue.loadManifest(enemyCharaManifest, true, './assets/images/enemy/');
     queue.loadManifest(magicManifest, true, './assets/images/battle/effect/magic/')
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
-    queue.addEventListener('complete', () => this.init());
+    return new Promise((resolve, reject) => {
+      queue.addEventListener('complete', () => { 
+        this.init().then((res) => {
+          resolve(res);
+        })
+      });
+    });
   }
   
   createMainCharaManifest(charactors) {
@@ -98,18 +104,21 @@ class Battle {
   }
 
   init() {
-    this.container = new createjs.Container();
-    this.field = this.setField();
-    this.commands = this.setCommands();
-    this.myCharactors = this.setCharactors(this.state.self.charactors);
-    this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
-    this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
-    createjs.Ticker.timingMode = createjs.Ticker.RAF;
-    createjs.Ticker.addEventListener('tick', stage);
-    this.container.addChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
-    stage.addChild(this.container);
-    stage.update();
-    this.turn();
+    return new Promise((resolve, reject) => {
+      this.container = new createjs.Container();
+      this.field = this.setField();
+      this.commands = this.setCommands();
+      this.myCharactors = this.setCharactors(this.state.self.charactors);
+      this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
+      this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
+      createjs.Ticker.timingMode = createjs.Ticker.RAF;
+      createjs.Ticker.addEventListener('tick', stage);
+      this.container.addChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
+      stage.addChild(this.container);
+      stage.update();
+      this.turn();
+      resolve('battle');
+    });
   }
 
   turn() {

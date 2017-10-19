@@ -20,19 +20,28 @@ class Home {
     queue.loadManifest(charaManifest, true, './assets/images/chara/stand/');
     queue.loadManifest(homeManifest, true, './assets/images/home/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
-    queue.addEventListener('complete', () => this.init());
+    return new Promise((resolve, reject) => {
+      queue.addEventListener('complete', () => { 
+        this.init().then((res) => {
+          resolve(res);
+        })
+      });
+    });
   }
 
   init() {;
-    this.container = new createjs.Container();
-    const bg = this.setBackground('bg');
-    const mainCharactor = this.setMainCharactor('main_chara');
-    this.header = this.setHeader();
-    this.footer = this.setFooter();
-    this.container.addChild(bg, mainCharactor);
-    this.container.y = - 100;
-    stage.addChild(this.container, this.header, this.footer);
-    stage.update();
+    return new Promise((resolve, reject) => {
+      this.container = new createjs.Container();
+      const bg = this.setBackground('bg');
+      const mainCharactor = this.setMainCharactor('main_chara');
+      this.header = this.setHeader();
+      this.footer = this.setFooter();
+      this.container.addChild(bg, mainCharactor);
+      this.container.y = - 100;
+      stage.addChild(this.container, this.header, this.footer);
+      stage.update();
+      resolve('home');
+    });
   }
 
   setBackground(key) {

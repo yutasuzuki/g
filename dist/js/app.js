@@ -18514,10 +18514,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _promise = __webpack_require__(11);
-
-var _promise2 = _interopRequireDefault(_promise);
-
 var _toConsumableArray2 = __webpack_require__(52);
 
 var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
@@ -18525,6 +18521,10 @@ var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 var _regenerator = __webpack_require__(15);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _promise = __webpack_require__(11);
+
+var _promise2 = _interopRequireDefault(_promise);
 
 var _asyncToGenerator2 = __webpack_require__(16);
 
@@ -18640,9 +18640,13 @@ var Battle = function () {
                 queue.addEventListener('fileload', function (e) {
                   return _this.loaders[e.item.id] = e.result;
                 });
-                queue.addEventListener('complete', function () {
-                  return _this.init();
-                });
+                return _context.abrupt('return', new _promise2.default(function (resolve, reject) {
+                  queue.addEventListener('complete', function () {
+                    _this.init().then(function (res) {
+                      resolve(res);
+                    });
+                  });
+                }));
 
               case 19:
               case 'end':
@@ -18681,20 +18685,25 @@ var Battle = function () {
   }, {
     key: 'init',
     value: function init() {
-      var _container;
+      var _this2 = this;
 
-      this.container = new createjs.Container();
-      this.field = this.setField();
-      this.commands = this.setCommands();
-      this.myCharactors = this.setCharactors(this.state.self.charactors);
-      this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
-      this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
-      createjs.Ticker.timingMode = createjs.Ticker.RAF;
-      createjs.Ticker.addEventListener('tick', stage);
-      (_container = this.container).addChild.apply(_container, [this.field, this.commands.attack, this.commands.defense].concat((0, _toConsumableArray3.default)(this.myCharactors), (0, _toConsumableArray3.default)(this.enemyCharactors)));
-      stage.addChild(this.container);
-      stage.update();
-      this.turn();
+      return new _promise2.default(function (resolve, reject) {
+        var _container;
+
+        _this2.container = new createjs.Container();
+        _this2.field = _this2.setField();
+        _this2.commands = _this2.setCommands();
+        _this2.myCharactors = _this2.setCharactors(_this2.state.self.charactors);
+        _this2.enemyCharactors = _this2.setCharactors(_this2.state.enemy.charactors, 'enemy');
+        _this2.Flow = new Flow(_this2.myCharactors, _this2.enemyCharactors);
+        createjs.Ticker.timingMode = createjs.Ticker.RAF;
+        createjs.Ticker.addEventListener('tick', stage);
+        (_container = _this2.container).addChild.apply(_container, [_this2.field, _this2.commands.attack, _this2.commands.defense].concat((0, _toConsumableArray3.default)(_this2.myCharactors), (0, _toConsumableArray3.default)(_this2.enemyCharactors)));
+        stage.addChild(_this2.container);
+        stage.update();
+        _this2.turn();
+        resolve('battle');
+      });
     }
   }, {
     key: 'turn',
@@ -18801,7 +18810,7 @@ var Battle = function () {
   }, {
     key: 'attackHandler',
     value: function attackHandler() {
-      var _this2 = this;
+      var _this3 = this;
 
       if (this.isCommandDisable()) return;
       this.state.turn.finish = false;
@@ -18818,7 +18827,7 @@ var Battle = function () {
       damege.tween(damagePoint, diffencer);
 
       attack.tween(attacker, diffencer).then(function () {
-        _this2.decideBattlePhase(_this2.orderedEnemyChara);
+        _this3.decideBattlePhase(_this3.orderedEnemyChara);
       });
     }
 
@@ -18827,7 +18836,7 @@ var Battle = function () {
   }, {
     key: 'magicHandler',
     value: function magicHandler() {
-      var _this3 = this;
+      var _this4 = this;
 
       if (this.isCommandDisable()) return;
       this.state.turn.finish = false;
@@ -18843,16 +18852,16 @@ var Battle = function () {
         var magicPromises = [];
         diffencers.forEach(function (diffencer) {
           if (0 < diffencer.status.HP) {
-            var damage = _this3.calcMagicDamage(commandType, attacker, diffencer);
+            var damage = _this4.calcMagicDamage(commandType, attacker, diffencer);
             diffencer.damage(damage);
             damege.tween(damage, diffencer);
-            var _magic = new _magic5.default(_this3.loaders['air']);
+            var _magic = new _magic5.default(_this4.loaders['air']);
             var magicPromise = _magic.tween(attacker, diffencer);
             magicPromises.push(magicPromise);
           }
         });
         _promise2.default.race(magicPromises).then(function () {
-          _this3.decideBattlePhase(diffencers);
+          _this4.decideBattlePhase(diffencers);
         }).catch(function (e) {
           console.log(e);
         });
@@ -18866,7 +18875,7 @@ var Battle = function () {
   }, {
     key: 'enemyAttack',
     value: function enemyAttack(diffenceType, attacker) {
-      var _this4 = this;
+      var _this5 = this;
 
       var commandType = this.choiceEnemyCommandType(attacker);
       console.log(' - - - - - - - - - - - -');
@@ -18880,7 +18889,7 @@ var Battle = function () {
         damege.tween(damagePoint, diffencer);
 
         attack.tween(attacker, diffencer).then(function () {
-          _this4.decideBattlePhase(_this4.orderedMyChara);
+          _this5.decideBattlePhase(_this5.orderedMyChara);
         });
       } else if (commandType === 'MGC') {
         if (diffenceType !== commandType) {
@@ -18888,16 +18897,16 @@ var Battle = function () {
           var magicPromises = [];
           diffencers.forEach(function (diffencer) {
             if (0 < diffencer.status.HP) {
-              var damage = _this4.calcMagicDamage(diffenceType, attacker, diffencer);
+              var damage = _this5.calcMagicDamage(diffenceType, attacker, diffencer);
               diffencer.damage(damage);
               damege.tween(damage, diffencer);
-              var _magic2 = new _magic5.default(_this4.loaders['air']);
+              var _magic2 = new _magic5.default(_this5.loaders['air']);
               var magicPromise = _magic2.tween(attacker, diffencer);
               magicPromises.push(magicPromise);
             }
           });
           _promise2.default.race(magicPromises).then(function () {
-            _this4.decideBattlePhase(_this4.orderedMyChara);
+            _this5.decideBattlePhase(_this5.orderedMyChara);
           }).catch(function (e) {
             console.log(e);
           });
@@ -18921,7 +18930,7 @@ var Battle = function () {
     key: 'reflectMagic',
     value: function () {
       var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(attacker, targetDiffencer, diffencers) {
-        var _this5 = this;
+        var _this6 = this;
 
         var commandType, m, magicPromises;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -18946,17 +18955,17 @@ var Battle = function () {
 
                 diffencers.forEach(function (diffencer) {
                   if (0 < diffencer.status.HP) {
-                    var damage = _this5.calcMagicDamage(commandType, attacker, diffencer);
+                    var damage = _this6.calcMagicDamage(commandType, attacker, diffencer);
                     console.log(diffencer.status.name + '\u306E\u30C0\u30E1\u30FC\u30B8', damage);
                     diffencer.damage(damage);
                     damege.tween(damage, diffencer);
-                    var _magic3 = new _magic5.default(_this5.loaders['air']);
+                    var _magic3 = new _magic5.default(_this6.loaders['air']);
                     var magicPromise = _magic3.tween(attacker, diffencer);
                     magicPromises.push(magicPromise);
                   }
                 });
                 _promise2.default.race(magicPromises).then(function () {
-                  _this5.decideBattlePhase(diffencers);
+                  _this6.decideBattlePhase(diffencers);
                 }).catch(function (e) {
                   console.log(e);
                 });
@@ -19007,14 +19016,14 @@ var Battle = function () {
   }, {
     key: 'decideBattlePhase',
     value: function decideBattlePhase(charactors) {
-      var _this6 = this;
+      var _this7 = this;
 
       var msg = charactors[0].type === 'self' ? '全滅した' : '敵を倒した';
       if (this.getLivingCharas(charactors).length === 0) {
         this.state.battle.finish = true;
         console.log(msg);
         setTimeout(function () {
-          _this6.showResult();
+          _this7.showResult();
         }, 1200);
       } else {
         this.turnController();
@@ -19023,7 +19032,7 @@ var Battle = function () {
   }, {
     key: 'showResult',
     value: function showResult() {
-      var _this7 = this;
+      var _this8 = this;
 
       var result = new createjs.Container();
       var bg = new createjs.Shape();
@@ -19038,7 +19047,7 @@ var Battle = function () {
       btnBack.alpha = 1;
       btnBack.addEventListener('click', function () {
         route.to('map');
-        _this7.destroy();
+        _this8.destroy();
       });
 
       result.addChild(bg, btnBack);
@@ -19249,14 +19258,14 @@ var Battle = function () {
   }, {
     key: 'setCharactors',
     value: function setCharactors(charactors) {
-      var _this8 = this;
+      var _this9 = this;
 
       var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'self';
 
       return charactors.map(function (charactor, index) {
         var key = type === 'self' ? 'chara_' + charactor.id : 'enemy_' + charactor.id;
         var container = new createjs.Container();
-        var chara = new createjs.Bitmap(_this8.loaders[key]);
+        var chara = new createjs.Bitmap(_this9.loaders[key]);
         container.regX = chara.getBounds().width / 4;
         container.regY = chara.getBounds().height / 4;
         container.x = _constants2.default[type].pos[index].x + 20;
@@ -20146,10 +20155,6 @@ var Router = function () {
 
     (0, _classCallCheck3.default)(this, Router);
 
-    this.loaders = [];
-    this.loading = {
-      circles: []
-    };
     this.config = {
       home: {
         name: 'home',
@@ -20173,11 +20178,6 @@ var Router = function () {
       }
     };
     var queue = new createjs.LoadQueue();
-    var fieldManifest = [{ src: 'loading-ghost.png', id: 'ghost' }];
-    queue.loadManifest(fieldManifest, true, './assets/images/loading/');
-    queue.addEventListener('fileload', function (e) {
-      return _this.loaders[e.item.id] = e.result;
-    });
     queue.addEventListener('complete', function () {
       return _this.start();
     });
@@ -20189,40 +20189,53 @@ var Router = function () {
   }, {
     key: 'load',
     value: function load() {
-      createjs.Ticker.timingMode = createjs.Ticker.RAF;
-      createjs.Ticker.addEventListener('tick', stage);
+      var _this2 = this;
 
-      var data = {
-        images: ['./assets/images/loading/loading-ghost.png'],
-        frames: { width: 170, height: 170, regX: 0, regY: 0, scaleX: 0.5, scaleY: 0.5 },
-        animations: {
-          ghost: {
-            frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-          }
-        },
-        framerate: 30
-      };
+      return new _promise2.default(function (resolve, reject) {
+        createjs.Ticker.timingMode = createjs.Ticker.RAF;
+        createjs.Ticker.addEventListener('tick', stage);
 
-      var spritesheet = new createjs.SpriteSheet(data);
-      var sprite = new createjs.Sprite(spritesheet, 0);
-      sprite.scaleX = 0.5;
-      sprite.scaleY = 0.5;
-      sprite.x = 100;
-      sprite.y = 100;
+        _this2.container = new createjs.Container();
+        var bg = new createjs.Shape();
+        bg.graphics.beginFill("black");
 
-      // sprite.gotoAndPlay('ghost');
+        var data = {
+          images: ['./assets/images/loading/loading-ghost.png'],
+          frames: { width: 170, height: 170, regX: 0, regY: 0, scaleX: 0.5, scaleY: 0.5 },
+          animations: {
+            ghost: {
+              frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+            }
+          },
+          framerate: 30
+        };
+        var spritesheet = new createjs.SpriteSheet(data);
+        var loading = new createjs.Sprite(spritesheet, 0);
+        loading.scaleX = 0.5;
+        loading.scaleY = 0.5;
+        loading.x = 100;
+        loading.y = 100;
+        loading.gotoAndPlay('ghost');
 
-      stage.addChild(sprite);
-      stage.update();
-
-      return new _promise2.default(function (resolve, reject) {});
+        _this2.container.addChild(bg, loading);
+        stage.addChild(_this2.container);
+        stage.update();
+        resolve();
+      });
     }
   }, {
     key: 'to',
     value: function to(scene) {
-      this.load();
-      var route = new this.config[scene].component();
-      // route.start();
+      var _this3 = this;
+
+      this.load().then(function (res) {
+        var route = new _this3.config[scene].component();
+        return route.start();
+      }).then(function (res) {
+        console.log(2, res);
+        stage.removeChild(_this3.container);
+        stage.update();
+      });
     }
   }]);
   return Router;
@@ -21065,6 +21078,10 @@ var _regenerator = __webpack_require__(15);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
+var _promise = __webpack_require__(11);
+
+var _promise2 = _interopRequireDefault(_promise);
+
 var _asyncToGenerator2 = __webpack_require__(16);
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
@@ -21112,9 +21129,13 @@ var Home = function () {
                 queue.addEventListener('fileload', function (e) {
                   return _this.loaders[e.item.id] = e.result;
                 });
-                queue.addEventListener('complete', function () {
-                  return _this.init();
-                });
+                return _context.abrupt('return', new _promise2.default(function (resolve, reject) {
+                  queue.addEventListener('complete', function () {
+                    _this.init().then(function (res) {
+                      resolve(res);
+                    });
+                  });
+                }));
 
               case 7:
               case 'end':
@@ -21133,16 +21154,21 @@ var Home = function () {
   }, {
     key: 'init',
     value: function init() {
+      var _this2 = this;
+
       ;
-      this.container = new createjs.Container();
-      var bg = this.setBackground('bg');
-      var mainCharactor = this.setMainCharactor('main_chara');
-      this.header = this.setHeader();
-      this.footer = this.setFooter();
-      this.container.addChild(bg, mainCharactor);
-      this.container.y = -100;
-      stage.addChild(this.container, this.header, this.footer);
-      stage.update();
+      return new _promise2.default(function (resolve, reject) {
+        _this2.container = new createjs.Container();
+        var bg = _this2.setBackground('bg');
+        var mainCharactor = _this2.setMainCharactor('main_chara');
+        _this2.header = _this2.setHeader();
+        _this2.footer = _this2.setFooter();
+        _this2.container.addChild(bg, mainCharactor);
+        _this2.container.y = -100;
+        stage.addChild(_this2.container, _this2.header, _this2.footer);
+        stage.update();
+        resolve('home');
+      });
     }
   }, {
     key: 'setBackground',
@@ -21170,7 +21196,7 @@ var Home = function () {
   }, {
     key: 'setFooter',
     value: function setFooter() {
-      var _this2 = this;
+      var _this3 = this;
 
       var container = new createjs.Container();
       container.y = window.innerHeight - 100;
@@ -21180,7 +21206,7 @@ var Home = function () {
       btnQuest.y = 10;
       btnQuest.addEventListener('click', function () {
         route.to('map');
-        _this2.destroy();
+        _this3.destroy();
       });
 
       var btnParty = new createjs.Bitmap(this.loaders['btn_party']);
@@ -21188,7 +21214,7 @@ var Home = function () {
       btnParty.y = 10;
       btnParty.addEventListener('click', function () {
         route.to('party');
-        _this2.destroy();
+        _this3.destroy();
       });
 
       container.addChild(btnQuest, btnParty);
@@ -23416,6 +23442,10 @@ var _regenerator = __webpack_require__(15);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
+var _promise = __webpack_require__(11);
+
+var _promise2 = _interopRequireDefault(_promise);
+
 var _asyncToGenerator2 = __webpack_require__(16);
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
@@ -23476,9 +23506,13 @@ var Map = function () {
                 queue.addEventListener('fileload', function (e) {
                   return _this.loaders[e.item.id] = e.result;
                 });
-                queue.addEventListener('complete', function () {
-                  return _this.init();
-                });
+                return _context.abrupt('return', new _promise2.default(function (resolve, reject) {
+                  queue.addEventListener('complete', function () {
+                    _this.init().then(function (res) {
+                      resolve(res);
+                    });
+                  });
+                }));
 
               case 8:
               case 'end':
@@ -23499,58 +23533,61 @@ var Map = function () {
     value: function init() {
       var _this2 = this;
 
-      this.field = this.setField();
-      this.squares = this.setSquare();
-      this.footer = this.setFooter();
-      createjs.Ticker.timingMode = createjs.Ticker.RAF;
-      createjs.Ticker.addEventListener('tick', stage);
-      var touch = {
-        start: {
-          x: 0,
-          y: 0
-        },
-        history: {
-          x: state.map.squares.pos.x,
-          y: state.map.squares.pos.y
-        }
-      };
-      this.touchstartHandler = function (e) {
-        var t = e.changedTouches[0];
-        touch.start.x = t.pageX;
-        touch.start.y = t.pageY;
-        _this2.squares.x = touch.history.x;
-        _this2.squares.y = touch.history.y;
-      };
-      this.touchmoveHandler = function (e) {
-        var t = e.changedTouches[0];
-        var diffX = touch.start.x - t.pageX;
-        var diffY = touch.start.y - t.pageY;
-        if (window.innerWidth - _this2.squares.getBounds().width <= _this2.squares.x && _this2.squares.x <= 0) {
-          _this2.squares.x = touch.history.x - diffX;
-        }
-        if (window.innerHeight - _this2.squares.getBounds().height <= _this2.squares.y && _this2.squares.y <= 0) {
-          _this2.squares.y = touch.history.y - diffY;
-        }
-        if (_this2.squares.x < window.innerWidth - _this2.squares.getBounds().width) {
-          _this2.squares.x = window.innerWidth - _this2.squares.getBounds().width;
-        } else if (_this2.squares.x > 0) {
-          _this2.squares.x = 0;
-        }
-        if (_this2.squares.y < window.innerHeight - _this2.squares.getBounds().height) {
-          _this2.squares.y = window.innerHeight - _this2.squares.getBounds().height;
-        } else if (_this2.squares.y > 0) {
-          _this2.squares.y = 0;
-        }
-      };
-      this.touchendHandler = function () {
-        touch.history.x = state.map.squares.pos.x = _this2.squares.x;
-        touch.history.y = state.map.squares.pos.y = _this2.squares.y;
-      };
-      window.addEventListener('touchstart', this.touchstartHandler);
-      window.addEventListener('touchmove', this.touchmoveHandler);
-      window.addEventListener('touchend', this.touchendHandler);
-      stage.addChild(this.field, this.squares, this.footer);
-      stage.update();
+      return new _promise2.default(function (resolve, reject) {
+        _this2.field = _this2.setField();
+        _this2.squares = _this2.setSquare();
+        _this2.footer = _this2.setFooter();
+        createjs.Ticker.timingMode = createjs.Ticker.RAF;
+        createjs.Ticker.addEventListener('tick', stage);
+        var touch = {
+          start: {
+            x: 0,
+            y: 0
+          },
+          history: {
+            x: state.map.squares.pos.x,
+            y: state.map.squares.pos.y
+          }
+        };
+        _this2.touchstartHandler = function (e) {
+          var t = e.changedTouches[0];
+          touch.start.x = t.pageX;
+          touch.start.y = t.pageY;
+          _this2.squares.x = touch.history.x;
+          _this2.squares.y = touch.history.y;
+        };
+        _this2.touchmoveHandler = function (e) {
+          var t = e.changedTouches[0];
+          var diffX = touch.start.x - t.pageX;
+          var diffY = touch.start.y - t.pageY;
+          if (window.innerWidth - _this2.squares.getBounds().width <= _this2.squares.x && _this2.squares.x <= 0) {
+            _this2.squares.x = touch.history.x - diffX;
+          }
+          if (window.innerHeight - _this2.squares.getBounds().height <= _this2.squares.y && _this2.squares.y <= 0) {
+            _this2.squares.y = touch.history.y - diffY;
+          }
+          if (_this2.squares.x < window.innerWidth - _this2.squares.getBounds().width) {
+            _this2.squares.x = window.innerWidth - _this2.squares.getBounds().width;
+          } else if (_this2.squares.x > 0) {
+            _this2.squares.x = 0;
+          }
+          if (_this2.squares.y < window.innerHeight - _this2.squares.getBounds().height) {
+            _this2.squares.y = window.innerHeight - _this2.squares.getBounds().height;
+          } else if (_this2.squares.y > 0) {
+            _this2.squares.y = 0;
+          }
+        };
+        _this2.touchendHandler = function () {
+          touch.history.x = state.map.squares.pos.x = _this2.squares.x;
+          touch.history.y = state.map.squares.pos.y = _this2.squares.y;
+        };
+        window.addEventListener('touchstart', _this2.touchstartHandler);
+        window.addEventListener('touchmove', _this2.touchmoveHandler);
+        window.addEventListener('touchend', _this2.touchendHandler);
+        stage.addChild(_this2.field, _this2.squares, _this2.footer);
+        stage.update();
+        resolve('map');
+      });
     }
   }, {
     key: 'setBitmap',
@@ -23677,9 +23714,7 @@ var Map = function () {
                         route.to('talk');
                         break;
                     }
-                    setTimeout(function () {
-                      _this4.destroy();
-                    }, 1000);
+                    _this4.destroy();
                   }
                 });
 
@@ -23774,6 +23809,10 @@ var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 var _regenerator = __webpack_require__(15);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _promise = __webpack_require__(11);
+
+var _promise2 = _interopRequireDefault(_promise);
 
 var _asyncToGenerator2 = __webpack_require__(16);
 
@@ -23895,9 +23934,13 @@ var Talk = function () {
                 queue.addEventListener('fileload', function (e) {
                   return _this.loaders[e.item.id] = e.result;
                 });
-                queue.addEventListener('complete', function () {
-                  return _this.init();
-                });
+                return _context.abrupt('return', new _promise2.default(function (resolve, reject) {
+                  queue.addEventListener('complete', function () {
+                    _this.init().then(function (res) {
+                      resolve(res);
+                    });
+                  });
+                }));
 
               case 7:
               case 'end':
@@ -23916,27 +23959,32 @@ var Talk = function () {
   }, {
     key: 'init',
     value: function init() {
-      var _mainChara, _otherChara;
+      var _this2 = this;
 
-      this.mainChara = this.setMainCharactor('main_chara');
-      if (state.map.currentType === 2) {
-        this.background = this.setBackground('inn');
-        this.otherChara = this.setOtherCharactor('person');
-        this.talkscript = innTalk;
-      } else if (state.map.currentType === 3) {
-        this.background = this.setBackground('castle');
-        this.otherChara = this.setOtherCharactor('king');
-        this.talkscript = castleTalk;
-      }
-      this.comment = this.setCommentBox();
+      return new _promise2.default(function (resolve, reject) {
+        var _mainChara, _otherChara;
 
-      this.mainChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(this.setting.mask))))()];
-      (_mainChara = this.mainChara).cache.apply(_mainChara, (0, _toConsumableArray3.default)(this.setting.cache));
-      this.otherChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(this.setting.mask))))()];
-      (_otherChara = this.otherChara).cache.apply(_otherChara, (0, _toConsumableArray3.default)(this.setting.cache));
+        _this2.mainChara = _this2.setMainCharactor('main_chara');
+        if (state.map.currentType === 2) {
+          _this2.background = _this2.setBackground('inn');
+          _this2.otherChara = _this2.setOtherCharactor('person');
+          _this2.talkscript = innTalk;
+        } else if (state.map.currentType === 3) {
+          _this2.background = _this2.setBackground('castle');
+          _this2.otherChara = _this2.setOtherCharactor('king');
+          _this2.talkscript = castleTalk;
+        }
+        _this2.comment = _this2.setCommentBox();
 
-      stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
-      stage.update();
+        _this2.mainChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this2.setting.mask))))()];
+        (_mainChara = _this2.mainChara).cache.apply(_mainChara, (0, _toConsumableArray3.default)(_this2.setting.cache));
+        _this2.otherChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this2.setting.mask))))()];
+        (_otherChara = _this2.otherChara).cache.apply(_otherChara, (0, _toConsumableArray3.default)(_this2.setting.cache));
+
+        stage.addChild(_this2.background, _this2.otherChara, _this2.mainChara, _this2.comment);
+        stage.update();
+        resolve('talk');
+      });
     }
   }, {
     key: 'setBackground',
@@ -23978,7 +24026,7 @@ var Talk = function () {
   }, {
     key: 'setCommentBox',
     value: function setCommentBox() {
-      var _this2 = this;
+      var _this3 = this;
 
       var commentBoxHeight = 200;
       var container = new createjs.Container();
@@ -23999,42 +24047,42 @@ var Talk = function () {
       this.talk.text.y = 60;
 
       bg.addEventListener('click', function () {
-        var item = _this2.talkscript.talk[_this2.talk.current];
+        var item = _this3.talkscript.talk[_this3.talk.current];
         if (item) {
           if (item.type === 0) {
             var _mainChara2, _otherChara2;
 
-            _this2.mainChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this2.setting.mask))))()];
-            (_mainChara2 = _this2.mainChara).cache.apply(_mainChara2, (0, _toConsumableArray3.default)(_this2.setting.cache));
-            _this2.otherChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this2.setting.mask))))()];
-            (_otherChara2 = _this2.otherChara).cache.apply(_otherChara2, (0, _toConsumableArray3.default)(_this2.setting.cache));
+            _this3.mainChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this3.setting.mask))))()];
+            (_mainChara2 = _this3.mainChara).cache.apply(_mainChara2, (0, _toConsumableArray3.default)(_this3.setting.cache));
+            _this3.otherChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this3.setting.mask))))()];
+            (_otherChara2 = _this3.otherChara).cache.apply(_otherChara2, (0, _toConsumableArray3.default)(_this3.setting.cache));
           } else if (item.type === 1) {
             var _mainChara3, _otherChara3;
 
-            stage.setChildIndex(_this2.mainChara, stage.getNumChildren() - 1);
-            stage.setChildIndex(_this2.otherChara, stage.getNumChildren() + 1);
-            _this2.mainChara.filters = [];
-            (_mainChara3 = _this2.mainChara).cache.apply(_mainChara3, (0, _toConsumableArray3.default)(_this2.setting.cache));
-            _this2.otherChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this2.setting.mask))))()];
-            (_otherChara3 = _this2.otherChara).cache.apply(_otherChara3, (0, _toConsumableArray3.default)(_this2.setting.cache));
+            stage.setChildIndex(_this3.mainChara, stage.getNumChildren() - 1);
+            stage.setChildIndex(_this3.otherChara, stage.getNumChildren() + 1);
+            _this3.mainChara.filters = [];
+            (_mainChara3 = _this3.mainChara).cache.apply(_mainChara3, (0, _toConsumableArray3.default)(_this3.setting.cache));
+            _this3.otherChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this3.setting.mask))))()];
+            (_otherChara3 = _this3.otherChara).cache.apply(_otherChara3, (0, _toConsumableArray3.default)(_this3.setting.cache));
           } else if (item.type === 2) {
             var _mainChara4, _otherChara4;
 
-            stage.setChildIndex(_this2.mainChara, stage.getNumChildren() + 1);
-            stage.setChildIndex(_this2.otherChara, stage.getNumChildren() - 1);
-            _this2.mainChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this2.setting.mask))))()];
-            (_mainChara4 = _this2.mainChara).cache.apply(_mainChara4, (0, _toConsumableArray3.default)(_this2.setting.cache));
-            _this2.otherChara.filters = [];
-            (_otherChara4 = _this2.otherChara).cache.apply(_otherChara4, (0, _toConsumableArray3.default)(_this2.setting.cache));
+            stage.setChildIndex(_this3.mainChara, stage.getNumChildren() + 1);
+            stage.setChildIndex(_this3.otherChara, stage.getNumChildren() - 1);
+            _this3.mainChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this3.setting.mask))))()];
+            (_mainChara4 = _this3.mainChara).cache.apply(_mainChara4, (0, _toConsumableArray3.default)(_this3.setting.cache));
+            _this3.otherChara.filters = [];
+            (_otherChara4 = _this3.otherChara).cache.apply(_otherChara4, (0, _toConsumableArray3.default)(_this3.setting.cache));
           }
-          stage.setChildIndex(_this2.comment, stage.getNumChildren() - 1);
-          _this2.talk.name.text = item.name;
-          _this2.talk.text.text = (0, _util.wrapText)(_this2.talk.text, item.text);
+          stage.setChildIndex(_this3.comment, stage.getNumChildren() - 1);
+          _this3.talk.name.text = item.name;
+          _this3.talk.text.text = (0, _util.wrapText)(_this3.talk.text, item.text);
           stage.update();
-          _this2.talk.current++;
+          _this3.talk.current++;
         } else {
-          route.to(_this2.talkscript.next);
-          _this2.destroy();
+          route.to(_this3.talkscript.next);
+          _this3.destroy();
         }
       });
 
@@ -24064,10 +24112,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _promise = __webpack_require__(11);
-
-var _promise2 = _interopRequireDefault(_promise);
-
 var _keys = __webpack_require__(127);
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -24075,6 +24119,10 @@ var _keys2 = _interopRequireDefault(_keys);
 var _regenerator = __webpack_require__(15);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _promise = __webpack_require__(11);
+
+var _promise2 = _interopRequireDefault(_promise);
 
 var _asyncToGenerator2 = __webpack_require__(16);
 
@@ -24132,9 +24180,13 @@ var Party = function () {
                 queue.addEventListener('fileload', function (e) {
                   return _this.loaders[e.item.id] = e.result;
                 });
-                queue.addEventListener('complete', function () {
-                  return _this.init();
-                });
+                return _context.abrupt('return', new _promise2.default(function (resolve, reject) {
+                  queue.addEventListener('complete', function () {
+                    _this.init().then(function (res) {
+                      resolve(res);
+                    });
+                  });
+                }));
 
               case 7:
               case 'end':
@@ -24153,14 +24205,19 @@ var Party = function () {
   }, {
     key: 'init',
     value: function init() {
-      this.container = new createjs.Container();
-      this.header = this.setHeader();
-      var party = this.setParty();
-      var charaContainer = this.setMember();
+      var _this2 = this;
 
-      this.container.addChild(charaContainer, party);
-      stage.addChild(this.container, this.header);
-      stage.update();
+      return new _promise2.default(function (resolve, reject) {
+        _this2.container = new createjs.Container();
+        _this2.header = _this2.setHeader();
+        var party = _this2.setParty();
+        var charaContainer = _this2.setMember();
+
+        _this2.container.addChild(charaContainer, party);
+        stage.addChild(_this2.container, _this2.header);
+        stage.update();
+        resolve('party');
+      });
     }
   }, {
     key: 'createMemberManifest',
@@ -24185,7 +24242,7 @@ var Party = function () {
   }, {
     key: 'setParty',
     value: function setParty() {
-      var _this2 = this;
+      var _this3 = this;
 
       var container = new createjs.Container();
 
@@ -24194,7 +24251,7 @@ var Party = function () {
         return value.id;
       }).forEach(function (id) {
         var charactorContainer = new createjs.Container();
-        var charactor = new createjs.Bitmap(_this2.loaders['chara_' + id]);
+        var charactor = new createjs.Bitmap(_this3.loaders['chara_' + id]);
         charactor.scaleX = window.innerWidth / charactor.getBounds().width / 5;
         charactor.scaleY = window.innerWidth / charactor.getBounds().width / 5;
         charactor.x = i * charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / 5;
@@ -24202,21 +24259,21 @@ var Party = function () {
         charactor.charaID = id;
         charactorContainer.addChild(charactor);
         charactorContainer.addEventListener('click', function (e) {
-          if (_this2.selected.main.charaID !== e.target.charaID) {
+          if (_this3.selected.main.charaID !== e.target.charaID) {
 
-            if ((0, _keys2.default)(_this2.selected.main).length) {
-              _this2.selected.main.filters = [];
-              _this2.selected.main.cache(0, 0, 960, 960);
+            if ((0, _keys2.default)(_this3.selected.main).length) {
+              _this3.selected.main.filters = [];
+              _this3.selected.main.cache(0, 0, 960, 960);
             }
             e.target.filters = [new createjs.ColorFilter(0.4, 0.4, 0.4, 1, 60, 10, 10, 0)];
             e.target.cache(0, 0, 960, 960);
-            _this2.selected.main = e.target;
+            _this3.selected.main = e.target;
           } else {
-            _this2.selected.main = {};
+            _this3.selected.main = {};
             e.target.filters = [];
             e.target.cache(0, 0, 960, 960);
           }
-          _this2.changeParty();
+          _this3.changeParty();
           stage.update();
         });
         container.addChild(charactorContainer);
@@ -24228,12 +24285,12 @@ var Party = function () {
   }, {
     key: 'changeParty',
     value: function changeParty() {
-      var _this3 = this;
+      var _this4 = this;
 
       if ((0, _keys2.default)(this.selected.main).length && (0, _keys2.default)(this.selected.sub).length) {
         state.party = state.party.map(function (charactor) {
-          if (charactor.id == _this3.selected.main.charaID) {
-            charactor = _this3.selected.sub.parent.status;
+          if (charactor.id == _this4.selected.main.charaID) {
+            charactor = _this4.selected.sub.parent.status;
           }
           return charactor;
         });
@@ -24245,7 +24302,7 @@ var Party = function () {
   }, {
     key: 'setMember',
     value: function setMember() {
-      var _this4 = this;
+      var _this5 = this;
 
       var COLUMN_COUNT = 6;
       var container = new createjs.Container();
@@ -24257,7 +24314,7 @@ var Party = function () {
       this.members.forEach(function (id) {
         var charactorContainer = new createjs.Container();
         var historyCharactor = '';
-        var charactor = new createjs.Bitmap(_this4.loaders['chara_' + id]);
+        var charactor = new createjs.Bitmap(_this5.loaders['chara_' + id]);
         charactor.scaleX = window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
         charactor.scaleY = window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
         charactor.x = i * charactor.getBounds().width * window.innerWidth / charactor.getBounds().width / COLUMN_COUNT;
@@ -24275,21 +24332,21 @@ var Party = function () {
             return value.id;
           }).indexOf(e.target.charaID) !== -1) return;
 
-          if (_this4.selected.sub.charaID !== e.target.charaID) {
+          if (_this5.selected.sub.charaID !== e.target.charaID) {
 
-            if ((0, _keys2.default)(_this4.selected.sub).length) {
-              _this4.selected.sub.filters = [];
-              _this4.selected.sub.cache(0, 0, 960, 960);
+            if ((0, _keys2.default)(_this5.selected.sub).length) {
+              _this5.selected.sub.filters = [];
+              _this5.selected.sub.cache(0, 0, 960, 960);
             }
             e.target.filters = [new createjs.ColorFilter(0.4, 0.4, 0.4, 1, 10, 10, 60, 0)];
             e.target.cache(0, 0, 960, 960);
-            _this4.selected.sub = e.target;
+            _this5.selected.sub = e.target;
           } else {
-            _this4.selected.sub = {};
+            _this5.selected.sub = {};
             e.target.filters = [];
             e.target.cache(0, 0, 960, 960);
           }
-          _this4.changeParty();
+          _this5.changeParty();
           stage.update();
         });
 
@@ -24318,7 +24375,7 @@ var Party = function () {
   }, {
     key: 'setHeader',
     value: function setHeader() {
-      var _this5 = this;
+      var _this6 = this;
 
       var container = new createjs.Container();
       var header = new createjs.Bitmap(this.loaders['header']);
@@ -24328,7 +24385,7 @@ var Party = function () {
       header.y = 0;
       header.addEventListener('click', function (e) {
         route.to('home');
-        _this5.destroy();
+        _this6.destroy();
       });
 
       container.addChild(header);

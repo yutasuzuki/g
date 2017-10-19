@@ -21,18 +21,27 @@ class Party {
     queue.loadManifest(memberManifest, true, './assets/images/chara/icon/');
     queue.loadManifest(homeManifest, true, './assets/images/home//');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
-    queue.addEventListener('complete', () => this.init());
+    return new Promise((resolve, reject) => {
+      queue.addEventListener('complete', () => { 
+        this.init().then((res) => {
+          resolve(res);
+        })
+      });
+    });
   }
 
   init() {
-    this.container = new createjs.Container();
-    this.header = this.setHeader()
-    const party = this.setParty();
-    const charaContainer = this.setMember();
+    return new Promise((resolve, reject) => {
+      this.container = new createjs.Container();
+      this.header = this.setHeader()
+      const party = this.setParty();
+      const charaContainer = this.setMember();
 
-    this.container.addChild(charaContainer, party);
-    stage.addChild(this.container, this.header);
-    stage.update();
+      this.container.addChild(charaContainer, party);
+      stage.addChild(this.container, this.header);
+      stage.update();
+      resolve('party');
+    });
   }
 
   createMemberManifest() {

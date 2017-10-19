@@ -109,33 +109,42 @@ class Talk {
     queue.loadManifest(talkManifest, true, './assets/images/talk/');
     queue.loadManifest(charaManifest, true, './assets/images/chara/talk/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
-    queue.addEventListener('complete', () => this.init());
+    return new Promise((resolve, reject) => {
+      queue.addEventListener('complete', () => { 
+        this.init().then((res) => {
+          resolve(res);
+        })
+      });
+    });
   }
 
   init() {
-    this.mainChara = this.setMainCharactor('main_chara');
-    if (state.map.currentType === 2) {
-      this.background = this.setBackground('inn');
-      this.otherChara = this.setOtherCharactor('person');
-      this.talkscript = innTalk;
-    } else if (state.map.currentType === 3) {
-      this.background = this.setBackground('castle');
-      this.otherChara = this.setOtherCharactor('king');
-      this.talkscript = castleTalk;
-    }
-    this.comment = this.setCommentBox();
+    return new Promise((resolve, reject) => {
+      this.mainChara = this.setMainCharactor('main_chara');
+      if (state.map.currentType === 2) {
+        this.background = this.setBackground('inn');
+        this.otherChara = this.setOtherCharactor('person');
+        this.talkscript = innTalk;
+      } else if (state.map.currentType === 3) {
+        this.background = this.setBackground('castle');
+        this.otherChara = this.setOtherCharactor('king');
+        this.talkscript = castleTalk;
+      }
+      this.comment = this.setCommentBox();
 
-    this.mainChara.filters = [
-      new createjs.ColorFilter(...this.setting.mask)
-    ];
-    this.mainChara.cache(...this.setting.cache);
-    this.otherChara.filters = [
-      new createjs.ColorFilter(...this.setting.mask)
-    ];
-    this.otherChara.cache(...this.setting.cache);
+      this.mainChara.filters = [
+        new createjs.ColorFilter(...this.setting.mask)
+      ];
+      this.mainChara.cache(...this.setting.cache);
+      this.otherChara.filters = [
+        new createjs.ColorFilter(...this.setting.mask)
+      ];
+      this.otherChara.cache(...this.setting.cache);
 
-    stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
-    stage.update();
+      stage.addChild(this.background, this.otherChara, this.mainChara, this.comment);
+      stage.update();
+      resolve('talk');
+    });
   }
 
   setBackground(key) {
