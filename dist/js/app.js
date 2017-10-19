@@ -20173,23 +20173,46 @@ var Router = function () {
       }
     };
     var queue = new createjs.LoadQueue();
-    var fieldManifest = [{ src: 'loadingBG.png', id: 'loadingBG' }];
+    var fieldManifest = [{ src: 'loading-ghost.png', id: 'ghost' }];
     queue.loadManifest(fieldManifest, true, './assets/images/loading/');
     queue.addEventListener('fileload', function (e) {
       return _this.loaders[e.item.id] = e.result;
     });
     queue.addEventListener('complete', function () {
-      return _this.load();
+      return _this.start();
     });
   }
 
   (0, _createClass3.default)(Router, [{
+    key: 'start',
+    value: function start() {}
+  }, {
     key: 'load',
     value: function load() {
-      var shapes = [];
-      var width = window.innerWidth;
-      var height = window.innerHeight;
+      createjs.Ticker.timingMode = createjs.Ticker.RAF;
+      createjs.Ticker.addEventListener('tick', stage);
 
+      var data = {
+        images: ['./assets/images/loading/loading-ghost.png'],
+        frames: { width: 170, height: 170, regX: 0, regY: 0, scaleX: 0.5, scaleY: 0.5 },
+        animations: {
+          ghost: {
+            frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+          }
+        },
+        framerate: 30
+      };
+
+      var spritesheet = new createjs.SpriteSheet(data);
+      var sprite = new createjs.Sprite(spritesheet, 0);
+      sprite.scaleX = 0.5;
+      sprite.scaleY = 0.5;
+      sprite.x = 100;
+      sprite.y = 100;
+
+      // sprite.gotoAndPlay('ghost');
+
+      stage.addChild(sprite);
       stage.update();
 
       return new _promise2.default(function (resolve, reject) {});
@@ -20197,48 +20220,9 @@ var Router = function () {
   }, {
     key: 'to',
     value: function to(scene) {
-      var circleSetting = {
-        width: 10,
-        x: 40,
-        y: 40
-      };
-      var screenWidth = window.innerWidth;
-      var screenHeight = window.innerHeight;
-      // while (false) {
-      // setTimeout(() => {
-      //   var circle = new createjs.Shape();
-
-      //   circle.graphics.beginFill('DeepSkyBlue').drawCircle(0,0, circleSetting.width);
-      //   circle.x = circleSetting.x;
-      //   circle.y = circleSetting.y;
-      //   circle.alpha = 0;
-
-      //   stage.addChild(circle);
-      //   var filter = new createjs.ColorFilter(1, 1, 1, 1); 
-      //   circle.filters = [filter];
-      //   circle.cache(-20, -20, 40, 40);
-
-      //   createjs.Ticker.setFPS(60);
-      //   createjs.Ticker.addEventListener("tick", function(event){
-      //     circle.updateCache();
-      //     stage.update(event);
-      //   });
-
-      //   createjs.Tween.get(filter, { loop: false })
-      //     .to({}, 500)
-      //     .to({redMultiplier: 1, greenMultiplier: 1, blueMultiplier: 1, alphaMultiplier: 1, redOffset: 255, greenOffset: 255, blueOffset: 255, alphaOffset: 1 }, 500);
-
-      //   createjs.Tween.get(circle)
-      //     .to({alpha: 1}, 500)
-      //     .to({ scaleX: 40, scaleY: 40 }, 500);
-      // }, 500);
-      // }
-
+      this.load();
       var route = new this.config[scene].component();
-      route.start();
-
-      // setTimeout(() => {
-      // }, 1500);
+      // route.start();
     }
   }]);
   return Router;
