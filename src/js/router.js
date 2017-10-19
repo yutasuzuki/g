@@ -1,3 +1,4 @@
+import { delay } from './util';
 import home from './home/home';
 import battle from './battle/battle';
 import map from './map/map';
@@ -59,8 +60,8 @@ class Router {
       const loading = new createjs.Sprite(spritesheet, 0);
       loading.scaleX = 0.5;
       loading.scaleY = 0.5;
-      loading.x = 100;
-      loading.y = 100;
+      loading.x = window.innerWidth - 120;
+      loading.y = window.innerHeight - 120;
       loading.gotoAndPlay('ghost');
 
       this.container.addChild(bg, loading)
@@ -70,18 +71,18 @@ class Router {
     })
   }
 
-  to(scene) {
-    this.load().then((res) => {
-      const route = new this.config[scene].component();
-      return route.start();
-    }).then((res) => {
-      console.log(2, res)
-      stage.removeChild(this.container);
-      stage.update();
-    });
+  async to(scene) {
+    this.load();
+    await delay(750);
+    const route = new this.config[scene].component();
+    const que = await route.start();
+    console.log(que);
+    stage.removeChild(this.container);
+    stage.update();
   }
 }
 
 const router = new Router();
+
 
 export default router;
