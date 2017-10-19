@@ -1,10 +1,12 @@
 push:
 	git add --all && \
-	git commit -m "update" && \
+	git commit -m "update" --allow-empty && \
 	git push origin master
 
 deploy:
-	make push && \
+	git add --all && \
+	git commit -m "update" --allow-empty && \
+	git push origin master && \
 	git checkout gh-pages && \
 	git merge master && \
 	git add --all && \
