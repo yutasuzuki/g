@@ -40,7 +40,6 @@ class Battle {
         finish: false
       }
     }
-    console.log('battle!');
   }
 
   async start() {
