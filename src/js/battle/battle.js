@@ -394,9 +394,15 @@ class Battle {
     btnBack.addEventListener('click', () => {
       route.to('map');
       this.destroy();
-    })
+    });
 
-    result.addChild(bg, btnBack);
+    const totalGold = _.sumBy(this.state.enemy.charactors, 'G');
+    const gold = new createjs.Text(`獲得Gold  ${totalGold}G`, "26px Roboto", "white");
+    gold.x = window.innerWidth / 2 - 85;
+    gold.y = window.innerHeight / 2 - 85;
+    state.gold += totalGold;
+
+    result.addChild(bg, btnBack, gold);
     this.container.addChild(result);
     stage.addChild(this.container);
     stage.update();

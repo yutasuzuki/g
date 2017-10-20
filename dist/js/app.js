@@ -676,7 +676,7 @@ function random() {
 /**
  * @description
  * setTimeoutのラッパー
- * @param {number} time 処理を止めたい秒数
+ * @param {number} time 処理を止めたい時間（ms）
  */
 function delay(time) {
   return new _promise2.default(function (resolve, reject) {
@@ -19093,7 +19093,13 @@ var Battle = function () {
         _this8.destroy();
       });
 
-      result.addChild(bg, btnBack);
+      var totalGold = _lodash2.default.sumBy(this.state.enemy.charactors, 'G');
+      var gold = new createjs.Text('\u7372\u5F97Gold  ' + totalGold + 'G', "26px Roboto", "white");
+      gold.x = window.innerWidth / 2 - 85;
+      gold.y = window.innerHeight / 2 - 85;
+      state.gold += totalGold;
+
+      result.addChild(bg, btnBack, gold);
       this.container.addChild(result);
       stage.addChild(this.container);
       stage.update();
@@ -20020,6 +20026,7 @@ createjs.Touch.enable(stage);
 window.route = _router2.default;
 window.state = {
   party: MyParty,
+  gold: 0,
   map: {
     currentType: 3,
     piece: {
@@ -22085,7 +22092,11 @@ var Home = function () {
       header.x = 0;
       header.y = 0;
 
-      container.addChild(header);
+      var gold = new createjs.Text(state.gold + ' G', "12px Roboto", "white");
+      gold.x = window.innerWidth - 30;
+      gold.y = header.getBounds().height - 34;
+
+      container.addChild(header, gold);
       return container;
     }
   }, {

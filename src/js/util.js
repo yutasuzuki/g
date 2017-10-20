@@ -11,7 +11,7 @@ export function random(min = 0, max = 100) {
 /**
  * @description
  * setTimeoutのラッパー
- * @param {number} time 処理を止めたい秒数
+ * @param {number} time 処理を止めたい時間（ms）
  */
 export function delay(time) {
   return new Promise(function(resolve, reject){
