@@ -1,6 +1,25 @@
-// 幅を指定するランダム関数
+/**
+ * @description
+ * min - maxの間の数字を返す乱数
+ * @param {number} min 最小値
+ * @param {number} max 最大値
+ */
 export function random(min = 0, max = 100) {
   return Math.floor(Math.random() * (max + 1 - min)) + min;
+}
+
+/**
+ * @description
+ * setTimeoutのラッパー
+ * @param {number} time 処理を止めたい秒数
+ */
+export function delay(time) {
+  return new Promise(function(resolve, reject){
+      const que = setTimeout(function(){
+        clearTimeout(que); 
+        resolve(time)
+      }, time)
+  })
 }
 
 /**

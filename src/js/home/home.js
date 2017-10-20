@@ -21,10 +21,9 @@ class Home {
     queue.loadManifest(homeManifest, true, './assets/images/home/');
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     return new Promise((resolve, reject) => {
-      queue.addEventListener('complete', () => { 
-        this.init().then((res) => {
-          resolve(res);
-        })
+      queue.addEventListener('complete', async () => {
+        const res = await this.init();
+        resolve(res);
       });
     });
   }

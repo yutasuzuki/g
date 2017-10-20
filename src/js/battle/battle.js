@@ -40,7 +40,6 @@ class Battle {
         finish: false
       }
     }
-    console.log('battle!');
   }
 
   async start() {
@@ -77,10 +76,9 @@ class Battle {
     queue.loadManifest(magicManifest, true, './assets/images/battle/effect/magic/')
     queue.addEventListener('fileload', (e) => this.loaders[e.item.id] = e.result);
     return new Promise((resolve, reject) => {
-      queue.addEventListener('complete', () => { 
-        this.init().then((res) => {
-          resolve(res);
-        })
+      queue.addEventListener('complete', async () => {
+        const res = await this.init();
+        resolve(res);
       });
     });
   }
