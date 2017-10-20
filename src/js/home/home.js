@@ -96,7 +96,11 @@ class Home {
     header.x = 0;
     header.y = 0;
 
-    container.addChild(header);
+    const gold = new createjs.Text(`${state.gold} G`, "12px Roboto", "white");
+    gold.x = window.innerWidth - 30;
+    gold.y = header.getBounds().height - 34;
+
+    container.addChild(header, gold);
     return container;
   }
 
