@@ -26,7 +26,8 @@ class Map {
         x: state.map.piece.pos.x,
         y: state.map.piece.pos.y
       }]
-    }
+    };
+    this.notifications = {};
   }
 
   async start() {
@@ -260,6 +261,8 @@ class Map {
               stage.update();
             } else {
               isSquareEneble = true;
+              const notification = this.showNotification('そこは進めません');
+              stage.addChild(notification);
               console.log('そこは進めません');
             }
           });
@@ -274,6 +277,23 @@ class Map {
     squares.addChild(charactor);
 
     return squares;
+  }
+
+  showNotification(text) {
+    const commentBoxHeight = 24;
+    const container = new createjs.Container();
+
+    const bg = new createjs.Shape();
+    bg.graphics.beginFill('rgba(200, 0, 0, 1)');   
+    bg.graphics.rect(0,0, window.innerWidth, commentBoxHeight);
+    bg.alpha = 0;
+    
+    const name = new createjs.Text(text, '12px Roboto', '#fff');
+    name.x = 10;
+    name.y = 6;
+
+    container.addChild(bg, name);
+    return container;
   }
 
   isRedo(x, y) {

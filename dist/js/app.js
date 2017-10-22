@@ -23579,6 +23579,7 @@ var Map = function () {
         y: state.map.piece.pos.y
       }]
     };
+    this.notifications = {};
   }
 
   (0, _createClass3.default)(Map, [{
@@ -23878,6 +23879,8 @@ var Map = function () {
                 stage.update();
               } else {
                 isSquareEneble = true;
+                var notification = _this4.showNotification('そこは進めません');
+                stage.addChild(notification);
                 console.log('そこは進めません');
               }
             });
@@ -23892,6 +23895,24 @@ var Map = function () {
       squares.addChild(charactor);
 
       return squares;
+    }
+  }, {
+    key: 'showNotification',
+    value: function showNotification(text) {
+      var commentBoxHeight = 24;
+      var container = new createjs.Container();
+
+      var bg = new createjs.Shape();
+      bg.graphics.beginFill('rgba(200, 0, 0, 1)');
+      bg.graphics.rect(0, 0, window.innerWidth, commentBoxHeight);
+      bg.alpha = 0;
+
+      var name = new createjs.Text(text, '12px Roboto', '#fff');
+      name.x = 10;
+      name.y = 6;
+
+      container.addChild(bg, name);
+      return container;
     }
   }, {
     key: 'isRedo',
