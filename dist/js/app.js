@@ -23201,7 +23201,7 @@ var Attack = function () {
       this.attacker = attacker;
       this.defenser = defenser;
       this.defenser.rotate = 20;
-      this.defenser.offsetY = -10;
+      this.defenser.offsetY = 0;
       this.defenser.offsetX = 10;
 
       if (this.attacker.type === 'enemy') {
@@ -23809,26 +23809,51 @@ var Map = function () {
                 createjs.Tween.get(charactor).to({
                   x: obj.target.x,
                   y: obj.target.y
-                }, 400).call(function () {
-                  charactor.stop();
-                  isSquareEneble = true;
-                  if (!_this4.dice.count) {
-                    console.log(obj.target.type);
-                    state.map.currentType = obj.target.type;
-                    switch (obj.target.type) {
-                      case 1:
-                        route.to('battle');
-                        break;
-                      case 2:
-                        route.to('talk');
-                        break;
-                      case 3:
-                        route.to('talk');
-                        break;
+                }, 400).call((0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
+                  return _regenerator2.default.wrap(function _callee3$(_context3) {
+                    while (1) {
+                      switch (_context3.prev = _context3.next) {
+                        case 0:
+                          charactor.stop();
+                          isSquareEneble = true;
+
+                          if (_this4.dice.count) {
+                            _context3.next = 17;
+                            break;
+                          }
+
+                          console.log(obj.target.type);
+                          state.map.currentType = obj.target.type;
+                          _context3.next = 7;
+                          return (0, _util.delay)(1000);
+
+                        case 7:
+                          _context3.t0 = obj.target.type;
+                          _context3.next = _context3.t0 === 1 ? 10 : _context3.t0 === 2 ? 12 : _context3.t0 === 3 ? 14 : 16;
+                          break;
+
+                        case 10:
+                          route.to('battle');
+                          return _context3.abrupt('break', 16);
+
+                        case 12:
+                          route.to('talk');
+                          return _context3.abrupt('break', 16);
+
+                        case 14:
+                          route.to('talk');
+                          return _context3.abrupt('break', 16);
+
+                        case 16:
+                          _this4.destroy();
+
+                        case 17:
+                        case 'end':
+                          return _context3.stop();
+                      }
                     }
-                    _this4.destroy();
-                  }
-                });
+                  }, _callee3, _this4);
+                })));
 
                 if (_this4.walk.history.length !== 1) {
                   if (_this4.isRedo(obj.target.pos.x, obj.target.pos.y)) {
@@ -24187,8 +24212,8 @@ var Talk = function () {
           } else if (item.type === 1) {
             var _mainChara3, _otherChara3;
 
-            stage.setChildIndex(_this3.mainChara, stage.getNumChildren() - 1);
-            stage.setChildIndex(_this3.otherChara, stage.getNumChildren() + 1);
+            stage.setChildIndex(_this3.mainChara, -1);
+            stage.setChildIndex(_this3.otherChara, 1);
             _this3.mainChara.filters = [];
             (_mainChara3 = _this3.mainChara).cache.apply(_mainChara3, (0, _toConsumableArray3.default)(_this3.setting.cache));
             _this3.otherChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this3.setting.mask))))()];
@@ -24196,14 +24221,14 @@ var Talk = function () {
           } else if (item.type === 2) {
             var _mainChara4, _otherChara4;
 
-            stage.setChildIndex(_this3.mainChara, stage.getNumChildren() + 1);
-            stage.setChildIndex(_this3.otherChara, stage.getNumChildren() - 1);
+            stage.setChildIndex(_this3.mainChara, 1);
+            stage.setChildIndex(_this3.otherChara, -1);
             _this3.mainChara.filters = [new (Function.prototype.bind.apply(createjs.ColorFilter, [null].concat((0, _toConsumableArray3.default)(_this3.setting.mask))))()];
             (_mainChara4 = _this3.mainChara).cache.apply(_mainChara4, (0, _toConsumableArray3.default)(_this3.setting.cache));
             _this3.otherChara.filters = [];
             (_otherChara4 = _this3.otherChara).cache.apply(_otherChara4, (0, _toConsumableArray3.default)(_this3.setting.cache));
           }
-          stage.setChildIndex(_this3.comment, stage.getNumChildren() - 1);
+          stage.setChildIndex(_this3.comment, -1);
           _this3.talk.name.text = item.name;
           _this3.talk.text.text = (0, _util.wrapText)(_this3.talk.text, item.text);
           stage.update();

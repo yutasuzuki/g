@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { random } from '../util';
+import { random, delay } from '../util';
 
 const MapPosition = [
   [1, 1, 1, 1, 1, 1, 1, 1, 2],
@@ -215,12 +215,13 @@ class Map {
                   x: obj.target.x,
                   y: obj.target.y
                 }, 400)
-                .call(() => {
+                .call(async () => {
                   charactor.stop();
                   isSquareEneble = true;
                   if (!this.dice.count) {
                     console.log(obj.target.type);
                     state.map.currentType = obj.target.type;
+                    await delay(1000);
                     switch (obj.target.type) {
                       case 1:
                         route.to('battle');
