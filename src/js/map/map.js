@@ -261,9 +261,23 @@ class Map {
               stage.update();
             } else {
               isSquareEneble = true;
-              const notification = this.showNotification('そこは進めません');
+              const notification = this.setNotification('そこは進めません');
               stage.addChild(notification);
-              console.log('そこは進めません');
+              stage.update();
+              createjs.Tween.get(notification)
+                .to({
+                  alpha: 1
+                }, 250)
+                .to({
+                  alpha: 1
+                }, 250)
+                .to({
+                  alpha: 0
+                }, 250)
+                .call(() => {
+                  stage.removeChild(notification);
+                  stage.update();
+                });
             }
           });
         }
@@ -279,14 +293,14 @@ class Map {
     return squares;
   }
 
-  showNotification(text) {
+  setNotification(text) {
     const commentBoxHeight = 24;
     const container = new createjs.Container();
+    container.alpha = 0;
 
     const bg = new createjs.Shape();
     bg.graphics.beginFill('rgba(200, 0, 0, 1)');   
     bg.graphics.rect(0,0, window.innerWidth, commentBoxHeight);
-    bg.alpha = 0;
     
     const name = new createjs.Text(text, '12px Roboto', '#fff');
     name.x = 10;

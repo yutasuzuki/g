@@ -23879,9 +23879,19 @@ var Map = function () {
                 stage.update();
               } else {
                 isSquareEneble = true;
-                var notification = _this4.showNotification('そこは進めません');
+                var notification = _this4.setNotification('そこは進めません');
                 stage.addChild(notification);
-                console.log('そこは進めません');
+                stage.update();
+                createjs.Tween.get(notification).to({
+                  alpha: 1
+                }, 250).to({
+                  alpha: 1
+                }, 250).to({
+                  alpha: 0
+                }, 250).call(function () {
+                  stage.removeChild(notification);
+                  stage.update();
+                });
               }
             });
           }
@@ -23897,15 +23907,15 @@ var Map = function () {
       return squares;
     }
   }, {
-    key: 'showNotification',
-    value: function showNotification(text) {
+    key: 'setNotification',
+    value: function setNotification(text) {
       var commentBoxHeight = 24;
       var container = new createjs.Container();
+      container.alpha = 0;
 
       var bg = new createjs.Shape();
       bg.graphics.beginFill('rgba(200, 0, 0, 1)');
       bg.graphics.rect(0, 0, window.innerWidth, commentBoxHeight);
-      bg.alpha = 0;
 
       var name = new createjs.Text(text, '12px Roboto', '#fff');
       name.x = 10;
