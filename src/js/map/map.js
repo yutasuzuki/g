@@ -222,7 +222,7 @@ class Map {
                   if (!this.dice.count) {
                     console.log(obj.target.type);
                     state.map.currentType = obj.target.type;
-                    await delay(1000);
+                    await delay(500);
                     switch (obj.target.type) {
                       case 1:
                         route.to('battle');

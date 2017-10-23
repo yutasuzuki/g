@@ -23826,7 +23826,7 @@ var Map = function () {
                           console.log(obj.target.type);
                           state.map.currentType = obj.target.type;
                           _context3.next = 7;
-                          return (0, _util.delay)(1000);
+                          return (0, _util.delay)(500);
 
                         case 7:
                           _context3.t0 = obj.target.type;
