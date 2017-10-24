@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { random } from '../util';
+import { random, partyFullRecovery } from '../util';
 
 class Home {
   constructor(type) {
@@ -28,7 +28,7 @@ class Home {
     });
   }
 
-  init() {;
+  init() {
     return new Promise((resolve, reject) => {
       this.container = new createjs.Container();
       const bg = this.setBackground('bg');
@@ -39,6 +39,7 @@ class Home {
       this.container.y = - 100;
       stage.addChild(this.container, this.header, this.footer);
       stage.update();
+      partyFullRecovery();
       resolve('home');
     });
   }
@@ -72,6 +73,9 @@ class Home {
     btnQuest.x = 0;
     btnQuest.y = 10;
     btnQuest.addEventListener('click', () => {
+      // スタートする位置
+      state.map.piece.pos.x = 0;
+      state.map.piece.pos.y = 0;
       route.to('map');
       this.destroy()
     })

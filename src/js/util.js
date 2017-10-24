@@ -61,3 +61,12 @@ export function wrapText(textInstance, text) {
 export function getCeil(num, n = 0) {
   return Math.ceil(num * Math.pow(10, n)) / Math.pow(10, n);
 }
+
+/**
+ * メンバーのHPを完全回復させる
+ */
+export function partyFullRecovery() {
+  state.party.map((status) => {
+    status.HP = status.MAX_HP;
+  });
+}

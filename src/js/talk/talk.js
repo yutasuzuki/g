@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { random, wrapText } from '../util';
+import { random, wrapText, partyFullRecovery } from '../util';
 
 const castleTalk = {
   talk: [
@@ -124,6 +124,7 @@ class Talk {
         this.background = this.setBackground('inn');
         this.otherChara = this.setOtherCharactor('person');
         this.talkscript = innTalk;
+        partyFullRecovery();
       } else if (state.map.currentType === 3) {
         this.background = this.setBackground('castle');
         this.otherChara = this.setOtherCharactor('king');

@@ -658,6 +658,7 @@ exports.random = random;
 exports.delay = delay;
 exports.wrapText = wrapText;
 exports.getCeil = getCeil;
+exports.partyFullRecovery = partyFullRecovery;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -728,6 +729,15 @@ function getCeil(num) {
   var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
   return Math.ceil(num * Math.pow(10, n)) / Math.pow(10, n);
+}
+
+/**
+ * メンバーのHPを完全回復させる
+ */
+function partyFullRecovery() {
+  state.party.map(function (status) {
+    status.HP = status.MAX_HP;
+  });
 }
 
 /***/ }),
@@ -22071,7 +22081,6 @@ var Home = function () {
     value: function init() {
       var _this2 = this;
 
-      ;
       return new _promise2.default(function (resolve, reject) {
         _this2.container = new createjs.Container();
         var bg = _this2.setBackground('bg');
@@ -22082,6 +22091,7 @@ var Home = function () {
         _this2.container.y = -100;
         stage.addChild(_this2.container, _this2.header, _this2.footer);
         stage.update();
+        (0, _util.partyFullRecovery)();
         resolve('home');
       });
     }
@@ -22120,6 +22130,9 @@ var Home = function () {
       btnQuest.x = 0;
       btnQuest.y = 10;
       btnQuest.addEventListener('click', function () {
+        // スタートする位置
+        state.map.piece.pos.x = 0;
+        state.map.piece.pos.y = 0;
         route.to('map');
         _this3.destroy();
       });
@@ -24214,6 +24227,7 @@ var Talk = function () {
           _this2.background = _this2.setBackground('inn');
           _this2.otherChara = _this2.setOtherCharactor('person');
           _this2.talkscript = innTalk;
+          (0, _util.partyFullRecovery)();
         } else if (state.map.currentType === 3) {
           _this2.background = _this2.setBackground('castle');
           _this2.otherChara = _this2.setOtherCharactor('king');
