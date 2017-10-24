@@ -19334,7 +19334,7 @@ var Battle = function () {
         container.y = _constants2.default[type].pos[index].y + 20;
         chara.scaleX = 0.5;
         chara.scaleY = 0.5;
-        chara.alpha = 0 < charactor.HP ? 1 : 0;
+        container.alpha = 0 < charactor.HP ? 1 : 0;
         container.status = charactor;
         container.type = type;
         if (type === 'self') {
@@ -20091,7 +20091,7 @@ window.state = {
   }
 };
 
-route.to('battle');
+route.to('home');
 
 /***/ }),
 /* 61 */
@@ -23615,7 +23615,13 @@ var _util = __webpack_require__(14);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var MapPosition = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2], [1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1], [1, 0, 1, 0, 2, 1, 1, 0, 0, 0, 1, 0, 1], [1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1], [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1], [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0], [0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0], [1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0], [1, 0, 1, 0, 0, 1, 1, 1, 1, 3, 0, 0, 0], [2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
+/**
+ * 0: 通れない山
+ * 1: 平原
+ * 2: 宿屋
+ * 3: 城（ゴール）
+ */
+var FieldMap = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2], [1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1], [1, 0, 1, 0, 2, 1, 1, 0, 0, 0, 1, 0, 1], [1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1], [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1], [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0], [0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0], [1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0], [1, 0, 1, 0, 0, 1, 1, 1, 1, 3, 0, 0, 0], [2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
 
 var Map = function () {
   function Map() {
@@ -23835,9 +23841,9 @@ var Map = function () {
       var squares = new createjs.Container();
       var isSquareEneble = true;
 
-      var length = MapPosition.length;
+      var length = FieldMap.length;
       for (var i = 0; i < length; i++) {
-        var item = MapPosition[i];
+        var item = FieldMap[i];
         var len = item.length;
         for (var t = 0; t < len; t++) {
           var square = new createjs.Bitmap(this.loaders['square_' + item[t]]);

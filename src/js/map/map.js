@@ -1,7 +1,13 @@
 import _ from 'lodash';
 import { random, delay } from '../util';
 
-const MapPosition = [
+/**
+ * 0: 通れない山
+ * 1: 平原
+ * 2: 宿屋
+ * 3: 城（ゴール）
+ */
+const FieldMap = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2],
   [1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1],
   [1, 0, 1, 0, 2, 1, 1, 0, 0, 0, 1, 0, 1],
@@ -186,9 +192,9 @@ class Map {
     const squares = new createjs.Container();
     let isSquareEneble = true;
 
-    const length = MapPosition.length;
+    const length = FieldMap.length;
     for (let i = 0; i < length; i++) {
-      const item = MapPosition[i];
+      const item = FieldMap[i];
       const len = item.length;
       for (let t = 0; t < len; t++) {
         const square = new createjs.Bitmap(this.loaders[`square_${item[t]}`]);

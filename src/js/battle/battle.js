@@ -599,7 +599,7 @@ class Battle {
       container.y = constants[type].pos[index].y + 20;
       chara.scaleX = 0.5;
       chara.scaleY = 0.5;
-      chara.alpha = 0 < charactor.HP ? 1 : 0;
+      container.alpha = 0 < charactor.HP ? 1 : 0;
       container.status = charactor;
       container.type = type;
       if (type === 'self') {
