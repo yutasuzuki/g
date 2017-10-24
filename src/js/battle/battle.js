@@ -152,14 +152,14 @@ class Battle {
       if (this.state.order.current.type === 'self') {
         this.state.self.current = this.state.order.current;
         this.state.enemy.current = this.getRandomChara(this.orderedEnemyChara);
-        this.commands.attack.y = window.innerHeight - 200;
+        this.commands.attack.y = window.innerHeight - 160;
         this.commands.defense.y = window.innerHeight;
         this.setCurrentMark(this.state.self.current, this.state.enemy.current);
       } else {
         this.state.enemy.current = this.state.order.current;
         this.state.self.current = this.getRandomChara(this.orderedMyChara);
         this.commands.attack.y = window.innerHeight;
-        this.commands.defense.y = window.innerHeight - 200;
+        this.commands.defense.y = window.innerHeight - 160;
         this.setCurrentMark(this.state.enemy.current, this.state.self.current);
       }
     } else {
@@ -437,12 +437,12 @@ class Battle {
     magic.addEventListener('click', this.magicHandler.bind(this));
     const skill = new createjs.Bitmap(this.loaders['skill']);
     skill.x = 0;
-    skill.y = 100;
+    skill.y = 80;
     skill.scaleX = 0.5;
     skill.scaleY = 0.5;
     const skip = new createjs.Bitmap(this.loaders['skip']);
     skip.x = window.innerWidth / 2;
-    skip.y = 100;
+    skip.y = 80;
     skip.scaleX = 0.5;
     skip.scaleY = 0.5;
      
@@ -467,12 +467,12 @@ class Battle {
     magicDefense.addEventListener('click', this.magicDefenseHandler.bind(this));
     const counter = new createjs.Bitmap(this.loaders['counter']);
     counter.x = 0;
-    counter.y = 100;
+    counter.y = 80;
     counter.scaleX = 0.5;
     counter.scaleY = 0.5;
     const recovery = new createjs.Bitmap(this.loaders['recovery']);
     recovery.x = window.innerWidth / 2;
-    recovery.y = 100;
+    recovery.y = 80;
     recovery.scaleX = 0.5;
     recovery.scaleY = 0.5;
      

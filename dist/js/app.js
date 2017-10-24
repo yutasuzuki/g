@@ -18789,14 +18789,14 @@ var Battle = function () {
         if (this.state.order.current.type === 'self') {
           this.state.self.current = this.state.order.current;
           this.state.enemy.current = this.getRandomChara(this.orderedEnemyChara);
-          this.commands.attack.y = window.innerHeight - 200;
+          this.commands.attack.y = window.innerHeight - 160;
           this.commands.defense.y = window.innerHeight;
           this.setCurrentMark(this.state.self.current, this.state.enemy.current);
         } else {
           this.state.enemy.current = this.state.order.current;
           this.state.self.current = this.getRandomChara(this.orderedMyChara);
           this.commands.attack.y = window.innerHeight;
-          this.commands.defense.y = window.innerHeight - 200;
+          this.commands.defense.y = window.innerHeight - 160;
           this.setCurrentMark(this.state.enemy.current, this.state.self.current);
         }
       } else {
@@ -19141,12 +19141,12 @@ var Battle = function () {
       magic.addEventListener('click', this.magicHandler.bind(this));
       var skill = new createjs.Bitmap(this.loaders['skill']);
       skill.x = 0;
-      skill.y = 100;
+      skill.y = 80;
       skill.scaleX = 0.5;
       skill.scaleY = 0.5;
       var skip = new createjs.Bitmap(this.loaders['skip']);
       skip.x = window.innerWidth / 2;
-      skip.y = 100;
+      skip.y = 80;
       skip.scaleX = 0.5;
       skip.scaleY = 0.5;
 
@@ -19170,12 +19170,12 @@ var Battle = function () {
       magicDefense.addEventListener('click', this.magicDefenseHandler.bind(this));
       var counter = new createjs.Bitmap(this.loaders['counter']);
       counter.x = 0;
-      counter.y = 100;
+      counter.y = 80;
       counter.scaleX = 0.5;
       counter.scaleY = 0.5;
       var recovery = new createjs.Bitmap(this.loaders['recovery']);
       recovery.x = window.innerWidth / 2;
-      recovery.y = 100;
+      recovery.y = 80;
       recovery.scaleX = 0.5;
       recovery.scaleY = 0.5;
 
@@ -20038,7 +20038,7 @@ window.state = {
   map: {
     currentType: 3,
     piece: {
-      pos: { x: 1, y: 0 }
+      pos: { x: 0, y: 0 }
     },
     squares: {
       pos: { x: 0, y: 0 }
@@ -23587,7 +23587,6 @@ var Map = function () {
         y: state.map.piece.pos.y
       }]
     };
-    this.notifications = {};
   }
 
   (0, _createClass3.default)(Map, [{
@@ -23596,13 +23595,12 @@ var Map = function () {
       var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
         var _this = this;
 
-        var queue, fieldManifest, mapManifest, walkManifest;
+        var queue, mapManifest, walkManifest;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 queue = new createjs.LoadQueue();
-                fieldManifest = [{ src: 'forest1.jpg', id: 'field' }];
                 mapManifest = [{ src: 'btn_dice.png', id: 'btn_dice' }, { src: 'dice_bg.png', id: 'dice_bg' }, { src: 'square_0.png', id: 'square_0' }, { src: 'square_1.png', id: 'square_1' }, { src: 'square_2.png', id: 'square_2' }, { src: 'square_3.png', id: 'square_3' }];
                 walkManifest = [{ src: 'chara_8.png', id: 'walk' }];
 
@@ -23635,7 +23633,7 @@ var Map = function () {
                   })));
                 }));
 
-              case 8:
+              case 7:
               case 'end':
                 return _context2.stop();
             }

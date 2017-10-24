@@ -27,14 +27,10 @@ class Map {
         y: state.map.piece.pos.y
       }]
     };
-    this.notifications = {};
   }
 
   async start() {
     const queue = new createjs.LoadQueue();
-    const fieldManifest = [
-      {src: 'forest1.jpg', id: 'field'},
-    ];
     const mapManifest = [
       {src: 'btn_dice.png', id: 'btn_dice'},
       {src: 'dice_bg.png', id: 'dice_bg'},
