@@ -580,7 +580,7 @@ class Battle {
 
   createEnemiesID() {
     const len = random(1, 5);
-    let items = []
+    let items = [];
     for (let i = 0; i < len; i++) {
       items.push(random(1, 24));
     }
@@ -604,9 +604,18 @@ class Battle {
       }
       container.status = charactor;
       container.type = type;
+      if (type === 'self') {
+        container.addEventListener('click', (e) => {
+          this.showCharacorStatus();
+        });
+      }
       container.addChild(chara);
       return container;
     });
+  }
+
+  showCharacorStatus() {
+
   }
 
   destroy() {

@@ -19327,10 +19327,18 @@ var Battle = function () {
         };
         container.status = charactor;
         container.type = type;
+        if (type === 'self') {
+          container.addEventListener('click', function (e) {
+            _this9.showCharacorStatus();
+          });
+        }
         container.addChild(chara);
         return container;
       });
     }
+  }, {
+    key: 'showCharacorStatus',
+    value: function showCharacorStatus() {}
   }, {
     key: 'destroy',
     value: function destroy() {
@@ -20038,7 +20046,7 @@ window.state = {
   }
 };
 
-route.to('home');
+route.to('battle');
 
 /***/ }),
 /* 61 */

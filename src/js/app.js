@@ -117,4 +117,4 @@ window.state = {
   }
 };
 
-route.to('home');
+route.to('battle');
