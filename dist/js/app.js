@@ -657,6 +657,7 @@ var _promise2 = _interopRequireDefault(_promise);
 exports.random = random;
 exports.delay = delay;
 exports.wrapText = wrapText;
+exports.getCeil = getCeil;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -716,6 +717,17 @@ function wrapText(textInstance, text) {
   textInstance.text = lines.join('\n');
 
   return textInstance.text;
+}
+
+/**
+ * 小数点を指定して切り上げる関数
+ * @param {*} num ベースとなる数字
+ * @param {*} n 対象にしたい小数点の桁数
+ */
+function getCeil(num) {
+  var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+  return Math.ceil(num * Math.pow(10, n)) / Math.pow(10, n);
 }
 
 /***/ }),
@@ -18733,14 +18745,14 @@ var Battle = function () {
       return new _promise2.default(function (resolve, reject) {
         var _container;
 
+        createjs.Ticker.timingMode = createjs.Ticker.RAF;
+        createjs.Ticker.addEventListener('tick', stage);
         _this2.container = new createjs.Container();
         _this2.field = _this2.setField();
         _this2.commands = _this2.setCommands();
         _this2.myCharactors = _this2.setCharactors(_this2.state.self.charactors);
         _this2.enemyCharactors = _this2.setCharactors(_this2.state.enemy.charactors, 'enemy');
         _this2.Flow = new Flow(_this2.myCharactors, _this2.enemyCharactors);
-        createjs.Ticker.timingMode = createjs.Ticker.RAF;
-        createjs.Ticker.addEventListener('tick', stage);
         (_container = _this2.container).addChild.apply(_container, [_this2.field, _this2.commands.attack, _this2.commands.defense].concat((0, _toConsumableArray3.default)(_this2.myCharactors), (0, _toConsumableArray3.default)(_this2.enemyCharactors)));
         stage.addChild(_this2.container);
         stage.update();
@@ -19314,6 +19326,7 @@ var Battle = function () {
       return charactors.map(function (charactor, index) {
         var key = type === 'self' ? 'chara_' + charactor.id : 'enemy_' + charactor.id;
         var container = new createjs.Container();
+
         var chara = new createjs.Bitmap(_this9.loaders[key]);
         container.regX = chara.getBounds().width / 4;
         container.regY = chara.getBounds().height / 4;
@@ -19322,9 +19335,6 @@ var Battle = function () {
         chara.scaleX = 0.5;
         chara.scaleY = 0.5;
         chara.alpha = 0 < charactor.HP ? 1 : 0;
-        container.damage = function (point) {
-          container.status.HP -= point;
-        };
         container.status = charactor;
         container.type = type;
         if (type === 'self') {
@@ -19332,7 +19342,42 @@ var Battle = function () {
             _this9.showCharacorStatus();
           });
         }
-        container.addChild(chara);
+
+        var gauge = {
+          outer: {
+            w: 40
+          },
+          inner: {
+            w: 38
+          }
+        };
+
+        var hp = new createjs.Container();
+        hp.x += 20;
+
+        var HPbg = new createjs.Shape();
+        HPbg.graphics.beginStroke("#111");
+        HPbg.graphics.beginFill("#111");
+        HPbg.graphics.drawRect(3, 3, gauge.outer.w, 4);
+
+        var HPvalue = new createjs.Shape();
+        HPvalue.graphics.beginStroke("#0b7");
+        HPvalue.graphics.beginFill("#0b7");
+
+        var scaleHP = gauge.inner.w / container.status.MAX_HP * container.status.HP / gauge.inner.w;
+        HPvalue.graphics.drawRect(3, 3, gauge.inner.w, 2);
+        HPvalue.x = 1;
+        HPvalue.y = 1;
+        HPvalue.scaleX = scaleHP;
+        hp.addChild(HPbg, HPvalue);
+
+        container.damage = function (point) {
+          container.status.HP -= point;
+          var scaleHP = gauge.inner.w / container.status.MAX_HP * container.status.HP / gauge.inner.w;
+          HPvalue.scaleX = 0 < scaleHP ? scaleHP : 0;
+        };
+
+        container.addChild(chara, hp);
         return container;
       });
     }
@@ -20046,7 +20091,7 @@ window.state = {
   }
 };
 
-route.to('home');
+route.to('battle');
 
 /***/ }),
 /* 61 */
@@ -23570,7 +23615,7 @@ var _util = __webpack_require__(14);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var MapPosition = [[1, 1, 1, 1, 1, 1, 1, 1, 2], [1, 0, 1, 0, 0, 0, 1, 0, 1], [1, 0, 1, 0, 2, 1, 1, 0, 1], [1, 0, 1, 0, 1, 0, 1, 0, 1], [1, 0, 1, 1, 1, 0, 1, 1, 1], [1, 1, 1, 0, 0, 0, 0, 0, 1], [1, 0, 1, 0, 0, 3, 0, 0, 1], [1, 0, 1, 0, 0, 1, 1, 1, 1], [2, 1, 1, 1, 1, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]];
+var MapPosition = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2], [1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1], [1, 0, 1, 0, 2, 1, 1, 0, 0, 0, 1, 0, 1], [1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1], [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1], [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0], [0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0], [1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0], [1, 0, 1, 0, 0, 1, 1, 1, 1, 3, 0, 0, 0], [2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
 
 var Map = function () {
   function Map() {
@@ -23727,6 +23772,9 @@ var Map = function () {
         animations: {
           walk: {
             frames: [0, 1, 2]
+          },
+          stop: {
+            frames: [0]
           }
         },
         framerate: 15
@@ -23821,40 +23869,41 @@ var Map = function () {
                     while (1) {
                       switch (_context3.prev = _context3.next) {
                         case 0:
+                          charactor.gotoAndPlay('stop');
                           charactor.stop();
                           isSquareEneble = true;
 
                           if (_this4.dice.count) {
-                            _context3.next = 17;
+                            _context3.next = 18;
                             break;
                           }
 
                           console.log(obj.target.type);
                           state.map.currentType = obj.target.type;
-                          _context3.next = 7;
+                          _context3.next = 8;
                           return (0, _util.delay)(500);
 
-                        case 7:
+                        case 8:
                           _context3.t0 = obj.target.type;
-                          _context3.next = _context3.t0 === 1 ? 10 : _context3.t0 === 2 ? 12 : _context3.t0 === 3 ? 14 : 16;
+                          _context3.next = _context3.t0 === 1 ? 11 : _context3.t0 === 2 ? 13 : _context3.t0 === 3 ? 15 : 17;
                           break;
 
-                        case 10:
+                        case 11:
                           route.to('battle');
-                          return _context3.abrupt('break', 16);
+                          return _context3.abrupt('break', 17);
 
-                        case 12:
+                        case 13:
                           route.to('talk');
-                          return _context3.abrupt('break', 16);
+                          return _context3.abrupt('break', 17);
 
-                        case 14:
+                        case 15:
                           route.to('talk');
-                          return _context3.abrupt('break', 16);
-
-                        case 16:
-                          _this4.destroy();
+                          return _context3.abrupt('break', 17);
 
                         case 17:
+                          _this4.destroy();
+
+                        case 18:
                         case 'end':
                           return _context3.stop();
                       }

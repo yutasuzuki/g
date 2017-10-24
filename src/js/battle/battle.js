@@ -4,7 +4,7 @@ import constants from './constants';
 import Attack from './tween/attack';
 import Magic from './tween/magic';
 import Damage from './tween/damage';
-import { random } from '../util';
+import { random, getCeil } from '../util';
 
 const attack = new Attack();
 const magic = {};
@@ -103,14 +103,14 @@ class Battle {
 
   init() {
     return new Promise((resolve, reject) => {
+      createjs.Ticker.timingMode = createjs.Ticker.RAF;
+      createjs.Ticker.addEventListener('tick', stage);
       this.container = new createjs.Container();
       this.field = this.setField();
       this.commands = this.setCommands();
       this.myCharactors = this.setCharactors(this.state.self.charactors);
       this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
       this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
-      createjs.Ticker.timingMode = createjs.Ticker.RAF;
-      createjs.Ticker.addEventListener('tick', stage);
       this.container.addChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
       stage.addChild(this.container);
       stage.update();
@@ -591,6 +591,7 @@ class Battle {
     return charactors.map((charactor, index) => {
       const key = type === 'self' ? `chara_${charactor.id}` : `enemy_${charactor.id}`;
       const container = new createjs.Container();
+
       const chara = new createjs.Bitmap(this.loaders[key]);
       container.regX = chara.getBounds().width / 4;
       container.regY = chara.getBounds().height / 4;
@@ -599,9 +600,6 @@ class Battle {
       chara.scaleX = 0.5;
       chara.scaleY = 0.5;
       chara.alpha = 0 < charactor.HP ? 1 : 0;
-      container.damage = function(point) {
-        container.status.HP -= point;
-      }
       container.status = charactor;
       container.type = type;
       if (type === 'self') {
@@ -609,7 +607,42 @@ class Battle {
           this.showCharacorStatus();
         });
       }
-      container.addChild(chara);
+  
+      const gauge = {
+        outer: {
+          w: 40
+        },
+        inner: {
+          w: 38
+        }
+      };
+
+      const hp = new createjs.Container();
+      hp.x += 20;
+
+      var HPbg = new createjs.Shape();
+      HPbg.graphics.beginStroke("#111");
+      HPbg.graphics.beginFill("#111");
+      HPbg.graphics.drawRect(3, 3, gauge.outer.w, 4);
+  
+      const HPvalue = new createjs.Shape();
+      HPvalue.graphics.beginStroke("#0b7");
+      HPvalue.graphics.beginFill("#0b7");
+
+      const scaleHP = (gauge.inner.w / container.status.MAX_HP * container.status.HP) / gauge.inner.w;
+      HPvalue.graphics.drawRect(3, 3, gauge.inner.w, 2);
+      HPvalue.x = 1;
+      HPvalue.y = 1;
+      HPvalue.scaleX = scaleHP;
+      hp.addChild(HPbg, HPvalue)
+
+      container.damage = function(point) {
+        container.status.HP -= point;
+        const scaleHP = (gauge.inner.w / container.status.MAX_HP * container.status.HP) / gauge.inner.w;
+        HPvalue.scaleX = 0 < scaleHP ? scaleHP: 0;
+      };
+
+      container.addChild(chara, hp);
       return container;
     });
   }
