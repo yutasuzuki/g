@@ -20089,7 +20089,7 @@ createjs.Touch.enable(stage);
 window.route = _router2.default;
 window.state = {
   party: MyParty,
-  gold: 1000,
+  gold: 0,
   map: {
     currentType: 3,
     piece: {
@@ -22159,8 +22159,10 @@ var Home = function () {
       header.y = 0;
 
       var gold = new createjs.Text(state.gold + ' G', "12px Roboto", "white");
-      gold.textAlign = "center";
-      gold.x = window.innerWidth - 30;
+      gold.textAlign = "left";
+      console.log(gold.getBounds().width);
+      gold.regX = gold.getBounds().width;
+      gold.x = window.innerWidth - 10;
       gold.y = header.getBounds().height - 34;
 
       container.addChild(header, gold);
@@ -24261,7 +24263,7 @@ var castleTalk = {
     text: 'よく参られた！'
   }, {
     type: 1,
-    name: 'ルシェ',
+    name: 'chara_8',
     text: 'こんにちは'
   }, {
     type: 2,
@@ -24273,12 +24275,12 @@ var castleTalk = {
     text: '後ほど褒美を取らせよう！'
   }, {
     type: 1,
-    name: 'ルシェ',
+    name: 'chara_8',
     text: 'こちらの口座に振り込んでください'
   }, {
     type: 0,
     name: '',
-    text: 'ルシェはカバンから通帳を取り出した'
+    text: 'chara_8はカバンから通帳を取り出した'
   }],
   next: 'home'
 };
@@ -24286,7 +24288,7 @@ var castleTalk = {
 var innTalk = {
   talk: [{
     type: 1,
-    name: 'ルシェ',
+    name: 'chara_8',
     text: 'こんにちは'
   }, {
     type: 2,
@@ -24302,7 +24304,7 @@ var innTalk = {
     text: '（沈黙）'
   }, {
     type: 1,
-    name: 'ルシェ',
+    name: 'chara_8',
     text: '今日泊まりたいのだけれども・・・'
   }, {
     type: 2,
@@ -24310,7 +24312,7 @@ var innTalk = {
     text: 'お好きな部屋をお使いください！'
   }, {
     type: 1,
-    name: 'ルシェ',
+    name: 'chara_8',
     text: 'ありがとう'
   }],
   next: 'map'
@@ -24861,7 +24863,7 @@ function ayncGetChara(charactorsID) {
 
   return new _promise2.default(function (resolve, reject) {
     var charactors = charactorsID.map(function (value) {
-      return _axios2.default.get('./assets/data/enemy/' + value + '.json');
+      return _axios2.default.get('./assets/data/chara/' + value + '.json');
     });
     _promise2.default.all(charactors).then(function (charas) {
       var c = charas.map(function (chara) {

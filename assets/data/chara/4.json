@@ -1,17 +1,17 @@
 {
-  "id": 2,
-  "name": "enemy_2",
-  "MAX_HP": 12,
-  "HP": 12,
+  "id": 4,
+  "name": "enemy_4",
+  "MAX_HP": 45,
+  "HP": 45,
   "ATK": 18,
   "MGC": 20,
   "DF": 30,
-  "SP": 11,
-  "G": 120,
+  "SP": 14,
+  "G": 25,
   "choice": {
     "rate": {
       "ATK": 30,
-      "MGC": 20,
+      "MGC": 30,
       "SP": 1,
       "OTHER": 1
     }
