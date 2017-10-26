@@ -105,7 +105,7 @@ createjs.Touch.enable(stage);
 window.route = router;
 window.state = {
   party: MyParty,
-  gold: 0,
+  gold: 1000,
   map: {
     currentType: 3,
     piece: {
@@ -117,4 +117,4 @@ window.state = {
   }
 };
 
-route.to('battle');
+route.to('home');

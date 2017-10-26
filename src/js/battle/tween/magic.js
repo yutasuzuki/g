@@ -31,7 +31,6 @@ class Magic {
     }
     sprite.regX = 96 / 2;
     sprite.regY = 256 / 2;
-    console.log(sprite);
 
     return sprite;
   }

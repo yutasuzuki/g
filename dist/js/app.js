@@ -20089,7 +20089,7 @@ createjs.Touch.enable(stage);
 window.route = _router2.default;
 window.state = {
   party: MyParty,
-  gold: 0,
+  gold: 1000,
   map: {
     currentType: 3,
     piece: {
@@ -20101,7 +20101,7 @@ window.state = {
   }
 };
 
-route.to('battle');
+route.to('home');
 
 /***/ }),
 /* 61 */
@@ -22159,6 +22159,7 @@ var Home = function () {
       header.y = 0;
 
       var gold = new createjs.Text(state.gold + ' G', "12px Roboto", "white");
+      gold.textAlign = "center";
       gold.x = window.innerWidth - 30;
       gold.y = header.getBounds().height - 34;
 
@@ -23397,7 +23398,6 @@ var Magic = function () {
       }
       sprite.regX = 96 / 2;
       sprite.regY = 256 / 2;
-      console.log(sprite);
 
       return sprite;
     }

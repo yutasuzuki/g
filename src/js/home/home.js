@@ -101,6 +101,7 @@ class Home {
     header.y = 0;
 
     const gold = new createjs.Text(`${state.gold} G`, "12px Roboto", "white");
+    gold.textAlign = "center";
     gold.x = window.innerWidth - 30;
     gold.y = header.getBounds().height - 34;
 
