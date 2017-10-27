@@ -10,7 +10,7 @@ const castleTalk = {
     },
     {
       type: 1,
-      name: 'ルシェ',
+      name: 'chara_8',
       text: 'こんにちは'
     },
     {
@@ -25,13 +25,13 @@ const castleTalk = {
     },
     {
       type: 1,
-      name: 'ルシェ',
+      name: 'chara_8',
       text: 'こちらの口座に振り込んでください'
     },
     {
       type: 0,
       name: '',
-      text: 'ルシェはカバンから通帳を取り出した'
+      text: 'chara_8はカバンから通帳を取り出した'
     }
   ],
   next: 'home'
@@ -41,7 +41,7 @@ const innTalk = {
   talk: [ 
     {
       type: 1,
-      name: 'ルシェ',
+      name: 'chara_8',
       text: 'こんにちは'
     },
     {
@@ -61,7 +61,7 @@ const innTalk = {
     },
     {
       type: 1,
-      name: 'ルシェ',
+      name: 'chara_8',
       text: '今日泊まりたいのだけれども・・・'
     },
     {
@@ -71,7 +71,7 @@ const innTalk = {
     },
     {
       type: 1,
-      name: 'ルシェ',
+      name: 'chara_8',
       text: 'ありがとう'
     }
   ],

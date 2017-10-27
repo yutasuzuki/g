@@ -51,7 +51,8 @@
 ## 今後やる気があればやる事
 
 * すべてJavaScriptでアプリ化。
-  1. Server : Node.js + Express
-  2. App : React Native
+  1. Server: Node.js + Express
+  2. App: React Native
+  3. Web: CreatJS and more
 
 * docker, nginx, Node.js, MySQL, Redisの環境を作る。

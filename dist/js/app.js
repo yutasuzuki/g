@@ -22159,7 +22159,10 @@ var Home = function () {
       header.y = 0;
 
       var gold = new createjs.Text(state.gold + ' G', "12px Roboto", "white");
-      gold.x = window.innerWidth - 30;
+      gold.textAlign = "left";
+      console.log(gold.getBounds().width);
+      gold.regX = gold.getBounds().width;
+      gold.x = window.innerWidth - 10;
       gold.y = header.getBounds().height - 34;
 
       container.addChild(header, gold);
@@ -23374,19 +23377,31 @@ var Magic = function () {
   (0, _createClass3.default)(Magic, [{
     key: 'setMagicEffect',
     value: function setMagicEffect(type) {
-      var air = new createjs.Bitmap(this.magic);
-      air.skewX = air.width / 2;
-      air.skewY = air.height / 2;
-      air.scaleX = 0.5;
-      air.scaleY = 0.5;
-      air.x = -240;
-      air.y = 60;
+      var data = {
+        images: ['./assets/images/battle/effect/magic/air.png'],
+        frames: { width: 96, height: 256, regX: 0, regY: 0 },
+        animations: {
+          walk: {
+            frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+          },
+          stop: {
+            frames: [0]
+          }
+        },
+        framerate: 15
+      };
+
+      var spritesheet = new createjs.SpriteSheet(data);
+      var sprite = new createjs.Sprite(spritesheet, 0);
+      sprite.x = 48;
+      sprite.y = 128 + 40;
       if (type === 'self') {
-        air.x = -10;
-        air.y = 60;
+        sprite.x = window.innerWidth - 48;
       }
-      air.alpha = 0;
-      return air;
+      sprite.regX = 96 / 2;
+      sprite.regY = 256 / 2;
+
+      return sprite;
     }
   }, {
     key: 'tween',
@@ -23445,15 +23460,13 @@ var Magic = function () {
 
       return new _promise2.default(function (resolve, reject) {
         createjs.Tween.get(_this3.effect).to({
-          alpha: 0.15,
-          x: _this3.effect.x + 10
-        }, 200).to({
-          alpha: 0.25,
-          x: _this3.effect.x
-        }, 1000).to({
-          alpha: 0,
-          x: _this3.effect.x + 15
-        }, 200).call(function () {
+          scaleX: 1,
+          scaleY: 1
+        }, 500).to({}, 300).to({
+          scaleX: 1.25,
+          scaleY: 1.25,
+          alpha: 0
+        }, 300).call(function () {
           resolve();
         });
       });
@@ -23526,6 +23539,173 @@ var Magic = function () {
 }();
 
 exports.default = Magic;
+
+// class Magic {
+//   constructor(magic) {
+//     this.queue = new createjs.LoadQueue();
+//     this.attacker = {};
+//     this.defenser = {};
+//     this.effect = {};
+//     this.magic = magic;
+//   }
+
+//   setMagicEffect(type) {
+//     const air = new createjs.Bitmap(this.magic);
+//     air.skewX = air.width / 2;
+//     air.skewY = air.height / 2;
+//     air.scaleX = 0.5;
+//     air.scaleY = 0.5;
+//     air.x = -240;
+//     air.y = 60;
+//     if (type === 'self') {
+//       air.x = -10;
+//       air.y = 60;
+//     }
+//     air.alpha = 0;
+//     return air;
+//   }
+
+//   tween(attacker, defenser, complete = () => {}) {
+//     this.attacker = attacker;
+//     this.defenser = defenser;
+//     this.defenser.rotate = 20;
+//     this.defenser.offsetY = -10;
+//     this.defenser.offsetX = 10;
+
+//     if (this.attacker.type === 'enemy') {
+//       this.defenser.rotate = -20;
+//       this.defenser.offsetY = 0;
+//       this.defenser.offsetX = -10;
+//     }
+
+//     this.effect = this.setMagicEffect(attacker.type);
+//     stage.addChild(this.effect);
+//     stage.update();
+
+//     return new Promise((resolve, reject) => {
+//       Promise.all([this._start(), this._effect(), this._damage()]).then(() => {
+//         if (this.defenser.status.HP <= 0) {
+//           createjs.Tween.get(this.defenser)
+//             .to({
+//               alpha: 0
+//             }, 800);
+//         }
+//         resolve();
+//       });
+//     })
+//   }
+
+//   _start() {
+//     const x = this.attacker.x;
+//     return new Promise((resolve, reject) => {
+//       createjs.Tween.get(this.attacker)
+//         .to({
+//           x: this.attacker.x + 40
+//         }, 100)
+//         .to({
+//           x,
+//         }, 100)
+//         .call(() => {
+//           resolve();
+//         });
+//     })
+//   }
+
+//   _effect() {
+//     return new Promise((resolve, reject) => {
+//       createjs.Tween.get(this.effect)
+//         .to({
+//           alpha: 0.15,
+//           x: this.effect.x + 10
+//         }, 200)
+//         .to({
+//           alpha: 0.25,
+//           x: this.effect.x
+//         }, 1000)
+//         .to({
+//           alpha: 0,
+//           x: this.effect.x + 15
+//         }, 200)
+//         .call(() => {
+//           resolve();
+//         });
+//     })
+//   }
+
+//   _damage() {
+//     if (this.defenser.type) {
+
+//     }
+//     return new Promise((resolve, reject) => {
+//       createjs.Tween.get(this.defenser)
+//         .to({
+//           alpha: .5,
+//         }, 100)
+//         .to({
+//           y: this.defenser.y + this.defenser.offsetY,
+//           x: this.defenser.x + this.defenser.offsetX,
+//           rotation: this.defenser.rotate,
+//           alpha: .5
+//         }, 100)
+//         .to({
+//           alpha: .5
+//         }, 500)
+//         .to({
+//           alpha: .5
+//         }, 500)
+//         .to({
+//           alpha: 1,
+//         }, 300)
+//         .to({
+//           y: this.defenser.y,
+//           x: this.defenser.x,
+//           rotation: 0
+//         }, 100)
+//         .call(() => {
+//           stage.removeChild(this.effect);
+//           resolve();
+//         });
+//     })
+//   }
+
+//   reflect(attacker) {
+//     console.log('attacker : ', attacker.status.name);
+//     const reflect = new createjs.Bitmap(this.magic);
+//     reflect.skewX = reflect.width / 2;
+//     reflect.skewY = reflect.height / 2;
+//     reflect.scaleX = 0.2;
+//     reflect.scaleY = 0.2;
+//     reflect.x = attacker.x - 50;
+//     reflect.y = attacker.y - 50;
+//     if (attacker.type === 'enemy') {
+//       reflect.x = attacker.x - 50;
+//     }
+//     reflect.alpha = 0;
+
+//     stage.addChild(reflect);
+//     stage.update();
+
+//     return new Promise((resolve, reject) => {
+//       createjs.Tween.get(reflect)
+//       .to({
+//         alpha: 0.15,
+//       }, 200)
+//       .to({
+//         alpha: 0.75,
+//       }, 300)
+//       .to({
+//         alpha: 0,
+//       }, 200)
+//       .call(() => {
+//         stage.removeChild(reflect);
+//         stage.update();
+//         resolve();
+//       });
+//     });
+//   }
+// }
+
+// export default Magic
 
 /***/ }),
 /* 123 */
@@ -24083,7 +24263,7 @@ var castleTalk = {
     text: 'よく参られた！'
   }, {
     type: 1,
-    name: 'ルシェ',
+    name: 'chara_8',
     text: 'こんにちは'
   }, {
     type: 2,
@@ -24095,12 +24275,12 @@ var castleTalk = {
     text: '後ほど褒美を取らせよう！'
   }, {
     type: 1,
-    name: 'ルシェ',
+    name: 'chara_8',
     text: 'こちらの口座に振り込んでください'
   }, {
     type: 0,
     name: '',
-    text: 'ルシェはカバンから通帳を取り出した'
+    text: 'chara_8はカバンから通帳を取り出した'
   }],
   next: 'home'
 };
@@ -24108,7 +24288,7 @@ var castleTalk = {
 var innTalk = {
   talk: [{
     type: 1,
-    name: 'ルシェ',
+    name: 'chara_8',
     text: 'こんにちは'
   }, {
     type: 2,
@@ -24124,7 +24304,7 @@ var innTalk = {
     text: '（沈黙）'
   }, {
     type: 1,
-    name: 'ルシェ',
+    name: 'chara_8',
     text: '今日泊まりたいのだけれども・・・'
   }, {
     type: 2,
@@ -24132,7 +24312,7 @@ var innTalk = {
     text: 'お好きな部屋をお使いください！'
   }, {
     type: 1,
-    name: 'ルシェ',
+    name: 'chara_8',
     text: 'ありがとう'
   }],
   next: 'map'
@@ -24683,7 +24863,7 @@ function ayncGetChara(charactorsID) {
 
   return new _promise2.default(function (resolve, reject) {
     var charactors = charactorsID.map(function (value) {
-      return _axios2.default.get('./assets/data/enemy/' + value + '.json');
+      return _axios2.default.get('./assets/data/chara/' + value + '.json');
     });
     _promise2.default.all(charactors).then(function (charas) {
       var c = charas.map(function (chara) {
