@@ -1,8 +1,8 @@
 {
   "id": 10,
-  "name": "enemy_5",
-  "MAX_HP": 45,
-  "HP": 1,
+  "name": "enemy_10",
+  "MAX_HP": 10,
+  "HP": 10,
   "ATK": 18,
   "MGC": 15,
   "DF": 30,

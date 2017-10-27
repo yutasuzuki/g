@@ -1,12 +1,12 @@
 {
   "id": 16,
   "name": "enemy_16",
-  "MAX_HP": 50,
-  "HP": 1,
+  "MAX_HP": 17,
+  "HP": 17,
   "ATK": 20,
   "MGC": 14,
-  "DF": 20,
-  "SP": 12,
+  "DF": 15,
+  "SP": 20,
   "G": 105,
   "choice": {
     "rate": {
