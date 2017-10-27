@@ -1,6 +1,6 @@
 {
   "id": 3,
-  "name": "enemy_3",
+  "name": "chara_3",
   "MAX_HP": 45,
   "HP": 45,
   "ATK": 18,

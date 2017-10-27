@@ -1,11 +1,11 @@
 {
   "id": 24,
-  "name": "enemy_24",
-  "MAX_HP": 45,
+  "name": "chara_24",
+  "MAX_HP": 55,
   "HP": 1,
-  "ATK": 18,
+  "ATK": 24,
   "MGC": 20,
-  "DF": 30,
+  "DF": 32,
   "SP": 14,
   "G": 140,
   "choice": {
