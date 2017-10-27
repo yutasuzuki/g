@@ -1,11 +1,11 @@
 {
   "id": 8,
-  "name": "enemy_3",
-  "MAX_HP": 45,
-  "HP": 1,
-  "ATK": 18,
-  "MGC": 19,
-  "DF": 30,
+  "name": "enemy_8",
+  "MAX_HP": 16,
+  "HP": 16,
+  "ATK": 22,
+  "MGC": 25,
+  "DF": 10,
   "SP": 12,
   "G": 110,
   "choice": {

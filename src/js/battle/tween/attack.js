@@ -8,7 +8,7 @@ class Attack {
     this.attacker = attacker;
     this.defenser = defenser;
     this.defenser.rotate = 20;
-    this.defenser.offsetY = -10;
+    this.defenser.offsetY = 0;
     this.defenser.offsetX = 10;
 
     if (this.attacker.type === 'enemy') {

@@ -4,7 +4,7 @@ import constants from './constants';
 import Attack from './tween/attack';
 import Magic from './tween/magic';
 import Damage from './tween/damage';
-import { random } from '../util';
+import { random, getCeil } from '../util';
 
 const attack = new Attack();
 const magic = {};
@@ -103,14 +103,14 @@ class Battle {
 
   init() {
     return new Promise((resolve, reject) => {
+      createjs.Ticker.timingMode = createjs.Ticker.RAF;
+      createjs.Ticker.addEventListener('tick', stage);
       this.container = new createjs.Container();
       this.field = this.setField();
       this.commands = this.setCommands();
       this.myCharactors = this.setCharactors(this.state.self.charactors);
       this.enemyCharactors = this.setCharactors(this.state.enemy.charactors, 'enemy');
       this.Flow = new Flow(this.myCharactors, this.enemyCharactors);
-      createjs.Ticker.timingMode = createjs.Ticker.RAF;
-      createjs.Ticker.addEventListener('tick', stage);
       this.container.addChild(this.field, this.commands.attack, this.commands.defense, ...this.myCharactors, ...this.enemyCharactors);
       stage.addChild(this.container);
       stage.update();
@@ -152,14 +152,14 @@ class Battle {
       if (this.state.order.current.type === 'self') {
         this.state.self.current = this.state.order.current;
         this.state.enemy.current = this.getRandomChara(this.orderedEnemyChara);
-        this.commands.attack.y = window.innerHeight - 200;
+        this.commands.attack.y = window.innerHeight - 160;
         this.commands.defense.y = window.innerHeight;
         this.setCurrentMark(this.state.self.current, this.state.enemy.current);
       } else {
         this.state.enemy.current = this.state.order.current;
         this.state.self.current = this.getRandomChara(this.orderedMyChara);
         this.commands.attack.y = window.innerHeight;
-        this.commands.defense.y = window.innerHeight - 200;
+        this.commands.defense.y = window.innerHeight - 160;
         this.setCurrentMark(this.state.enemy.current, this.state.self.current);
       }
     } else {
@@ -437,12 +437,12 @@ class Battle {
     magic.addEventListener('click', this.magicHandler.bind(this));
     const skill = new createjs.Bitmap(this.loaders['skill']);
     skill.x = 0;
-    skill.y = 100;
+    skill.y = 80;
     skill.scaleX = 0.5;
     skill.scaleY = 0.5;
     const skip = new createjs.Bitmap(this.loaders['skip']);
     skip.x = window.innerWidth / 2;
-    skip.y = 100;
+    skip.y = 80;
     skip.scaleX = 0.5;
     skip.scaleY = 0.5;
      
@@ -467,12 +467,12 @@ class Battle {
     magicDefense.addEventListener('click', this.magicDefenseHandler.bind(this));
     const counter = new createjs.Bitmap(this.loaders['counter']);
     counter.x = 0;
-    counter.y = 100;
+    counter.y = 80;
     counter.scaleX = 0.5;
     counter.scaleY = 0.5;
     const recovery = new createjs.Bitmap(this.loaders['recovery']);
     recovery.x = window.innerWidth / 2;
-    recovery.y = 100;
+    recovery.y = 80;
     recovery.scaleX = 0.5;
     recovery.scaleY = 0.5;
      
@@ -580,7 +580,7 @@ class Battle {
 
   createEnemiesID() {
     const len = random(1, 5);
-    let items = []
+    let items = [];
     for (let i = 0; i < len; i++) {
       items.push(random(1, 24));
     }
@@ -591,6 +591,7 @@ class Battle {
     return charactors.map((charactor, index) => {
       const key = type === 'self' ? `chara_${charactor.id}` : `enemy_${charactor.id}`;
       const container = new createjs.Container();
+
       const chara = new createjs.Bitmap(this.loaders[key]);
       container.regX = chara.getBounds().width / 4;
       container.regY = chara.getBounds().height / 4;
@@ -598,15 +599,56 @@ class Battle {
       container.y = constants[type].pos[index].y + 20;
       chara.scaleX = 0.5;
       chara.scaleY = 0.5;
-      chara.alpha = 0 < charactor.HP ? 1 : 0;
-      container.damage = function(point) {
-        container.status.HP -= point;
-      }
+      container.alpha = 0 < charactor.HP ? 1 : 0;
       container.status = charactor;
       container.type = type;
-      container.addChild(chara);
+      if (type === 'self') {
+        container.addEventListener('click', (e) => {
+          this.showCharacorStatus();
+        });
+      }
+  
+      const gauge = {
+        outer: {
+          w: 40
+        },
+        inner: {
+          w: 38
+        }
+      };
+
+      const hp = new createjs.Container();
+      hp.x += 20;
+
+      var HPbg = new createjs.Shape();
+      HPbg.graphics.beginStroke("#111");
+      HPbg.graphics.beginFill("#111");
+      HPbg.graphics.drawRect(3, 3, gauge.outer.w, 4);
+  
+      const HPvalue = new createjs.Shape();
+      HPvalue.graphics.beginStroke("#0b7");
+      HPvalue.graphics.beginFill("#0b7");
+
+      const scaleHP = (gauge.inner.w / container.status.MAX_HP * container.status.HP) / gauge.inner.w;
+      HPvalue.graphics.drawRect(3, 3, gauge.inner.w, 2);
+      HPvalue.x = 1;
+      HPvalue.y = 1;
+      HPvalue.scaleX = scaleHP;
+      hp.addChild(HPbg, HPvalue)
+
+      container.damage = function(point) {
+        container.status.HP -= point;
+        const scaleHP = (gauge.inner.w / container.status.MAX_HP * container.status.HP) / gauge.inner.w;
+        HPvalue.scaleX = 0 < scaleHP ? scaleHP: 0;
+      };
+
+      container.addChild(chara, hp);
       return container;
     });
+  }
+
+  showCharacorStatus() {
+
   }
 
   destroy() {

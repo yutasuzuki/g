@@ -52,3 +52,21 @@ export function wrapText(textInstance, text) {
 
   return textInstance.text;
 }
+
+/**
+ * 小数点を指定して切り上げる関数
+ * @param {*} num ベースとなる数字
+ * @param {*} n 対象にしたい小数点の桁数
+ */
+export function getCeil(num, n = 0) {
+  return Math.ceil(num * Math.pow(10, n)) / Math.pow(10, n);
+}
+
+/**
+ * メンバーのHPを完全回復させる
+ */
+export function partyFullRecovery() {
+  state.party.map((status) => {
+    status.HP = status.MAX_HP;
+  });
+}

@@ -109,7 +109,7 @@ window.state = {
   map: {
     currentType: 3,
     piece: {
-      pos: { x: 1, y: 0 }
+      pos: { x: 0, y: 0 }
     },
     squares: {
       pos: { x: 0, y: 0 }

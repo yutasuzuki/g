@@ -213,7 +213,7 @@ function ayncGetChara(charactorsID) {
   
     return new Promise((resolve, reject) => {
       let charactors = charactorsID.map((value) => {
-        return axios.get(`./assets/data/enemy/${value}.json`);
+        return axios.get(`./assets/data/chara/${value}.json`);
       });
       Promise.all(charactors).then((charas) => {
         const c = charas.map(chara => chara.data);

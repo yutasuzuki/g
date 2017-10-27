@@ -1,17 +1,25 @@
 import _ from 'lodash';
-import { random } from '../util';
+import { random, delay } from '../util';
 
-const MapPosition = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 2],
-  [1, 0, 1, 0, 0, 0, 1, 0, 1],
-  [1, 0, 1, 0, 2, 1, 1, 0, 1],
-  [1, 0, 1, 0, 1, 0, 1, 0, 1],
-  [1, 0, 1, 1, 1, 0, 1, 1, 1],
-  [1, 1, 1, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 0, 0, 3, 0, 0, 1],
-  [1, 0, 1, 0, 0, 1, 1, 1, 1],
-  [2, 1, 1, 1, 1, 1, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0]
+/**
+ * 0: 通れない山
+ * 1: 平原
+ * 2: 宿屋
+ * 3: 城（ゴール）
+ */
+const FieldMap = [
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2],
+  [1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 1, 0, 2, 1, 1, 0, 0, 0, 1, 0, 1],
+  [1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1],
+  [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0],
+  [1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0],
+  [0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0],
+  [1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
+  [1, 0, 1, 0, 0, 1, 1, 1, 1, 3, 0, 0, 0],
+  [2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
 class Map {
@@ -26,14 +34,11 @@ class Map {
         x: state.map.piece.pos.x,
         y: state.map.piece.pos.y
       }]
-    }
+    };
   }
 
   async start() {
     const queue = new createjs.LoadQueue();
-    const fieldManifest = [
-      {src: 'forest1.jpg', id: 'field'},
-    ];
     const mapManifest = [
       {src: 'btn_dice.png', id: 'btn_dice'},
       {src: 'dice_bg.png', id: 'dice_bg'},
@@ -130,6 +135,9 @@ class Map {
       animations: {
         walk: {
           frames: [0, 1, 2],
+        },
+        stop: {
+          frames: [0],
         }
       },
       framerate: 15
@@ -184,9 +192,9 @@ class Map {
     const squares = new createjs.Container();
     let isSquareEneble = true;
 
-    const length = MapPosition.length;
+    const length = FieldMap.length;
     for (let i = 0; i < length; i++) {
-      const item = MapPosition[i];
+      const item = FieldMap[i];
       const len = item.length;
       for (let t = 0; t < len; t++) {
         const square = new createjs.Bitmap(this.loaders[`square_${item[t]}`]);
@@ -215,12 +223,14 @@ class Map {
                   x: obj.target.x,
                   y: obj.target.y
                 }, 400)
-                .call(() => {
+                .call(async () => {
+                  charactor.gotoAndPlay('stop');
                   charactor.stop();
                   isSquareEneble = true;
                   if (!this.dice.count) {
                     console.log(obj.target.type);
                     state.map.currentType = obj.target.type;
+                    await delay(500);
                     switch (obj.target.type) {
                       case 1:
                         route.to('battle');
@@ -259,7 +269,23 @@ class Map {
               stage.update();
             } else {
               isSquareEneble = true;
-              console.log('そこは進めません');
+              const notification = this.setNotification('そこは進めません');
+              stage.addChild(notification);
+              stage.update();
+              createjs.Tween.get(notification)
+                .to({
+                  alpha: 1
+                }, 250)
+                .to({
+                  alpha: 1
+                }, 250)
+                .to({
+                  alpha: 0
+                }, 250)
+                .call(() => {
+                  stage.removeChild(notification);
+                  stage.update();
+                });
             }
           });
         }
@@ -273,6 +299,23 @@ class Map {
     squares.addChild(charactor);
 
     return squares;
+  }
+
+  setNotification(text) {
+    const commentBoxHeight = 24;
+    const container = new createjs.Container();
+    container.alpha = 0;
+
+    const bg = new createjs.Shape();
+    bg.graphics.beginFill('rgba(200, 0, 0, 1)');   
+    bg.graphics.rect(0,0, window.innerWidth, commentBoxHeight);
+    
+    const name = new createjs.Text(text, '12px Roboto', '#fff');
+    name.x = 10;
+    name.y = 6;
+
+    container.addChild(bg, name);
+    return container;
   }
 
   isRedo(x, y) {

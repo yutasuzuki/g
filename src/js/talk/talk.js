@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { random, wrapText } from '../util';
+import { random, wrapText, partyFullRecovery } from '../util';
 
 const castleTalk = {
   talk: [
@@ -10,7 +10,7 @@ const castleTalk = {
     },
     {
       type: 1,
-      name: 'ルシェ',
+      name: 'chara_8',
       text: 'こんにちは'
     },
     {
@@ -25,13 +25,13 @@ const castleTalk = {
     },
     {
       type: 1,
-      name: 'ルシェ',
+      name: 'chara_8',
       text: 'こちらの口座に振り込んでください'
     },
     {
       type: 0,
       name: '',
-      text: 'ルシェはカバンから通帳を取り出した'
+      text: 'chara_8はカバンから通帳を取り出した'
     }
   ],
   next: 'home'
@@ -41,7 +41,7 @@ const innTalk = {
   talk: [ 
     {
       type: 1,
-      name: 'ルシェ',
+      name: 'chara_8',
       text: 'こんにちは'
     },
     {
@@ -61,7 +61,7 @@ const innTalk = {
     },
     {
       type: 1,
-      name: 'ルシェ',
+      name: 'chara_8',
       text: '今日泊まりたいのだけれども・・・'
     },
     {
@@ -71,7 +71,7 @@ const innTalk = {
     },
     {
       type: 1,
-      name: 'ルシェ',
+      name: 'chara_8',
       text: 'ありがとう'
     }
   ],
@@ -124,6 +124,7 @@ class Talk {
         this.background = this.setBackground('inn');
         this.otherChara = this.setOtherCharactor('person');
         this.talkscript = innTalk;
+        partyFullRecovery();
       } else if (state.map.currentType === 3) {
         this.background = this.setBackground('castle');
         this.otherChara = this.setOtherCharactor('king');
@@ -212,8 +213,8 @@ class Talk {
           ];
           this.otherChara.cache(...this.setting.cache);
         } else if (item.type === 1) {
-          stage.setChildIndex(this.mainChara, stage.getNumChildren() - 1);
-          stage.setChildIndex(this.otherChara, stage.getNumChildren() + 1);
+          stage.setChildIndex(this.mainChara, -1);
+          stage.setChildIndex(this.otherChara, 1);
           this.mainChara.filters = [];
           this.mainChara.cache(...this.setting.cache);
           this.otherChara.filters = [
@@ -221,8 +222,8 @@ class Talk {
           ];
           this.otherChara.cache(...this.setting.cache);
         } else if (item.type === 2) {
-          stage.setChildIndex(this.mainChara, stage.getNumChildren() + 1);
-          stage.setChildIndex(this.otherChara, stage.getNumChildren() - 1);
+          stage.setChildIndex(this.mainChara, 1);
+          stage.setChildIndex(this.otherChara, -1);
           this.mainChara.filters = [
             new createjs.ColorFilter(...this.setting.mask)
           ];
@@ -230,7 +231,7 @@ class Talk {
           this.otherChara.filters = [];
           this.otherChara.cache(...this.setting.cache);
         }
-        stage.setChildIndex(this.comment, stage.getNumChildren() - 1);
+        stage.setChildIndex(this.comment, -1);
         this.talk.name.text = item.name;
         this.talk.text.text = wrapText(this.talk.text, item.text);
         stage.update();
